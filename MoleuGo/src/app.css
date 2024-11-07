@@ -1,0 +1,39 @@
+:root {
+  font: 100% 'Montserrat', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000; 
+}
+
+main {
+  /* 특별한 경우가 아니면 화면은 항상 Header, Content, Footer로 분리 */
+  /* 이 양식이 아닌 페이지의 경우 해당 svelte 파일에서 main css 작성 */
+  display: grid;
+  height: 100vh; 
+  grid-template-rows: 80px 1fr 40px;
+}
+
+.header-container {
+  z-index: 1;
+  top: 0;
+}
+
+.footer-container {
+  z-index: 1;
+  bottom: 0;
+}
+
+.main-list-visible {
+  transform: translateX(210px); 
+  transition: transform 0.5s ease;
+}
+
+.main-list-invisible {
+  transform: translateX(0px);  
+  transition: transform 0.5s ease; 
+}
