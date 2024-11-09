@@ -14,6 +14,7 @@
     };
 </script>
 
+
 <main>
     <div id="popup-container" on:click={closeLoginPopup}>
         <div id="popup-content">
