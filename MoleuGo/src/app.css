@@ -15,7 +15,7 @@ main {
   /* 이 양식이 아닌 페이지의 경우 해당 svelte 파일에서 main css 작성 */
   display: grid;
   height: 100vh; 
-  grid-template-rows: 80px 1fr 40px;
+  grid-template-rows: 70px 1fr 40px;
 }
 
 .header-container {
