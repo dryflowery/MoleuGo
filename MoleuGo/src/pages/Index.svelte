@@ -1,6 +1,7 @@
 <script>
+    import { push } from "svelte-spa-router";
     import Footer from "../component/Footer.svelte";
-    import Header from "../component/Header.svelte";
+    import Header from "../component/revised_version/Header_2.svelte";
 </script>
   
 <main>
@@ -17,7 +18,7 @@
             <input type="text" placeholder="Search algorithms...">
     
             <div>
-                <button id="learn-more-btn">더 알아보기</button>
+                <button id="learn-more-btn" on:click={()=> push('/main')}> 더 알아보기</button>
                 <button id="search-start-btn">검색</button>
             </div>
         </div>
@@ -42,7 +43,7 @@
     }
 
     #main1-left-container {
-        padding: 250px 0px 0px 190px;
+        padding: 250px 0px 0px 120px;
     }
 
     #main-title {
