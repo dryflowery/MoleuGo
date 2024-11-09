@@ -12,7 +12,7 @@
     </div>
 
     <div class="main-container">
-        <div id="main1-left-container">
+        <div id="main-left-container">
             <div id="main-title">알고리즘의 시각화를 경험해보세요</div>
             <div id="sub-title">궁금한 알고리즘 검색하기</div>
             <input type="text" placeholder="Search algorithms...">
@@ -23,7 +23,7 @@
             </div>
         </div>
      
-        <div id="main1-right-container">
+        <div id="main-right-container">
              <div id="algo-gif-container">
                 <img src="assets/algoGif.gif" alt="visualized algorithm" id="algo-gif">
              </div>
@@ -57,7 +57,7 @@
         color: #dedede;
     }
 
-    #main1-left-container input[type="text"] {
+    #main-left-container input[type="text"] {
         padding: 10px;
         margin-top: 20px;
         border-radius: 5px;
@@ -69,7 +69,7 @@
         color: #FFFFFF;
     }
 
-    #main1-left-container button {
+    #main-left-container button {
         padding: 10px 20px;
         margin: 20px 10px 0px 0px;
         border-radius: 5px;
