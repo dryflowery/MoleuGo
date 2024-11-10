@@ -1,6 +1,6 @@
 <script>
     import AlgorithmList from "./AlgorithmList.svelte";
-    import LoginPopup from "../component/LoginPopup.svelte";
+    import LoginPopup from "./LoginPopup.svelte";
     import { push } from "svelte-spa-router";
     import {isListVisible, isLoginVisible} from "../lib/store";
     
@@ -49,14 +49,14 @@
 
 <style>
     main {
-        height: 79px;
+        height: 70px;
         display: flex;
         border-bottom: 1px solid #3d444d;
         background-color: #000000;
     }
 
     #menu-toggle-container {
-        padding: 15px 0px 0px 15px;
+        padding: 11px 0px 0px 15px;
     }
 
     #menu-circle {
@@ -75,7 +75,7 @@
 
     .algorithm-list {
         position: absolute;
-        top: 80px;
+        top: 71px;
         left: -401px; 
         width: 400px;
         height: calc(100vh - 120px);
@@ -88,12 +88,12 @@
     }
 
     #site-icon-container {
-        padding: 15px 0px 0px 25px;
+        padding: 14px 0px 0px 15px;
     }
 
     #site-icon {
-        width: 40px;
-        height: 40px;
+        width: 35px;
+        height: 35px;
         border-radius: 50%;
         border: 5px solid #3d444d;
         background-color: #8d8d8d;
@@ -101,12 +101,12 @@
     }
 
     #site-name-container {
-        padding: 25px 0px 0px 15px;
+        padding: 28px 0px 0px 10px;
     }
 
     #site-name {
         color: #FFFFFF;
-        font-size: 1.5rem;
+        font-size: 1rem;
         cursor: pointer;
         font-weight: bold;
     }
@@ -117,7 +117,7 @@
         border-radius: 10px;
         cursor: pointer;
         font-size: 1rem;
-        border: 2px solid #FFFFFF;
+        border: 1px solid #FFFFFF;
     }
 
     .sign-btn:hover {
@@ -127,7 +127,7 @@
     }
 
     #sign-in-container {
-        padding: 20px 0px 0px 1430px;
+        padding: 15px 0px 0px 1480px;
     }
 
     #sign-in-btn {
@@ -137,7 +137,7 @@
     }
 
     #sign-up-container {
-        padding: 20px 0px 0px 10px;
+        padding: 15px 0px 0px 10px;
     }
 
     #sign-up-btn {

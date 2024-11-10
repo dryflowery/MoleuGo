@@ -1,7 +1,7 @@
 <script>
     import { push } from "svelte-spa-router";
     import Footer from "../component/Footer.svelte";
-    import Header from "../component/revised_version/Header_2.svelte";
+    import Header from "../component/Header.svelte";
 </script>
   
 <main>

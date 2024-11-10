@@ -1,8 +1,8 @@
 <script>
-    import AlgorithmList from "./AlgorithmList_2.svelte";
-    import LoginPopup from "../LoginPopup.svelte";
+    import AlgorithmList from "./AlgorithmList_mainPage.svelte";
+    import LoginPopup from "./LoginPopup.svelte";
     import { push } from "svelte-spa-router";
-    import {isListVisible, isLoginVisible} from "../../lib/store";
+    import {isListVisible, isLoginVisible} from "../lib/store";
     
     const setAlgorithmListVisible = () => {
         $isListVisible = !$isListVisible;
@@ -127,7 +127,7 @@
     }
 
     #sign-in-container {
-        padding: 15px 0px 0px 1495px;
+        padding: 15px 0px 0px 1480px;
     }
 
     #sign-in-btn {
