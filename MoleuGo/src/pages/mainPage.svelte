@@ -1,13 +1,11 @@
 <script>
-  import Footer from "../component/Footer.svelte";
-  import HeaderMainPage from "../component/Header.svelte";
-  import { isListVisible } from "../lib/store";
-  import { isLogin } from "../lib/store";
-  import AlgorithmList from "../component/AlgorithmList.svelte";
-  import LoginPopup from "../component/LoginPopup.svelte";
-
-  let userName = 'combung2'; // 예시 -> 나중에 데베에서 끌고와야할것들
-
+    import Footer from "../component/Footer.svelte";
+    import Header from "../component/Header.svelte";
+    import {isListVisible } from "../lib/store"
+    import {isLogin } from "../lib/store"
+    import AuthPage from "../component/isAuthpage/authPage.svelte";
+    import NoAuthPage from "../component/isAuthpage/noAuthPage.svelte";
+    import AlgorithmList from "../component/AlgorithmList.svelte";
 </script>
 
 <main>

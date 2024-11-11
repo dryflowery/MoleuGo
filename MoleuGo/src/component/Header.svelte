@@ -42,7 +42,7 @@
     </div>
 
     <div id="sign-up-container">
-        <button id="sign-up-btn" class="sign-btn">회원가입</button>
+        <button id="sign-up-btn" class="sign-btn" on:click={() => push('/signup')}>회원가입</button>
     </div>
     <!-- 로그인, 비로그인 다르게 표시(백엔드) -->
 </main>
