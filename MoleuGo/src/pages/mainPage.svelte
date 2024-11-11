@@ -1,6 +1,6 @@
 <script>
   import Footer from "../component/Footer.svelte";
-  import HeaderMainPage from "../component/Header_mainPage.svelte";
+  import HeaderMainPage from "../component/Header.svelte";
   import { isListVisible } from "../lib/store";
   import { isLogin } from "../lib/store";
   import AlgorithmList from "../component/AlgorithmList.svelte";
@@ -98,7 +98,7 @@
   
 
   main {
-    height: 150vh;
+    height: 100vh;
 
   }
 
@@ -112,9 +112,9 @@
     display: grid;
     grid-column: 2;
     grid-template-columns: 115px 456px 456px 1fr auto;
-    grid-template-rows: 350px 480px;
+    grid-template-rows: 350px 462px;
     column-gap: 35px;
-    row-gap: 10px;
+    row-gap: 6px;
     margin-top: 25px;
   }
 
@@ -219,7 +219,7 @@
     flex-direction: column;
     position: absolute;
     width: 200px;
-    height: 785px;
+    height: 765px;
     background-color: #151b23;
     opacity: 0.8;
     align-items: center;
@@ -234,7 +234,7 @@
 
   #roadMap-box {
     width: 200px;
-    height: 786px;
+    height: 765px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
