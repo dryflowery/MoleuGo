@@ -1,7 +1,7 @@
 <!--메인페이지-->
 <script>
     import Footer from "../component/Footer.svelte";
-    import Header from "../component/revised_version/Header_2.svelte";
+    import Header from "../component/Header.svelte";
     import {isListVisible } from "../lib/store"
     import {isLogin } from "../lib/store"
     import AuthPage from "../component/isAuthpage/authPage.svelte";

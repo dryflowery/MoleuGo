@@ -1,7 +1,7 @@
 <script>
     import { push } from "svelte-spa-router";
     import Footer from "../component/Footer.svelte";
-    import Header from "../component/revised_version/Header_2.svelte";
+    import Header from "../component/Header.svelte";
 </script>
   
 <main>
@@ -42,7 +42,7 @@
         grid-template-columns: 1030px auto;
     }
 
-    #main1-left-container {
+    #main-left-container {
         padding: 250px 0px 0px 120px;
     }
 
