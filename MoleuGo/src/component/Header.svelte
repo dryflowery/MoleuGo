@@ -1,6 +1,6 @@
 <script>
     import AlgorithmList from "./AlgorithmList.svelte";
-    import LoginPopup from "../component/LoginPopup.svelte";
+    import LoginPopup from "./LoginPopup.svelte";
     import { push } from "svelte-spa-router";
     import {isListVisible, isLoginVisible} from "../lib/store";
     
@@ -127,7 +127,7 @@
     }
 
     #sign-in-container {
-        padding: 15px 0px 0px 1495px;
+        padding: 15px 0px 0px 1480px;
     }
 
     #sign-in-btn {
