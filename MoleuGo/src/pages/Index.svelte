@@ -1,4 +1,5 @@
 <script>
+    import { push } from "svelte-spa-router";
     import Footer from "../component/Footer.svelte";
     import Header from "../component/Header.svelte";
 </script>
@@ -11,18 +12,18 @@
     </div>
 
     <div class="main-container">
-        <div id="main1-left-container">
+        <div id="main-left-container">
             <div id="main-title">알고리즘의 시각화를 경험해보세요</div>
             <div id="sub-title">궁금한 알고리즘 검색하기</div>
             <input type="text" placeholder="Search algorithms...">
     
             <div>
-                <button id="learn-more-btn">더 알아보기</button>
+                <button id="learn-more-btn" on:click={()=> push('/main')}> 더 알아보기</button>
                 <button id="search-start-btn">검색</button>
             </div>
         </div>
      
-        <div id="main1-right-container">
+        <div id="main-right-container">
              <div id="algo-gif-container">
                 <img src="assets/algoGif.gif" alt="visualized algorithm" id="algo-gif">
              </div>
@@ -41,8 +42,8 @@
         grid-template-columns: 1030px auto;
     }
 
-    #main1-left-container {
-        padding: 250px 0px 0px 190px;
+    #main-left-container {
+        padding: 250px 0px 0px 120px;
     }
 
     #main-title {
@@ -56,7 +57,7 @@
         color: #dedede;
     }
 
-    #main1-left-container input[type="text"] {
+    #main-left-container input[type="text"] {
         padding: 10px;
         margin-top: 20px;
         border-radius: 5px;
@@ -68,7 +69,7 @@
         color: #FFFFFF;
     }
 
-    #main1-left-container button {
+    #main-left-container button {
         padding: 10px 20px;
         margin: 20px 10px 0px 0px;
         border-radius: 5px;

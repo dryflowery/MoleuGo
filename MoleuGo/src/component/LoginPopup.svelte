@@ -14,6 +14,7 @@
     };
 </script>
 
+
 <main>
     <div id="popup-container" on:click={closeLoginPopup}>
         <div id="popup-content">
@@ -28,7 +29,7 @@
             <button id="login-btn">로그인</button>
             
             <div id="link-container">
-                <a href="#">비밀번호 찾기</a> | <a href="#">회원가입</a>
+                <a href="#">비밀번호 찾기</a> | <a href="/#/signup">회원가입</a>
             </div>
             
             <div class="divider"></div>
