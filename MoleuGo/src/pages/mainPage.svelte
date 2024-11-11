@@ -3,14 +3,11 @@
     import Header from "../component/Header.svelte";
     import {isListVisible } from "../lib/store"
     import {isLogin } from "../lib/store"
-    import AuthPage from "../component/isAuthpage/authPage.svelte";
-    import NoAuthPage from "../component/isAuthpage/noAuthPage.svelte";
-    import AlgorithmList from "../component/AlgorithmList.svelte";
 </script>
 
 <main>
   <div class="header-container">
-    <HeaderMainPage />
+    <Header />
   </div>
 
   <div class="main-container" style="transform: translateX({$isListVisible ? 400 : 200}px); margin-right: {$isListVisible ? 400: 0}px; "> <!--알고리즘 리스트 유무에 따른 위치,크기 조절-->
