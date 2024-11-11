@@ -1,5 +1,5 @@
 <script>
-    import MainPage from "../pages/mainPage.svelte";
+    import MainPage from "../pages/MainPage.svelte";
 </script>
 
 <main>
