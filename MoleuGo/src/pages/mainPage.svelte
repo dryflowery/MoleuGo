@@ -4,6 +4,10 @@
   import { isListVisible } from "../lib/store";
   import { isLogin } from "../lib/store";
   import AlgorithmList from "../component/AlgorithmList.svelte";
+  import LoginPopup from "../component/LoginPopup.svelte";
+
+  let userName = 'combung2'; // 예시 -> 나중에 데베에서 끌고와야할것들
+
 </script>
 
 <main>
@@ -16,7 +20,22 @@
 
       <div id="dailyGoal"> <!--일일 목표 -->
         <t style="color: #a3a3a3; font-size: 25px; font-weight: bold; color: #4C905E">일일 목표</t>
-        <div id="dailyGoal-box" style="margin-top: 5px;"> 일일목표</div>
+        <div id="dailyGoal-box" style="margin-top: 5px;"> 
+
+          <!--비 로그인 시 생기는 잠금-->
+          {#if !$isLogin}
+            <div id="locked-box-daily">
+              <img src="assets/lock.png" style="height: 130px;">
+              <p>로그인 하고 컨텐츠 보기</p>
+            </div>
+          {/if}
+
+          <!--로그인 시 생기는 화면-->
+          <div id="dailyGoal-box-content" class="{ $isLogin ? ' ' : 'blurred' }"> 
+            안녕하세요 
+          </div>
+
+        </div>
       </div>
 
       <div id="recentAlgorithm"> <!--최근알고리즘 -->
@@ -31,12 +50,40 @@
 
       <div id="myProfile"> <!--마이페이지 -->
         <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;">마이페이지</t>
-        <div id="myProfile-box" style="margin-top: 5px;"> 마이페이지</div>
+        <div id="myProfile-box" style="margin-top: 5px;">
+
+          {#if !$isLogin}
+            <div id="locked-box-myProfile">
+              <img src="assets/lock.png" style="height: 130px;">
+              <p>로그인 하고 컨텐츠 보기</p>
+            </div>
+
+          {/if}
+
+          <div id="myProfile-box-content" class="{ $isLogin ? ' ' : 'blurred' }"> 
+            안녕하세요
+          </div>
+
+        </div>
       </div>
 
       <div id="roadMap"> <!--로드맵 -->
         <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;">로드맵</t>
-        <div id="roadMap-box" style="margin-top: 5px;"> 로드맵</div>
+        <div id="roadMap-box" style="margin-top: 5px;">
+
+          {#if !$isLogin}
+            <div id="locked-box-roadMap">
+              <img src="assets/lock.png" style="height: 130px;">
+              <p>로그인 하고 컨텐츠 보기</p>
+            </div>
+
+          {/if}
+
+          <div id="roadMap-box-content" class="{ $isLogin ? ' ' : 'blurred' }"> 
+            안녕하세요
+          </div>
+
+        </div>
       </div>
 
     </div>
@@ -58,17 +105,31 @@
   .main-container {
     color: white;
     transition: transform 0.5s ease, margin 0.5s ease;
+    justify-content: center;
   }
 
   .content {
     display: grid;
     grid-column: 2;
-    justify-content: center;
-    grid-template-columns: 120px 456px 456px 1fr auto;
+    grid-template-columns: 115px 456px 456px 1fr auto;
     grid-template-rows: 350px 480px;
     column-gap: 35px;
     row-gap: 10px;
     margin-top: 25px;
+  }
+
+
+  #locked-box-daily {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 425px;
+    height: 285px;
+    background-color: #15231c;
+    opacity: 0.8;
+    align-items: center;
+    justify-content: center;
+    
   }
 
   #dailyGoal {
@@ -77,11 +138,18 @@
   }
 
   #dailyGoal-box {
+    position : relative;
     width: 450px;
-    height: 300px;
+    height: 310px;
     background-color: #15231c;
     border: 3px solid #4a7744;
     border-radius: 8px;
+    box-sizing: border-box;
+    padding: 10px;
+  }
+
+  #dailyGoal-box-content {
+    
   }
 
   #recentAlgorithm {
@@ -90,8 +158,9 @@
   }
 
   #recentAlgorithm-box {
+    box-sizing: border-box;
     width: 450px;
-    height: 300px;
+    height: 310px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
@@ -101,13 +170,28 @@
     grid-column: 2;
     grid-row: 2;
   }
+  
 
   #community-box {
+    box-sizing: border-box;
     width: 450px;
     height: 425px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
+  }
+
+  #locked-box-myProfile {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 425px;
+    height: 400px;
+    background-color: #151b23;
+    opacity: 0.8;
+    align-items: center;
+    justify-content: center;
+    
   }
 
   #myProfile {
@@ -116,11 +200,31 @@
   }
 
   #myProfile-box {
+    position : relative;
+    box-sizing: border-box;
     width: 450px;
     height: 425px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
+    padding: 10px;
+  }
+
+  #myProfile-box-content {
+    
+  }
+
+  #locked-box-roadMap {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 200px;
+    height: 785px;
+    background-color: #151b23;
+    opacity: 0.8;
+    align-items: center;
+    justify-content: center;
+    
   }
 
   #roadMap:nth-child(5) {
@@ -134,6 +238,10 @@
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
+  }
+
+  .blurred {
+    filter: blur(4px);
   }
 
 </style>

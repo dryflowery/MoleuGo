@@ -122,7 +122,7 @@
 
     .sign-btn:hover {
         background-color: #1a1a1a;
-        border: 2px solid #cccccc;
+        border: 1px solid #cccccc;
         color: #cccccc;
     }
 
