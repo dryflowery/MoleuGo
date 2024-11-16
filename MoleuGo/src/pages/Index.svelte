@@ -19,7 +19,8 @@
     
             <div>
                 <button id="learn-more-btn" on:click={()=> push('/main')}> 더 알아보기</button>
-                <button id="search-start-btn">검색</button>
+                <!-- 임시로 추가. 나중에 삭제 -->
+                <button id="search-start-btn" on:click={()=> push('/visualization/BubbleSort')}>검색</button> 
             </div>
         </div>
      
@@ -43,7 +44,7 @@
     }
 
     #main-left-container {
-        padding: 250px 0px 0px 120px;
+        padding: 280px 0px 0px 120px;
     }
 
     #main-title {

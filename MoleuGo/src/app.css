@@ -1,5 +1,5 @@
 :root {
-  font: 100% 'Montserrat', sans-serif;
+  font: 100% 'Malgun Gothic', sans-serif;
 }
 
 body {
@@ -30,7 +30,7 @@ main {
 }
 
 .main-list-visible {
-  transform: translateX(210px); 
+  transform: translateX(220px); 
   transition: transform 0.5s ease;
 }
 
