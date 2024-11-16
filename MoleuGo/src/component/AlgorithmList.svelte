@@ -48,7 +48,7 @@
     }
 
     #algo-list-header-container {
-        padding: 20px 0px 0px 20px;
+        padding: 20px 0px 0px 15px;
         display: flex;
     }
 
