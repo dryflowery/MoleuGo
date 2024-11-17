@@ -1,16 +1,11 @@
 <script>
-    let isDifficultyAsc = true;
-    let isTypeAsc = true;
+    let isAlgoType = true;
 
-    const changeDiffSortType = () => {
-        isDifficultyAsc = !isDifficultyAsc;
-    }
-
-    const changeTypeSortType = () => {
-        isTypeAsc = !isTypeAsc;
+    const algoListType = () => {
+        isAlgoType = !isAlgoType;
     }
 </script>
-  
+
 <main>
     <div id="algo-list-header-container">
         <span id="algo-list-name">
@@ -18,16 +13,10 @@
         </span>
         
         <span id="algo-list-sort-btn">
-            {#if isDifficultyAsc}
-                <button id="difficulty-asc-sort-btn" on:click={changeDiffSortType}>난이도 ▴</button>
+            {#if isAlgoType}
+                 <button id="algo-search-btn" on:click={algoListType}>종류</button>
             {:else}
-                <button id="difficulty-dsc-sort-btn" on:click={changeDiffSortType}>난이도 ▾</button>
-            {/if}
-
-            {#if isTypeAsc}
-                <button id="type-sort-btn" on:click={changeTypeSortType}>종류 ▴</button>
-            {:else}
-                <button id="type-sort-btn" on:click={changeTypeSortType}>종류 ▾</button>
+                <button id="algo-search-btn" style="font-size: 0.9rem;" on:click={algoListType}>난이도</button>
             {/if}
         </span>
     </div>
@@ -36,8 +25,84 @@
         <input type="text" placeholder="Search algorithms...">
         <button id="algo-search-btn">검색</button>
     </div>
+
+
+    {#if isAlgoType}
+        <div id="algorithm-list">
+            <div>
+                <p class="algo-list-index-text">1. 선형 자료구조</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 연결리스트 <br>
+                    <input type="checkbox" /> 스택 <br>
+                    <input type="checkbox" /> 큐 <br>
+                    <input type="checkbox" /> 덱
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">2. 트리 자료구조</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 이진 탐색 트리 <br>
+                    <input type="checkbox" /> 힙 <br>
+                    <input type="checkbox" /> AVL트리 <br>
+                    <input type="checkbox" /> 레드-블랙 트리 <br>
+                    <input type="checkbox" /> 최소 신장 트리 <br>
+                    <input type="checkbox" /> 세그먼트 트리 <br>
+                    <input type="checkbox" /> 펜윅 트리 <br>
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">3. 탐색</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 이분 탐색
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">4. 재귀</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 하노이 탑 <br>
+                    <input type="checkbox" /> N-Queen
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">5. 정렬</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 버블 정렬 <br>
+                    <input type="checkbox" /> 선택 정렬 <br>
+                    <input type="checkbox" /> 삽입 정렬 <br>
+                    <input type="checkbox" /> 병합 정렬 <br>
+                    <input type="checkbox" /> 퀵 정렬 <br>
+                    <input type="checkbox" /> 기수 정렬 <br>
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">6. 그래프 탐색</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 깊이우선 탐색(DFS) <br>
+                    <input type="checkbox" /> 너비 우선 탐색(BFS) 
+                </div>
+            </div>
+
+
+        </div>
+    {:else}
+        <div id="algorithm-list" style="background-color: aquamarine;">
+            123
+        </div>
+    {/if}
+    
 </main>
-  
+
 <style>
     main {
         height: calc(100vh - 110px);
@@ -59,7 +124,7 @@
     }
 
     #algo-list-sort-btn {
-        padding-left: 83px;
+        padding-left: 161px;
     }
 
     #algo-list-sort-btn button {
@@ -110,4 +175,28 @@
     #algo-search-btn:hover {
         background-color: #1A6A2D;
     }
+
+    #algorithm-list {
+        margin-top: -650px;
+        height: 650px;
+        padding-left: 20px; 
+        border-radius: 5px;
+        color: #333;
+        font-size: 1rem;
+    }
+
+    .algo-list-index-text{
+        font-size: 0.8rem;
+        color: #FFFFFF;
+    }
+
+    .algo-list-text{
+        font-size: 0.8rem;
+        color: #FFFFFF;
+    }
+
+    p{
+        margin-bottom: 5px;
+    }
+
 </style>
