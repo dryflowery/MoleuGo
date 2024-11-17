@@ -38,3 +38,224 @@ main {
   transform: translateX(0px);  
   transition: transform 0.5s ease; 
 }
+
+/* visualization css */
+.visualization-list-visible {
+  transform: scale(0.8);
+  transform-origin: top right; 
+  transition: transform 0.5s ease; 
+}
+
+.visualization-list-invisible {
+  transform: scale(1.0);
+  transform-origin: top right;
+  transition: transform 0.5s ease; 
+}
+
+.algorithm-title-container {
+  color: #FFFFFF;
+  font-size: 1.25rem;
+  font-weight: bold;
+  padding: 10px 0px 0px 60px;
+}
+
+.theory-btn {
+  background-color: #509f50;
+  color: #FFFFFF;
+  font-weight: bold;
+  width: 100px;
+  height: 26px;
+  transform: translateY(-1px); 
+  border: none;
+}
+
+.theory-btn:hover {
+  background-color: #407f40;
+  cursor: pointer;
+}
+
+.canvas {
+  background-color: #FFFFFF;
+  height: 729px;
+  width: 1400px;
+  margin-left: 49.5px;
+  border: 5px solid #313131;
+  border-radius: 20px;
+}
+
+.animation-control-container {
+     
+}
+
+.explanation-container {
+  display: grid;
+  grid-template-rows: 40px 140px;
+  background-color: #509650;
+  height: 180px;
+  width: 380px;
+  margin: 20px 0px 0px 20px;
+  border-radius: 0 0 5px 5px; 
+}
+
+.explanation-title {
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 6px 0px 0px 10px;
+  border-bottom: 10px solid #0d0e0f; 
+}
+
+.explanation {
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 10px 0px 0px 10px;
+}
+
+.code-container {
+  display: grid;
+  grid-template-rows: 40px 569px;
+  background-color: #3b3f3b;
+  height: 609px;
+  width: 380px;
+  margin: 20px 0px 0px 20px;
+  border-radius: 0 0 5px 5px; 
+}
+
+.code-title {
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 6px 0px 0px 10px;
+  border-bottom: 10px solid #0d0e0f; 
+}
+
+.code {
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 10px 0px 0px 10px;
+}
+
+.navigation-container {
+  position: absolute;
+  z-index: 1000;
+}
+/* visualization css */
+
+/* navigation css */
+.navigation-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #161a23;
+  border-radius: 10px;
+}
+
+.navigation-menu { 
+  /* 9개 사각형 둘러싸고 있는 부분 */
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navigation-menu .navigation { 
+  /* 9개 사각형 부분 */
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.5s;
+}
+
+.navigation-menu .navigation span {
+   /* 각각의 사각형(비활성화): 가운데 사각형 제외 */
+  position: absolute;
+  width: 3.5px;
+  height: 3.5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  transform: translate(calc(10px * var(--x)), calc(10px * var(--y)));
+  transition: transform 0.5s, width 0.5s, height 0.5s;
+  transition-delay: calc(0.1s * var(--i));
+}
+
+.navigation-menu .navigation span ion-icon {
+  /* 각각의 사각형의 아이콘(비활성화): 가운데 사각형 제외 */
+  color: #FFFFFF;
+  font-size: 0.25rem;
+  transition: 0.5s;
+}
+
+.navigation-menu .navigation.active span ion-icon { 
+  /* 각각의 사각형의 아이콘(활성화): 가운데 사각형 제외 */
+  font-size: 1.75rem;
+}
+
+.navigation-menu .navigation.active span:hover ion-icon { 
+  /* 각각의 사각형의 아이콘에 커서 올렸을 때: 가운데 사각형 제외 */
+  color: #50C878;
+}
+
+.navigation-menu .navigation.active span { 
+  /* 각각의 사각형(활성화): 가운데 사각형 제외 */
+  width: 45px;
+  height: 45px;
+  background: #1f2536;
+  transform: translate(calc(60px * var(--x)), calc(60px * var(--y)));
+  border-radius: 5px;
+}
+
+.navigation-menu .center { 
+  /* 가운데 사각형(비활성화) */
+  position: absolute;
+  width: 3.5px;
+  height: 3.5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #FFFFFF;
+  transition: 0.5s;
+}
+
+.navigation-menu .navigation.active ~ .center {
+  /* 가운데 사각형(활성화) */
+  width: 40px; 
+  height: 40px;
+  pointer-events: initial;
+  background-color: transparent;
+  color: #FFFFFF;
+  border-radius: 5px;
+}
+
+.navigation-menu .navigation ~ .center ion-icon { 
+  /* 가운데 사각형의 아이콘(비활성화) */
+  color: #FFFFFF;
+  font-size: 2.5rem;
+  scale: 0;
+  transition: 0.5s;
+}
+
+.navigation-menu .navigation.active ~ .center ion-icon { 
+  /* 가운데 사각형의 아이콘(활성화) */
+  scale: 1;
+}  
+
+.navigation-menu .navigation.active ~ .center:hover ion-icon { 
+  /* 각각의 사각형의 아이콘에 커서 올렸을 때: 가운데 사각형 제외 */
+  color: #50C878;
+}
+
+.tooltip {
+  background-color: transparent;
+  color: #161a23;
+  position: absolute;
+  top: -90px;
+  font-size: 1.2rem;
+  font-weight: bolder;
+  white-space: nowrap; 
+}
+/* navigation css */
