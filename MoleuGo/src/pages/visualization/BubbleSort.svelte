@@ -173,7 +173,7 @@
         transition: left 0.5s ease, height 0.5s ease; 
     }
 
-    #main-right-container {
+    .main-right-container {
         display: grid;
         grid-template-rows: 200px 649px;
         background-color: #0d0e0f;
