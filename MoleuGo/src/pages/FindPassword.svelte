@@ -3,25 +3,24 @@
     
 		<div class="box">
 			<br>
-			<h2>MoleuGo</h2>
-			<br><br>
+			<h1>MoleuGo</h1>
 
 			<h2>비밀번호 찾기</h2>
-			<h3>가입한 이메일을 입력해 주세요</h3>
-			<h3>이메일을 통해 비밀번호 재설정 메일을 보내드립니다.</h3>	
+			<h3>가입한 이메일을 입력해 주세요. <br>
+				이메일을 통해 비밀번호 재설정 메일을 보내드립니다.</h3>
 			
 			<br><br><br>
 
 			<div class="container">
-				<div class="submit-text" style="left: 120px;">이메일</div> 
+				<div class="submit-text">이메일</div> 
 				<input type="email" class="input-box" placeholder="example@MoleuGo.com">
-				<button class="submit-button">인증</button>
+				<button class="submit-button" style="margin-left: 10px;">인증</button>
 			</div>
 			
 			<br>
 
 			<div class="container">
-				<button class="submit-button" style="width: 18vw;">비밀번호 재설정</button>
+				<button class="submit-button" style="width: 19.8vw;">비밀번호 재설정</button>
 			</div>
 
 		</div>
@@ -38,22 +37,21 @@
 	}
 
 	.box {
-		width: 30vw;  
-		height: 100%; 
-		background-color: #1b1a1a; 
+		width: 35vw;  
+		height: 98%; 
+		background-color: #101010;
 		border-radius: 20px; 
 		position: absolute;   
 		top: 50%;              
 		left: 50%;             
-		transform: translate(-50%, -50%);        
+		transform: translate(-50%, -50%);  
+		display: flex;         
 		flex-direction: column;  
-		justify-content: center;  
 		align-items: center;      
 		text-align: center;   
 	}
 
-	h2, h3 {
-		margin: 0.3vw;  
+	h1, h2{
 		padding: 0; 
 		color: #fff; 
 	}
@@ -65,7 +63,7 @@
 
 	.container {
 		display: flex; 
-		justify-content: center;
+		justify-content: flex-start;
 		align-items: center;
 		position: relative; 
 	}
@@ -79,25 +77,30 @@
 		top: -25px; 
 	}
 
-	.input-box {
-		padding: 5px;
-		font-size: 1.2rem;
-		width: 15vw;  
-		border: 2px solid #333;  
-		border-radius: 10px;
-		margin-right: 10px;
-		background-color: #333;  
-		color: #fff;  
+	.submit-button:hover {
+		background-color: #444; 
 	}
 
+	.input-box {
+        padding: 5px;
+        font-size: 1.2rem;
+        width: 15.5vw;
+        border: 2px solid #131b1a;
+        border-radius: 10px;
+        background-color: #131b1a;
+        color: #fff;
+        height: 30px; 
+    }
+
 	.submit-button {
-		padding: 5px 10px;
-		font-size: 1.1rem;
-		background-color: #00ac4d; 
-		color: #fff;  
-		border-radius: 10px;
-		cursor: pointer;
-		border: none;
-	}
+        font-size: 1.2rem; 
+        background-color: #086c42;
+        color: #fff;
+        border-radius: 10px;
+        cursor: pointer;
+        border: none;
+        height: 44px; 
+        padding: 0 10px; 
+    }
 
 </style>
