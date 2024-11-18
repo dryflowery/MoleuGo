@@ -97,7 +97,7 @@
 
   main {
     height: 100vh;
-
+    align-items: center;
   }
 
   .main-container {
@@ -176,7 +176,7 @@
   #community-box {
     box-sizing: border-box;
     width: 450px;
-    height: 410px;
+    height: 370px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
@@ -190,7 +190,7 @@
     flex-direction: column;
     position: absolute;
     width: 425px;
-    height: 390px;
+    height: 350px;
     background-color: #151b23;
     opacity: 0.8;
     align-items: center;
@@ -209,7 +209,7 @@
     position : relative;
     box-sizing: border-box;
     width: 450px;
-    height: 410px;
+    height: 370px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
@@ -226,7 +226,7 @@
     flex-direction: column;
     position: absolute;
     width: 170px;
-    height: 745px;
+    height: 705px;
     background-color: #151b23;
     opacity: 0.8;
     align-items: center;
@@ -244,7 +244,7 @@
   #roadMap-box {
     box-sizing: border-box;
     width: 200px;
-    height: 766px;
+    height: 726px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
