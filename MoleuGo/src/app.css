@@ -249,7 +249,7 @@ main {
   color: #50C878;
 }
 
-.tooltip {
+.navigation-tooltip {
   background-color: transparent;
   color: #161a23;
   position: absolute;
@@ -257,5 +257,33 @@ main {
   font-size: 1.2rem;
   font-weight: bolder;
   white-space: nowrap; 
+}
+
+.navigation-toggle {
+  display: flex;
+  position: absolute;
+  left: 100px;
+  top: -81.5px;
+  width: fit-content;
+  background-color: #161a23;
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 10px 10px;
+  border-radius: 5px;
+  gap: 10px;
+}
+
+.navigation-toggle input, button {
+  border-radius: 2.5px;
+  border: none;
+}
+
+.navigation-toggle button {
+  background-color: #FFFFFF;
+  cursor: pointer;
+}
+
+.navigation-toggle button:hover {
+  background-color: #CCCCCC;
 }
 /* navigation css */
