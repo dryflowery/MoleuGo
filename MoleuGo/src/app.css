@@ -3,7 +3,7 @@
 }
 
 body {
-  overflow-x: hidden; /*mainPage 에서 생기는 문제 때문 자세한건 릴리즈 노트 확인*/
+  
   margin: 0;
   padding: 0;
   width: 100vw;
