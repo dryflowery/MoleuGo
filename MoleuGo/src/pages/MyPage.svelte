@@ -50,6 +50,10 @@
 </main>
   
 <style>
+  
+  main {
+    align-items: center;
+  }
 
  .main-container {
    color: white;
