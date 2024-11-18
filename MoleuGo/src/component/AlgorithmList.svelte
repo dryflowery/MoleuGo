@@ -93,11 +93,101 @@
                 </div>
             </div>
 
+            <div>
+                <p class="algo-list-index-text">7. 최단 경로</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 다익스트라 <br>
+                    <input type="checkbox" /> 벨만-포드 <br>
+                    <input type="checkbox" /> 플로이드 워셜 <br>
+                </div>
+            </div>
 
+            <div>
+                <p class="algo-list-index-text">8. 그래프</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 최소 공통 조상(LCA) <br>
+                    <input type="checkbox" /> 강한 연결 요소(SCC) <br>
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">9. 기하</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 블록 껍질(Convex Hull) <br>
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">9. 기타</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 투 포인터 <br>
+                    <input type="checkbox" /> 위상 정렬 <br>
+                </div>
+            </div>
         </div>
     {:else}
-        <div id="algorithm-list" style="background-color: aquamarine;">
-            123
+        <div id="algorithm-list">
+            <div>
+                <p class="algo-list-index-text">1, 쉬움</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 연결리스트 <br>
+                    <input type="checkbox" /> 스택 <br>
+                    <input type="checkbox" /> 큐 <br>
+                    <input type="checkbox" /> 덱 <br>
+                    <input type="checkbox" /> 버블 정렬 <br>
+                    <input type="checkbox" /> 선택 정렬 <br>
+                    <input type="checkbox" /> 삽입 정렬
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">2. 보통</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 이분 탐색 <br>
+                    <input type="checkbox" /> 하노이 탑 <br>
+                    <input type="checkbox" /> N-Quuen <br>
+                    <input type="checkbox" /> 병합 정렬 <br>
+                    <input type="checkbox" /> 퀵 정렬 <br>
+                    <input type="checkbox" /> 깊이우선 탐색(DFS) <br>
+                    <input type="checkbox" /> 너비우선 탐색(BFS) <br>
+                    <input type="checkbox" /> 다익스트라 <br>
+                    <input type="checkbox" /> 플로이드 워셜 <br>
+                    <input type="checkbox" /> 투 포인터
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">3. 어려움</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 이진 탐색 트르 <br>
+                    <input type="checkbox" /> 힙 <br>
+                    <input type="checkbox" /> 최소 신장 트리 <br>
+                    <input type="checkbox" /> 위상 정렬 <br>
+                    <input type="checkbox" /> 강한 연결 요소(SCC) <br>
+                    <input type="checkbox" />  레드-블랙 트리 <br>
+                    <input type="checkbox" /> AVL트리 <br>
+                    <input type="checkbox" /> 벨만 포드 <br>
+                    <input type="checkbox" /> 기수 정렬 <br>
+                </div>
+            </div>
+
+            <div>
+                <p class="algo-list-index-text">4. 매우 어려움</p>
+                
+                <div class="algo-list-text">
+                    <input type="checkbox" /> 최소 공통 조상(LCA) <br>
+                    <input type="checkbox" /> 블록 껍질(Convex Hull) <br>
+                    <input type="checkbox" /> 세그먼트 트리 <br>
+                    <input type="checkbox" /> 펜윅 트리
+                </div>
+            </div>
         </div>
     {/if}
     
@@ -177,22 +267,24 @@
     }
 
     #algorithm-list {
-        margin-top: -650px;
-        height: 650px;
+        margin-top: -640px;
+        height: 680px;
         padding-left: 20px; 
         border-radius: 5px;
         color: #333;
         font-size: 1rem;
+        overflow-y: auto; /* 수직 스크롤 활성화 */
+        overflow-x: hidden; /* 수평 스크롤 숨기기 */
     }
 
     .algo-list-index-text{
-        font-size: 0.8rem;
+        font-size: 1.2rem;
         color: #FFFFFF;
     }
 
     .algo-list-text{
-        font-size: 0.8rem;
-        color: #FFFFFF;
+        font-size: 1rem;
+        color: #8a8888;
     }
 
     p{
