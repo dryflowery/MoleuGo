@@ -1,8 +1,12 @@
 <script>
-    import Footer from "../component/Footer.svelte";
-    import Header from "../component/Header.svelte";
-    import {isListVisible } from "../lib/store"
-    import {isLogin } from "../lib/store"
+  import Footer from "../component/Footer.svelte";
+  import Header from "../component/Header.svelte";
+  import {isListVisible } from "../lib/store"
+  import {isLogin } from "../lib/store"
+  import { push } from "svelte-spa-router";
+
+  let isActive = false;
+
 </script>
 
 <main>
@@ -36,16 +40,17 @@
 
       <div id="recentAlgorithm"> <!--최근알고리즘 -->
         <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;">최근 알고리즘</t>
-        <div id="recentAlgorithm-box" style="margin-top: 5px;"> 최근 알고리즘</div>
+        <div id="recentAlgorithm-box" style="margin-top: 5px;"> 최근 알고리즘
+        </div>
       </div>
 
       <div id="community"> <!--커뮤니티 -->
         <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;">커뮤니티</t>
-        <div id="community-box" style="margin-top: 5px;"> 커뮤니티 </div>
+        <div id="community-box" style="margin-top: 5px;">안녕하세요</div>
       </div>
 
       <div id="myProfile"> <!--마이페이지 -->
-        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;">마이페이지</t>
+        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;" on:click={()=> push('/main/myPage')}>마이페이지</t>
         <div id="myProfile-box" style="margin-top: 5px;">
 
           {#if !$isLogin}
@@ -54,7 +59,6 @@
               <img src="assets/lock.png" style="height: 130px;">
               <p>로그인 하고 컨텐츠 보기</p>
             </div>
-
           {/if}
 
           <div id="myProfile-box-content" class="{ $isLogin ? ' ' : 'blurred' }"> 
@@ -80,7 +84,6 @@
           <div id="roadMap-box-content" class="{ $isLogin ? ' ' : 'blurred' }"> 
             안녕하세요
           </div>
-
         </div>
       </div>
 
@@ -110,7 +113,7 @@
     display: grid;
     grid-column: 2;
     grid-template-columns: 115px 456px 456px 1fr auto;
-    grid-template-rows: 350px 462px;
+    grid-template-rows: 350px 1fr;
     column-gap: 35px;
     row-gap: 6px;
     margin-top: 25px;
@@ -176,11 +179,14 @@
   #community-box {
     box-sizing: border-box;
     width: 450px;
-    height: 425px;
+    height: 410px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
     padding: 10px;
+    display: grid;
+    grid-template-rows: 50px 335px;
+
   }
 
   #locked-box-myProfile {
@@ -188,7 +194,7 @@
     flex-direction: column;
     position: absolute;
     width: 425px;
-    height: 400px;
+    height: 390px;
     background-color: #151b23;
     opacity: 0.8;
     align-items: center;
@@ -207,7 +213,7 @@
     position : relative;
     box-sizing: border-box;
     width: 450px;
-    height: 425px;
+    height: 410px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
@@ -223,7 +229,7 @@
     flex-direction: column;
     position: absolute;
     width: 170px;
-    height: 755px;
+    height: 745px;
     background-color: #151b23;
     opacity: 0.8;
     align-items: center;
@@ -241,7 +247,7 @@
   #roadMap-box {
     box-sizing: border-box;
     width: 200px;
-    height: 782px;
+    height: 765px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
