@@ -4,9 +4,6 @@
   import {isListVisible } from "../lib/store"
   import {isLogin } from "../lib/store"
   import { push } from "svelte-spa-router";
-
-  let isActive = false;
-
 </script>
 
 <main>
@@ -14,7 +11,7 @@
     <Header />
   </div>
 
-  <div class="main-container" style="transform: translateX({$isListVisible ? 400 : 200}px); margin-right: {$isListVisible ? 400: 0}px; "> <!--알고리즘 리스트 유무에 따른 위치,크기 조절-->
+  <div class="main-container" style="transform: translateX({$isListVisible ? 400 : 200}px); margin-right: {$isListVisible ? 400: 200}px; "> <!--알고리즘 리스트 유무에 따른 위치,크기 조절-->
     <div class="content">
 
       <div id="dailyGoal"> <!--일일 목표 -->
@@ -186,7 +183,6 @@
     padding: 10px;
     display: grid;
     grid-template-rows: 50px 335px;
-
   }
 
   #locked-box-myProfile {
@@ -217,6 +213,7 @@
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
+    box-sizing: border-box;
     padding: 10px;
   }
 
@@ -247,10 +244,11 @@
   #roadMap-box {
     box-sizing: border-box;
     width: 200px;
-    height: 765px;
+    height: 766px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
+    box-sizing: border-box;
     padding: 10px;
   }
 
