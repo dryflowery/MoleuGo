@@ -49,20 +49,30 @@
         });
     };
 
-    const createRandomElements = (e) => {
-        let cnt = e.detail.cnt;
+    const createRandomElement = (e) => {
+        let elementCnt = e.detail.elementCnt;
         numArr = [];  
 
-        for (let i = 0; i < cnt; i++) {
+        for (let i = 0; i < elementCnt; i++) {
             numArr.push(Math.floor(Math.random() * 38) + 3);
         }
     };
 
+    const createInputtedElement = (e) => {
+        let tmpArr = e.detail.tmpArr;
+        numArr = tmpArr;
+    };
+
+    const startBubbleSort = (e) => {
+        
+    };
 </script>
 
 <main>
     <div class="navigation-container">
-        <Navigation on:createRandomElements={createRandomElements} />
+        <Navigation on:createRandomElement={createRandomElement} 
+        on:createInputtedElement={createInputtedElement} 
+        on:startBubbleSort={startBubbleSort}/>
     </div>
 
     <div class="header-container">
