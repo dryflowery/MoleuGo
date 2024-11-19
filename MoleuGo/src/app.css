@@ -112,8 +112,8 @@ main {
 
 .explanation {
   color: #FFFFFF;
-  font-weight: bold;
-  padding: 10px 0px 0px 10px;
+  font-size: 1.1rem;
+  padding: 6px 0px 0px 10px;
 }
 
 .code-container {
@@ -133,10 +133,16 @@ main {
   border-bottom: 10px solid #0d0e0f; 
 }
 
-.code {
+.code-area {
   color: #FFFFFF;
-  font-weight: bold;
-  padding: 10px 0px 0px 10px;
+  font-size: 1.1rem;
+  padding: 6px 0px 0px 0px;
+}
+
+.code-area .code {
+  padding-left: 10px;
+  height: 32.5px;
+  line-height: 32.5px; 
 }
 
 .navigation-container {
