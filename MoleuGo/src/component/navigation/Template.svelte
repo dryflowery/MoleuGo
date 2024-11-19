@@ -37,11 +37,24 @@
     const onDrag = (e) => {
         if (!isDragging) return;
 
-        const container = e.target.closest(".container");
-        if (container) {
-            navigationPos.top = `${e.clientY - offsetY}px`;
-            navigationPos.left = `${e.clientX - offsetX}px`;
-        }
+        requestAnimationFrame(() => {
+            const navWidth = 125; 
+            const navHeight = 125; 
+
+            const minX = 0;
+            const minY = 0;
+            const maxX = window.innerWidth - navWidth;
+            const maxY = window.innerHeight - navHeight;
+
+            let newLeft = e.clientX - offsetX;
+            let newTop = e.clientY - offsetY;
+
+            newLeft = Math.max(minX, Math.min(newLeft, maxX));
+            newTop = Math.max(minY, Math.min(newTop, maxY));
+
+            navigationPos.top = `${newTop}px`;
+            navigationPos.left = `${newLeft}px`;
+        });
     };
 
     const stopDrag = () => {
@@ -80,40 +93,49 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div class="menu"  on:contextmenu={toggleNavigation}>
             <div class="navigation" class:active={isActive}>
+                <!-- 0번 -->
                 <span style="--i:0; --x:-1; --y:-1">
     
                 </span>
 
+                <!-- 1번 -->
                 <span style="--i:1; --x:0; --y:-1">
            
                 </span>
 
+                <!-- 2번 -->
                 <span style="--i:2; --x:1; --y:-1">
 
                 </span>
 
+                <!-- 3번 -->
                 <span style="--i:3; --x:1; --y:0">
                  
                 </span>
 
+                <!-- 4번 (active시 잡고 이동하는 용도) -->
                 <span style="--i:4; --x:1; --y:1" id="drag">
-                    <!-- 잡고 이동하는 용도 -->
+
                     <ion-icon name="hand-left-outline"></ion-icon> 
                 </span>
 
+                <!-- 5번 -->
                 <span style="--i:5; --x:0; --y:1">
                   
                 </span>
 
+                <!-- 6번 -->
                 <span style="--i:6; --x:-1; --y:1">
               
                 </span>
                 
+                <!-- 7번 -->
                 <span style="--i:7; --x:-1; --y:0">
                    
                 </span>           
             </div>
             
+            <!-- 8번 (알고리즘 실행) -->
             <div class="center">
                 <ion-icon name="play-outline"></ion-icon>
             </div>

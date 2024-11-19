@@ -17,6 +17,9 @@
 
     <div class="main-container" class:visualization-list-visible={$isListVisible} class:visualization-list-invisible={!$isListVisible}>
         <div class="main-left-container">
+            <!-- main-left-container, main-right-container 나누는 수직선 -->
+            <div class="visualization-vertical-line"></div>
+            
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 버블 정렬(Bubble Sort) 
@@ -64,12 +67,12 @@
     .main-container {
         display: grid;
         grid-template-columns: 1500px auto;
+        align-items: center;
     }
 
     .main-left-container {
         display: grid;
-        grid-template-rows: 45px 1fr 65px;
-        border-right: 1px solid #414852;
+        grid-template-rows: 50px 1fr 60px;
     }
 
     .main-right-container {
