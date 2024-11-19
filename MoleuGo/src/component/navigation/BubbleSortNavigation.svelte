@@ -160,6 +160,8 @@
             return;
         }
 
+        toggle = Array(9).fill(false);
+        isActive = false;
         dispatch('startBubbleSort', {isAsc});
     }
 </script>
