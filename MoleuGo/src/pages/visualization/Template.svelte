@@ -3,7 +3,37 @@
     import Navigation from "../../component/navigation/BubbleSortNavigation.svelte"; // Navigation 경로 수정
     import {isListVisible} from "../../lib/store";
 
+    let isPaused = false;
     let explanation = ``;
+    let animationSpeed = 1;
+    let animationSteps = [];
+
+    const delay = (duration) => {
+        return new Promise((resolve) => { setTimeout(resolve, duration); });
+    };
+
+    // pause 체크
+    const waitPause = async () => {
+        return new Promise((resolve) => {
+            const checkPause = () => {
+                if (isPaused === false) {
+                    setTimeout(resolve, 0);
+                } 
+                else {
+                    setTimeout(() => {
+                        if (isPaused === true) {
+                            checkPause(); 
+                        } 
+                        else {
+                            resolve();
+                        }
+                    }, 50); 
+                }
+            };
+
+            checkPause();
+        });
+    };
 </script>
 
 <main>
@@ -17,6 +47,9 @@
 
     <div class="main-container" class:visualization-list-visible={$isListVisible} class:visualization-list-invisible={!$isListVisible}>
         <div class="main-left-container">
+            <!-- main-left-container, main-right-container 나누는 수직선 -->
+            <div class="visualization-vertical-line"></div>
+            
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 버블 정렬(Bubble Sort) 
@@ -34,20 +67,16 @@
 
         <div class="main-right-container">
             <div class="explanation-container">
-                <div class="explanation-title">
-                    단계별 알고리즘 설명
-                </div>
-
+                <div class="explanation-title">단계별 알고리즘 설명</div>
                 <div class="explanation">{@html explanation}</div>
             </div>
 
             <div class="code-container">
-                <div class="code-title">
-                    의사코드
-                </div>
+                <div class="code-title">의사코드</div>
 
-                <div class="code">
-
+                <div class="code-area">
+                    <!-- 코드의 class="code"로 설정 -->
+                     <!-- 들여쓰기는 padding-left:35px -->
                 </div>
             </div>
         </div>
@@ -59,17 +88,21 @@
         display: grid;
         height: 100vh;
         grid-template-rows: 70px 1fr;
+        user-select: none;
+        -ms-use-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
     }
 
     .main-container {
         display: grid;
         grid-template-columns: 1500px auto;
+        align-items: center;
     }
 
     .main-left-container {
         display: grid;
-        grid-template-rows: 45px 1fr 65px;
-        border-right: 1px solid #414852;
+        grid-template-rows: 50px 1fr 60px;
     }
 
     .main-right-container {

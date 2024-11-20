@@ -44,11 +44,24 @@
     const onDrag = (e) => {
         if (!isDragging) return;
 
-        const container = e.target.closest(".navigation-container");
-        if (container) {
-            navigationPos.top = `${e.clientY - offsetY}px`;
-            navigationPos.left = `${e.clientX - offsetX}px`;
-        }
+        requestAnimationFrame(() => {
+            const navWidth = 125; 
+            const navHeight = 125; 
+
+            const minX = 0;
+            const minY = 0;
+            const maxX = window.innerWidth - navWidth;
+            const maxY = window.innerHeight - navHeight;
+
+            let newLeft = e.clientX - offsetX;
+            let newTop = e.clientY - offsetY;
+
+            newLeft = Math.max(minX, Math.min(newLeft, maxX));
+            newTop = Math.max(minY, Math.min(newTop, maxY));
+
+            navigationPos.top = `${newTop}px`;
+            navigationPos.left = `${newLeft}px`;
+        });
     };
 
     const stopDrag = () => {
@@ -147,6 +160,8 @@
             return;
         }
 
+        toggle = Array(9).fill(false);
+        isActive = false;
         dispatch('startBubbleSort', {isAsc});
     }
 </script>
@@ -198,19 +213,20 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div class="navigation-menu"  on:contextmenu={toggleNavigation}>
             <div class="navigation" class:active={isActive}>
+                <!-- 0번 (원소 직접 생성) -->
                 <span style="--i:0; --x:-1; --y:-1">
                     <ion-icon name="duplicate-outline" on:click={() => changeToggle(0)} 
                     on:mouseenter={() => tooltip[0] = true} on:mouseleave={() => tooltip[0] = false}></ion-icon>
                 </span>
 
+                <!-- 1번 (원소 랜덤 생성) -->
                 <span style="--i:1; --x:0; --y:-1"> 
-                    <!-- 원소 개수 설정 후 랜덤 생성 -->
                     <ion-icon name="shuffle-outline" on:click={() => changeToggle(1)} 
                     on:mouseenter={() => tooltip[1] = true} on:mouseleave={() => tooltip[1] = false}></ion-icon>
                 </span>
 
+                <!-- 2번 (오름차순, 내림차순 변경) -->
                 <span style="--i:2; --x:1; --y:-1" on:click={switchAsc}>
-                    <!-- 오름차순, 내림차순 변경 -->
                     {#if isAsc}
                         <ion-icon name="arrow-down-outline"
                         on:mouseenter={() => tooltip[2] = true} on:mouseleave={() => tooltip[2] = false}></ion-icon>
@@ -220,28 +236,33 @@
                     {/if}
                 </span>
 
+                <!-- 3번 -->
                 <span style="--i:3; --x:1; --y:0">
                  
                 </span>
 
+                <!-- 4번 (active시 잡고 이동하는 용도) -->
                 <span style="--i:4; --x:1; --y:1" id="drag">
-                    <!-- 잡고 이동하는 용도 -->
                     <ion-icon name="hand-left-outline"></ion-icon> 
                 </span>
 
+                <!-- 5번 -->
                 <span style="--i:5; --x:0; --y:1">
                   
                 </span>
 
+                <!-- 6번 -->
                 <span style="--i:6; --x:-1; --y:1">
               
                 </span>
                 
+                <!-- 7번 -->
                 <span style="--i:7; --x:-1; --y:0">
                    
                 </span>           
             </div>
             
+            <!-- 8번 (알고리즘 실행) -->
             <div class="center">
                 <ion-icon name="play-outline" on:click={startBubbleSort}
                 on:mouseenter={() => tooltip[8] = true} on:mouseleave={() => tooltip[8] = false}></ion-icon>
