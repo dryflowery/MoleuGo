@@ -4,6 +4,7 @@
     import {isListVisible } from "../lib/store"
     import {isLogin } from "../lib/store"
     import { push } from "svelte-spa-router";
+    import Template from "./visualization/Template.svelte";
 
     let userName = "";
     let isLengthValid = false;
@@ -106,11 +107,11 @@
 
     // 닉네임 검증 함수
     function validateUserName(name) {
-        const lengthRegex = /^.{2,10}$/; // 2~10 글자
-        const specialCharRegex = /^[^\s!@#$%^&*(),.?":{}|<>]*$/; // 띄어쓰기 및 특수문자 제외
+      const lengthRegex = /^.{2,10}$/; // 2~10 글자
+      const specialCharRegex = /^[^\s!@#$%^&*(),.?":{}|<>]*$/; // 띄어쓰기 및 특수문자 제외
 
-        isLengthValid = lengthRegex.test(name);
-        isSpecialCharValid = specialCharRegex.test(name);
+      isLengthValid = lengthRegex.test(name);
+      isSpecialCharValid = specialCharRegex.test(name);
     }
 
     // 닉네임 저장 버튼 클릭 이벤트
@@ -216,7 +217,6 @@
                        <ion-icon name="checkmark-outline"></ion-icon> 
                        띄어쓰기를 포함한 특수문자 X
                   </div>
-
                   {#if showResult}
                     <div id="Requirements_3" 
                       class:success={saveMessage === "중복확인 닉네임 변경 완료"} 
@@ -225,7 +225,6 @@
                       {saveMessage}
                     </div>
                   {/if}
-
                 </div>
               </div>
             </div>
@@ -351,6 +350,10 @@
             <img id="log" src="assets/갤로그.png">
           </div>
 
+          <div id="moveRoadMap">
+            <ion-icon name="chevron-down-outline" size="large" ></ion-icon>
+          </div>
+
         </div ><!--오른쪽 컨테이너 끝-->
 
       </div> <!--content-box 끝-->
@@ -395,6 +398,10 @@
     margin-left: 38px;
     margin-top: 0px;
     position: absolute;
+  }
+
+  #moveRoadMap{
+    justify-content: center;
   }
 
 
@@ -499,7 +506,7 @@
   }
 
   #profile-edit-Btn:hover {
-    background-color: #1c682b;
+    background-color: #333333;
   }
 
   #change-userName {
@@ -576,7 +583,8 @@
       margin-right: 23px;
   }
 
-  .toggle-password-btn:hover {
+  .toggle-password-btn,   
+  .toggle-password-btn_2:hover {
     color: #424242; /* 버튼 호버 시 색상 변경 */
   }
 
@@ -633,7 +641,7 @@
   }
 
   #userName-edit-Btn:hover {
-    background-color: #1c682b;
+    background-color: #333333;
   }
 
   #verify-userName-container {
