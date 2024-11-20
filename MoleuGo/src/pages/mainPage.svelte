@@ -4,6 +4,13 @@
   import {isListVisible } from "../lib/store"
   import {isLogin } from "../lib/store"
   import { push } from "svelte-spa-router";
+
+
+  //임시로 사용하는 함수(로그인/비로그인)
+  const changeLogin = ()=> {
+    $isLogin = !$isLogin
+  }
+
 </script>
 
 <main>
@@ -15,7 +22,7 @@
     <div class="content">
 
       <div id="dailyGoal"> <!--일일 목표 -->
-        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold; color: #4C905E">일일 목표</t>
+        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold; color: #4C905E" on:click={changeLogin}> 일일 목표</t>
         <div id="dailyGoal-box" style="margin-top: 5px;"> 
 
           <!--비 로그인 시 생기는 잠금-->
@@ -47,17 +54,25 @@
       </div>
 
       <div id="myProfile"> <!--마이페이지 -->
-        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;" on:click={()=> push('/main/myPage')}>마이페이지</t>
-        <div id="myProfile-box" style="margin-top: 5px;">
+        
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
 
-          {#if !$isLogin}
-            <div id="locked-box-myProfile">
-              <!-- svelte-ignore a11y-missing-attribute -->
-              <img src="assets/lock.png" style="height: 130px;">
-              <p>로그인 하고 컨텐츠 보기</p>
-            </div>
+         <!-- 비 로그인시 마이페이지 이동 불가-->
+        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;" 
+           class="{isLogin ? '' : 'disabled'}" 
+           on:click={() => { if ($isLogin) push('/main/myPage') }}>
+
+           마이페이지 
+
+          {#if !$isLogin} <!--자물쇠 이미지 보이기 on/off-->
+          <!-- svelte-ignore a11y-missing-attribute -->
+          <img id='locked' src="assets/lock.png" style="height: 20px;">
           {/if}
 
+        </t>
+
+        <div id="myProfile-box" style="margin-top: 5px;">
           <div id="myProfile-box-content" class="{ $isLogin ? ' ' : 'blurred' }"> 
             안녕하세요
           </div>
@@ -66,18 +81,24 @@
       </div>
 
       <div id="roadMap"> <!--로드맵 -->
-        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;">로드맵</t>
-        <div id="roadMap-box" style="margin-top: 5px;">
 
-          {#if !$isLogin}
-            <div id="locked-box-roadMap">
-              <!-- svelte-ignore a11y-missing-attribute -->
-              <img src="assets/lock.png" style="height: 130px;">
-              <p>로그인 하고 컨텐츠 보기</p>
-            </div>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
 
+        <!-- 비 로그인시 로드맵 이동 불가-->
+        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;" 
+           class="{isLogin ? '' : 'disabled'}" 
+           on:click={() => { if ($isLogin) push('/main/myPage') }}>
+           
+           로드맵
+          
+          {#if !$isLogin} <!--자물쇠 이미지 보이기 on/off-->
+          <!-- svelte-ignore a11y-missing-attribute -->
+          <img id='locked' src="assets/lock.png" style="height: 20px;">
           {/if}
-
+          
+          </t>
+        <div id="roadMap-box" style="margin-top: 5px;">
           <div id="roadMap-box-content" class="{ $isLogin ? ' ' : 'blurred' }"> 
             안녕하세요
           </div>
@@ -97,7 +118,7 @@
 
   main {
     height: 100vh;
-
+    align-items: center;
   }
 
   .main-container {
@@ -113,7 +134,6 @@
     grid-template-rows: 350px 1fr;
     column-gap: 35px;
     row-gap: 6px;
-    margin-top: 25px;
   }
 
 
@@ -176,7 +196,7 @@
   #community-box {
     box-sizing: border-box;
     width: 450px;
-    height: 410px;
+    height: 370px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
@@ -190,7 +210,7 @@
     flex-direction: column;
     position: absolute;
     width: 425px;
-    height: 390px;
+    height: 352px;
     background-color: #151b23;
     opacity: 0.8;
     align-items: center;
@@ -209,7 +229,7 @@
     position : relative;
     box-sizing: border-box;
     width: 450px;
-    height: 410px;
+    height: 372px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
@@ -221,20 +241,6 @@
     
   }
 
-  #locked-box-roadMap {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    width: 170px;
-    height: 745px;
-    background-color: #151b23;
-    opacity: 0.8;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none; /* 마우스 이벤트 무시 */
-    user-select: none;    /* 선택 불가 */
-    
-  }
 
   #roadMap:nth-child(5) {
     grid-column: 4 / 5;
@@ -244,7 +250,7 @@
   #roadMap-box {
     box-sizing: border-box;
     width: 200px;
-    height: 766px;
+    height: 728px;
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;
@@ -256,6 +262,17 @@
     filter: blur(4px);
     pointer-events: none; /* 마우스 이벤트 무시 */
     user-select: none;    /* 선택 불가 */
+  }
+
+  .disabled {
+    pointer-events: none; /* 클릭 이벤트 비활성화 */
+    opacity: 3; /* 비활성화 시 시각적 효과 */
+    cursor: not-allowed; /* 커서를 비활성화된 모양으로 변경 */
+  }
+  
+  #locked {
+    pointer-events: none;
+    user-select: none;
   }
 
 </style>
