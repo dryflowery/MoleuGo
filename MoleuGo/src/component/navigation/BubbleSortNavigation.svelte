@@ -3,6 +3,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
+    import { animationWorking } from '../../lib/store';
     const dispatch = createEventDispatcher();
 
     let tooltip = Array(9).fill(false);
@@ -156,7 +157,7 @@
     };
 
     const startBubbleSort = () => {
-        if(!isActive) {
+        if(!isActive || $animationWorking) {
             return;
         }
 

@@ -1,17 +1,26 @@
 <script>
     import Header from "../../component/Header.svelte";
     import Navigation from "../../component/navigation/BubbleSortNavigation.svelte";
-    import {isListVisible} from "../../lib/store";
+    import {isListVisible, animationWorking} from "../../lib/store";
 
     let numArr = [29, 10, 14, 37, 14]
     let graphLeft = [];
     let indexLeft = [];
 
-    let isPaused = false;
+    let isPaused = true;
+    let pausedIcon = true;
+    let fromBtn = false;
+    let isReplay = false;
     let explanation = ``;
     let animationSpeed = 2;
     let animationQuery = [];
     let codeColor = Array(3).fill()
+    let animationStep = [0, 0]; // [curStep, maxStep]
+    let gradient = 0;
+
+    // 슬라이더 색깔관리
+    $: gradient = (animationStep[0] === 0 || animationStep[1] === 0) ? 0 : (animationStep[0] / animationStep[1]) * 100;
+    $: sliderStyle = `linear-gradient(to right, #509650 ${gradient}%, #585858 ${gradient}%)`;
 
     // 원소가 바뀔 때마다 위치 계산
     $: {
@@ -53,7 +62,46 @@
         });
     };
 
+    const InitAnimation = () => {
+        $animationWorking = false;
+        pausedIcon = true;
+        isPaused = true;
+        isReplay = true;
+        fromBtn = false;
+        explanation = ``;
+        animationSpeed = 2;
+        animationQuery = [];
+        codeColor = Array(3).fill()
+        animationStep = [0, 0]; 
+
+        const graphElements = document.querySelectorAll('.graph');
+        const elementElements = document.querySelectorAll('.element');
+        const indexElements = document.querySelectorAll('.index');
+
+        // 색상 수정
+        graphElements.forEach(element => {
+            element.style.backgroundColor = "#d9d9d9";
+        });
+
+        elementElements.forEach(element => {
+            element.style.backgroundColor = "#737373";
+            element.style.color = "#dcdcdc";
+        });
+
+        indexElements.forEach(element => {
+            element.style.color = "#000000";
+        });
+
+        graphElements.forEach(element => {
+            element.style.transition = "left 0.5s ease, height 0.5s ease";
+        });
+
+        console.log(gradient);
+    };
+
     const createRandomElement = (e) => {
+        InitAnimation();
+
         const elementCnt = e.detail.elementCnt;
         numArr = [];  
 
@@ -63,15 +111,22 @@
     };
 
     const createInputtedElement = (e) => {
+        InitAnimation();
+
         const tmpArr = e.detail.tmpArr;
         numArr = tmpArr;
     };
 
     // BubbleSort animation start
     const startBubbleSort = (e) => {
-        const isAsc = e.detail.isAsc;
+        InitAnimation();
 
+        const isAsc = e.detail.isAsc;
         preDrawBubbleSort(isAsc);
+
+        $animationWorking = true;
+        pausedIcon = false;
+        isPaused = false;
         drawBubbleSort();
     };
 
@@ -84,7 +139,7 @@
                 codeColor[i] = "rgba(255, 255, 255, 0)";
             }
         }
-    }
+    };
 
     const pushAnimationQuery = (tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, 
                                 tmpIndexColor,tmpSwap1, tmpSwap2, tmpExplanation, tmpCode) => {
@@ -195,64 +250,102 @@
     };
 
     const drawBubbleSort = async () => {
+        animationStep = [0, animationQuery.length - 1];
+
+        while(true) {
+            if(animationStep[0] == animationStep[1]) {
+                pausedIcon = true;
+                isPaused = true;
+            }
+            
+            if(!$animationWorking) {
+                break;
+            }
+
+            await playBubbleSortAnimation(animationStep[0]);
+            await waitPause();
+
+            // 버튼을 통해서 제어하는 경우 animationStep의 값을 변경하면 안됨. 정해진 animationStep[0]의 값으로 설정해야 함.
+            if(!fromBtn) {
+                animationStep[0] = Math.min(animationStep[0] + 1, animationStep[1]);
+            }
+        }
+    };
+
+    const playBubbleSortAnimation = async (i) => {
         const graphElements = document.querySelectorAll('.graph');
         const elementElements = document.querySelectorAll('.element');
         const indexElements = document.querySelectorAll('.index');
-        
-        let animationStep = [0, animationQuery.length];
 
-        while (animationStep[0] < animationStep[1]) {
-            await waitPause();
+        explanation = animationQuery[i].curExplanation; // explanation 수정
+        changeCodeColor(animationQuery[i].curCode); // codeColor 수정
 
-            explanation = animationQuery[animationStep[0]].curExplanation; // explanation 수정
-            changeCodeColor(animationQuery[animationStep[0]].curCode); // codeColor 수정
-            
-            // 색상 수정
-            graphElements.forEach((element, idx) => {
-                element.style.backgroundColor = animationQuery[animationStep[0]].curGraphBgColor[idx];
-            });
+        // 색상 수정
+        graphElements.forEach((element, idx) => {
+            element.style.backgroundColor = animationQuery[i].curGraphBgColor[idx];
+        });
 
-            elementElements.forEach((element, idx) => {
-                element.style.backgroundColor = animationQuery[animationStep[0]].curElementBgColor[idx];
-                element.style.color = animationQuery[animationStep[0]].curElementColor[idx];
-            });
+        elementElements.forEach((element, idx) => {
+            element.style.backgroundColor = animationQuery[i].curElementBgColor[idx];
+            element.style.color = animationQuery[i].curElementColor[idx];
+        });
 
-            indexElements.forEach((element, idx) => {
-                element.style.color = animationQuery[animationStep[0]].curIndexColor[idx];
-            });
+        indexElements.forEach((element, idx) => {
+            element.style.color = animationQuery[i].curIndexColor[idx];
+        });
 
-            // swap이 필요한 경우에만
-            if (animationQuery[animationStep[0]].curSwap1 != animationQuery[animationStep[0]].curSwap2) {
-                let swap1 = animationQuery[animationStep[0]].curSwap1;
-                let swap2 = animationQuery[animationStep[0]].curSwap2;
-                
-                graphElements.forEach(element => {
-                    element.style.transition = `left ${(1 / animationSpeed)}s ease`;
-                });
-
-                // swap animation
-                var tmp = graphLeft[swap1];
-                graphLeft[swap1] = graphLeft[swap2];
-                graphLeft[swap2] = tmp;
-
-                await delay(2000 * (1 / animationSpeed));
-
-                graphElements.forEach(element => {
-                    element.style.transition = "left 0s ease";
-                });
-
-                // non-animation
-                numArr = [...animationQuery[animationStep[0] + 1].curArr];
-            } else {
-                await delay(2000 * (1 / animationSpeed));
+        // animation-control 영역의 버튼을 통해서 함수가 호출된 경우, 애니메이션을 재생하지 않고 색상, 배열만 변경
+        if(fromBtn) {
+            if(!isReplay) {
+                isPaused = true;
+            }
+            else {
+                isReplay = false;
             }
 
-            animationStep[0]++;
+            fromBtn = false;
+
+            graphElements.forEach(element => {
+                element.style.transition = "left 0.5s ease, height 0.5s ease";
+            });
+
+            if(animationQuery[i].curSwap1 != animationQuery[i].curSwap2) {
+                numArr = [...animationQuery[i + 1].curArr];
+            }
+            else {
+                numArr = [...animationQuery[i].curArr];
+            }
+
+            return;
         }
 
+        // swap이 필요한 경우에만
+        if (!isPaused && animationQuery[i].curSwap1 != animationQuery[i].curSwap2) {
+            let swap1 = animationQuery[i].curSwap1;
+            let swap2 = animationQuery[i].curSwap2;
+            
+            graphElements.forEach(element => {
+                element.style.transition = `left ${(1 / animationSpeed)}s ease`;
+            });
+
+            // swap animation
+            var tmp = graphLeft[swap1];
+            graphLeft[swap1] = graphLeft[swap2];
+            graphLeft[swap2] = tmp;
+        }
+
+        await delay(2000 * (1 / animationSpeed));
+
         graphElements.forEach(element => {
-            element.style.transition = "left 0.5s ease, height 0.5s ease";
+            element.style.transition = "left 0s ease, height 0s ease";
         });
+
+        if(animationQuery[i].curSwap1 != animationQuery[i].curSwap2) {
+            numArr = [...animationQuery[i + 1].curArr];
+        }
+        else {
+            numArr = [...animationQuery[i].curArr];
+        }
     };
 </script>
 
@@ -291,8 +384,38 @@
             </div>
 
             <div class="animation-control-container">
+                <ion-icon name="play-back" class="animation-control-btn" disabled={!$animationWorking ? true : null} on:click={() => {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = 0;}}></ion-icon>
+                <ion-icon name="caret-back" class="animation-control-btn" disabled={!$animationWorking ? true : null}  on:click={() => {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.max(animationStep[0] - 1, 0);}}></ion-icon>
 
-            </div>
+                {#if isPaused || pausedIcon} 
+                    <ion-icon name="play-outline" class="animation-control-btn" disabled={!$animationWorking ? true : null} style="font-size: 2.5rem; color: #d9d9d9;" 
+                        on:click={() => {
+                            if (animationStep[0] === animationStep[1]) {
+                                fromBtn = true; isPaused = false; isReplay = true; animationStep[0] = 0;
+                            } 
+
+                            isPaused = false; 
+                            pausedIcon = false;
+                        }}>
+                    </ion-icon>
+            
+                {:else}
+                    <ion-icon name="pause-outline" class="animation-control-btn" disabled={!$animationWorking ? true : null} style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => {isPaused = true; pausedIcon = true;}}></ion-icon>
+                {/if}
+
+                <ion-icon name="caret-forward" class="animation-control-btn" disabled={!$animationWorking ? true : null} on:click={() => {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.min(animationStep[0] + 1, animationStep[1]);}}></ion-icon>
+                <ion-icon name="play-forward" class="animation-control-btn" disabled={!$animationWorking ? true : null} on:click={() => {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = animationStep[1];}}></ion-icon>
+
+                <input
+                    type="range"
+                    disabled={!$animationWorking ? true : null}
+                    style="background: {sliderStyle};"
+                    min={0}
+                    max={animationStep[1]}
+                    bind:value={animationStep[0]}
+                    on:input={() => {isPaused = false; pausedIcon = true; fromBtn = true;}}
+                />
+            </div>      
         </div>
 
         <div class="main-right-container">

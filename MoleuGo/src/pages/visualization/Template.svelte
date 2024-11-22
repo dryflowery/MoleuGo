@@ -6,7 +6,11 @@
     let isPaused = false;
     let explanation = ``;
     let animationSpeed = 1;
-    let animationSteps = [];
+    let animationStep = [0, 0]; // [curStep, maxStep]
+
+    // 슬라이더 색깔관리
+    $: gradientValue = (animationStep[0] / animationStep[1]) * 100;
+    $: sliderStyle = `linear-gradient(to right, #509650 ${gradientValue}%, #585858 ${gradientValue}%)`;
 
     const delay = (duration) => {
         return new Promise((resolve) => { setTimeout(resolve, duration); });
@@ -61,8 +65,28 @@
             </div>
 
             <div class="animation-control-container">
+                <!-- animation-control-btn은 on:click으로 애니메이션 제어 -->
+                <ion-icon name="play-back" class="animation-control-btn"></ion-icon>
+                <ion-icon name="caret-back" class="animation-control-btn"></ion-icon>
 
-            </div>
+                {#if isPaused}
+                    <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => isPaused = !isPaused}></ion-icon>
+                {:else}
+                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => isPaused = !isPaused}></ion-icon>
+                {/if}
+
+                <ion-icon name="caret-forward" class="animation-control-btn"></ion-icon>
+                <ion-icon name="play-forward" class="animation-control-btn"></ion-icon>
+
+                <!-- input은 on:input으로 애니메이션 제어 -->
+                <input
+                    type="range"
+                    style="background: {sliderStyle};"
+                    min={0}
+                    max={animationStep[1]}
+                    bind:value={animationStep[0]}
+                />
+            </div> 
         </div>
 
         <div class="main-right-container">
@@ -76,7 +100,7 @@
 
                 <div class="code-area">
                     <!-- 코드의 class="code"로 설정 -->
-                     <!-- 들여쓰기는 padding-left:35px -->
+                    <!-- 들여쓰기는 padding-left:35px -->
                 </div>
             </div>
         </div>
