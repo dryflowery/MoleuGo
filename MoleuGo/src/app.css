@@ -90,7 +90,45 @@ main {
 }
 
 .animation-control-container {
-     
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+}
+
+.animation-control-btn {
+  color: #909090;
+  font-size: 1.5rem;
+  padding-right: 5px;
+  cursor: pointer;
+}
+
+.animation-control-btn:hover {
+  transform: scale(1.1);
+}
+
+.animation-control-container input[type="range"] {
+  width: 500px;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  height: 10px;
+  cursor: pointer;
+  margin-left: 10px;
+  background: linear-gradient(to right, #509650 0%, #585858 0%);
+}
+  
+.animation-control-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 15px; 
+  width: 10px; 
+  background: #d9d9d9;
+  cursor: pointer; 
+}
+
+.animation-control-btn[disabled] {
+  opacity: 0.5; /* 비활성화 상태를 시각적으로 표시 */
+  pointer-events: none; /* 클릭 이벤트 비활성화 */
+  cursor: not-allowed; /* 비활성화 상태임을 나타내는 커서 */
 }
 
 .explanation-container {
