@@ -106,12 +106,6 @@ main {
   transform: scale(1.1);
 }
 
-.animation-control-btn[disabled] {
-  opacity: 0.5; /* 비활성화 상태를 시각적으로 표시 */
-  pointer-events: none; /* 클릭 이벤트 비활성화 */
-  cursor: not-allowed; /* 비활성화 상태임을 나타내는 커서 */
-}
-
 .animation-slider {
   width: 500px;
   -webkit-appearance: none;
