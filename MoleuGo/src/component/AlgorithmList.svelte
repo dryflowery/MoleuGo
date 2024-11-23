@@ -1,6 +1,6 @@
 <script>
     import { push } from "svelte-spa-router";
-
+    import { isListVisible } from "../lib/store";
 </script>
 
 <main>
@@ -98,11 +98,11 @@
         <div>
             <p class="algo-list-index-text">5. 정렬</p>
             
-            <div class="algo-list-text-div">
-                <span on:click={()=> push('/visualization/BubbleSort')}>버블 정렬</span>
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/BubbleSort');}}>
+                <span>버블 정렬</span>
             </div>
 
-            <div class="algo-list-text-div">
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/SelectionSort')}}>
                 <span>선택 정렬</span>
             </div>
 
