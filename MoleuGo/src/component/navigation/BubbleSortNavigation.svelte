@@ -12,7 +12,7 @@
     let isDragging = false; 
     let offsetX = 0; 
     let offsetY = 0; 
-    let navigationPos = { top: "700px", left: "1300px" }; 
+    let navigationPos = { top: "700px", left: "130px" }; 
     let isAsc = true;
 
     let elementCnt = 5;
