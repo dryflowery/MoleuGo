@@ -38,7 +38,9 @@
     let verifyPasswordMessage = "확인을 위해 새 비밀번호를 다시 입력하세요"; // 확인 메시지
     let verifyPasswordMessageStyle = ""; // 메시지 스타일
 
-    let ispasswordCheckIcon = false // 비밀번호 설정 옆 아이콘 유/무
+    let ispasswordCheckIcon = false ;// 비밀번호 설정 옆 아이콘 유/무
+
+    let isvisualableNickNameSetting = true;
     
 
     function checkOldPassword() {
@@ -186,47 +188,47 @@
               </div>
 
               <div id='change-userName-container'>
-
-                <div id="change-userName-Title">
-                  <t style="color: #bbbbbb;">닉네임: {savedUserName || "컴붕이1"} </t>
-                  {#if saveMessage == '중복된 닉네임입니다. 다시 설정해주세요.'}
-                    <ion-icon name="warning-outline" style="color: yellow;"></ion-icon>
-                  {:else if saveMessage == "중복확인 닉네임 변경 완료"}
-                    <ion-icon name="checkmark-outline" style="color: green;" ></ion-icon>
-                  {/if}
-                </div>
-
-                <div id="change-userName">
-                  <input type="text" placeholder="닉네임 변경 ..." bind:value="{userName}">
-                  <button id="userName-edit-Btn" on:click={saveUserName}>변경</button>
-                </div>
-
-                <div id="verify-userName-container">
-
-                  <div id="Requirements_1" 
-                       class:valid={isLengthValid}  
-                       class:invalid={!isLengthValid}> 
-                       <ion-icon name="checkmark-outline"></ion-icon> 
-                       2 ~ 10 글자 사이의 닉네임을 정해주세요
+                {#if isvisualableNickNameSetting}
+                  <div id="change-userName-Title">
+                    <t style="color: #bbbbbb;">닉네임: {savedUserName || "컴붕이1"} </t>
+                    {#if saveMessage == '중복된 닉네임입니다. 다시 설정해주세요.'}
+                      <ion-icon name="warning-outline" style="color: yellow;"></ion-icon>
+                    {:else if saveMessage == "중복확인 닉네임 변경 완료"}
+                      <ion-icon name="checkmark-outline" style="color: green;" ></ion-icon>
+                    {/if}
                   </div>
 
-                  <div id="Requirements_2" 
-                       class:valid={isSpecialCharValid}
-                       class:invalid={!isSpecialCharValid}> 
-                       <ion-icon name="checkmark-outline"></ion-icon> 
-                       띄어쓰기를 포함한 특수문자 X
+                  <div id="change-userName">
+                    <input type="text" placeholder="닉네임 변경 ..." bind:value="{userName}">
+                    <button id="userName-edit-Btn" on:click={saveUserName}>변경</button>
                   </div>
 
-                  {#if showResult}
-                    <div id="Requirements_3" 
-                      class:success={saveMessage === "중복확인 닉네임 변경 완료"} 
-                      class:error={saveMessage === "중복된 닉네임입니다. 다시 설정해주세요." || saveMessage === "조건을 충족 해주세요"}>
-                      <ion-icon name="checkmark-outline"></ion-icon>
-                      {saveMessage}
+                  <div id="verify-userName-container">
+
+                    <div id="Requirements_1" 
+                        class:valid={isLengthValid}  
+                        class:invalid={!isLengthValid}> 
+                        <ion-icon name="checkmark-outline"></ion-icon> 
+                        2 ~ 10 글자 사이의 닉네임을 정해주세요
                     </div>
-                  {/if}
 
-                </div>
+                    <div id="Requirements_2" 
+                        class:valid={isSpecialCharValid}
+                        class:invalid={!isSpecialCharValid}> 
+                        <ion-icon name="checkmark-outline"></ion-icon> 
+                        띄어쓰기를 포함한 특수문자 X
+                    </div>
+
+                    {#if showResult}
+                      <div id="Requirements_3" 
+                        class:success={saveMessage === "중복확인 닉네임 변경 완료"} 
+                        class:error={saveMessage === "중복된 닉네임입니다. 다시 설정해주세요." || saveMessage === "조건을 충족 해주세요"}>
+                        <ion-icon name="checkmark-outline"></ion-icon>
+                        {saveMessage}
+                      </div>
+                    {/if}
+                  </div>
+                {/if}
               </div>
             </div>
 
@@ -344,11 +346,11 @@
         <div id="right-container"> <!--오른쪽 컨테이너 시작-->
 
           <div id="lawn-container"><!--잔디밭 컨테이너 시작-->
-            <img id="lawn" src="assets/잔디밭.png">
+            
           </div>
 
           <div id="community"><!--잔디밭 컨테이너 시작-->
-            <img id="log" src="assets/갤로그.png">
+            
           </div>
 
         </div ><!--오른쪽 컨테이너 끝-->
@@ -420,7 +422,7 @@
 
   #right-container {
     display:grid;
-    grid-template-rows: 0.6fr 1fr;
+    grid-template-rows: 0.8fr 1fr;
   }
 
   #profile-edit-container {
