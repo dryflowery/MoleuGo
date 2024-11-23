@@ -1,5 +1,5 @@
 <!-- 좌클릭으로 drag, 우클릭으로 active  -->
-<!-- active 상태에서는 #drag(손 아이콘)만 drag 가능  -->
+<!-- active 상태에서는 #drag(손 아이콘)만 drag 가능  --> 
 <script>
     import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
@@ -156,14 +156,14 @@
         isAsc = !isAsc;
     };
 
-    const startBubbleSort = () => {
+    const startSelectionSort = () => {
         if(!isActive || animationWorking) {
             return;
         }
 
         toggle = Array(9).fill(false);
         isActive = false;
-        dispatch('startBubbleSort', {isAsc});
+        dispatch('startSelectionSort', {isAsc});
     }
 </script>
 
@@ -265,7 +265,7 @@
             
             <!-- 8번 (알고리즘 실행) -->
             <div class="center">
-                <ion-icon name="play-outline" on:click={startBubbleSort}
+                <ion-icon name="play-outline" on:click={startSelectionSort}
                 on:mouseenter={() => tooltip[8] = true} on:mouseleave={() => tooltip[8] = false}></ion-icon>
             </div>
         </div>

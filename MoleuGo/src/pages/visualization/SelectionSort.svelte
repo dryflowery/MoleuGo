@@ -1,6 +1,6 @@
 <script>
     import Header from "../../component/Header.svelte";
-    import Navigation from "../../component/navigation/BubbleSortNavigation.svelte";
+    import Navigation from "../../component/navigation/SelectionSortNavigation.svelte";
     import {isListVisible} from "../../lib/store";
 
     let numArr = [29, 10, 14, 37, 14]
@@ -37,8 +37,8 @@
         }
         
     };
-
-    // 애니메이션 슬라이더 색깔관리
+    
+    // 슬라이더 색깔관리
     $: gradient = (animationStep[0] === 0 || animationStep[1] === 0) ? 0 : (animationStep[0] / animationStep[1]) * 100;
     $: sliderStyle = `linear-gradient(to right, #509650 ${gradient}%, #585858 ${gradient}%)`;
 
@@ -137,17 +137,17 @@
         numArr = tmpArr;
     };
 
-    // BubbleSort animation start
-    const startBubbleSort = (e) => {
+    // SelectionSort animation start
+    const startSelectionSort = (e) => {
         InitAnimation();
 
         const isAsc = e.detail.isAsc;
-        preDrawBubbleSort(isAsc);
+        preDrawSelectionSort(isAsc);
 
         animationWorking = true;
         pausedIcon = false;
         isPaused = false;
-        drawBubbleSort();
+        drawSelectionSort();
     };
 
     const changeCodeColor = (idx) => {
@@ -176,7 +176,7 @@
         })
     };
 
-    const preDrawBubbleSort = (isAsc) => {  
+    const preDrawSelectionSort = (isAsc) => {  
         const graphBg = {normal: "#d9d9d9", selected: "#ecadae", sorted: "#9fda9b"};
         const elementBg = {normal: "#737373", selected: "#ad7677", sorted: "#6a9068"};
         const elementColor = {normal: "#dcdcdc", selected: "#ffebeb", sorted: "#e8ffe6"};
@@ -269,7 +269,7 @@
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
     };
 
-    const drawBubbleSort = async () => {
+    const drawSelectionSort = async () => {
         animationStep = [0, animationQuery.length - 1];
 
         while(true) {
@@ -282,7 +282,7 @@
                 break;
             }
 
-            await playBubbleSortAnimation(animationStep[0]);
+            await playSelectionSortAnimation(animationStep[0]);
             await waitPause();
 
             // 버튼을 통해서 제어하는 경우 animationStep의 값을 변경하면 안됨. 정해진 animationStep[0]의 값으로 설정해야 함.
@@ -294,7 +294,7 @@
 
     let cnt = 0;
 
-    const playBubbleSortAnimation = async (i) => {
+    const playSelectionSortAnimation = async (i) => {
         let test = false;
         if(fromBtn) test = true;
         if(!animationWorking) {
@@ -383,7 +383,7 @@
     <div class="navigation-container">
         <Navigation on:createRandomElement={createRandomElement} 
         on:createInputtedElement={createInputtedElement} 
-        on:startBubbleSort={startBubbleSort}
+        on:startSelectionSort={startSelectionSort}
         animationWorking={animationWorking}/>
     </div>
 
@@ -398,7 +398,7 @@
 
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
-                버블 정렬(Bubble Sort) 
+                선택 정렬(Selection Sort) 
                 <button class="theory-btn">이론 설명</button> 
             </div>
 
