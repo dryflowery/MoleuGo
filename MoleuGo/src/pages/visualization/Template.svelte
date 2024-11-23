@@ -1,13 +1,32 @@
 <script>
     import Header from "../../component/Header.svelte";
     import Navigation from "../../component/navigation/BubbleSortNavigation.svelte"; // Navigation 경로 수정
-    import {isListVisible, animationWorking} from "../../lib/store";
+    import {isListVisible} from "../../lib/store";
 
     let isPaused = false;
     let explanation = ``;
-    let animationSpeed = 2;
+    let animationSpeed = 1;
     let animationStep = [0, 0]; // [curStep, maxStep]
+    let animationWorking = false;
 
+    // 슬라이더의 위치에 따른 animationSpeed 관리
+    // 50%까지는 [1, 10], 51%부터는 [11, 1000]
+    const updateSpeed = (event) => {
+        const sliderValue = event.target.value;
+        
+        if (sliderValue <= 50) {
+            animationSpeed = Math.round(sliderValue / 5); 
+            
+            if(animationSpeed == 0) {
+                animationSpeed = 1;
+            }
+        } 
+        else {
+            animationSpeed = Math.min(1000, Math.round(10 + (sliderValue - 50) * 20));  
+        }
+        
+    };
+    
     // 슬라이더 색깔관리
     $: gradient = (animationStep[0] === 0 || animationStep[1] === 0) ? 0 : (animationStep[0] / animationStep[1]) * 100;
     $: sliderStyle = `linear-gradient(to right, #509650 ${gradient}%, #585858 ${gradient}%)`;
@@ -42,7 +61,7 @@
 
 <main>
     <div class="navigation-container">
-        <Navigation />
+        <Navigation animationWorking={animationWorking}/>
     </div>
 
     <div class="header-container">
@@ -79,14 +98,24 @@
                 <ion-icon name="play-forward" class="animation-control-btn"></ion-icon>
 
                 <!-- input은 on:input으로 애니메이션 제어 -->
-                <input
+                <input class="animation-slider"
                     type="range"
-                    disabled={!$animationWorking ? true : null}
+                    disabled={!animationWorking ? true : null}
                     style="background: {sliderStyle};"
                     min={0}
                     max={animationStep[1]}
                     bind:value={animationStep[0]}
                 />
+
+                <input class="speed-slider"
+                    type="range" 
+                    min="0" 
+                    max="100" 
+                    step="1" 
+                    value="0"
+                    on:input={updateSpeed}
+                />
+                <span class="speed-label">x {animationSpeed}</span>
             </div> 
         </div>
 
