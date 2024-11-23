@@ -18,6 +18,7 @@
     let animationQuery = [];
     let codeColor = Array(3).fill()
     let animationStep = [0, 0]; // [curStep, maxStep]
+    let asyncCnt = 0; // 비동기 함수 한 번에 하나만 실행하기 위한 변수
     let gradient = 0;
 
     // 슬라이더의 위치에 따른 animationSpeed 관리
@@ -37,7 +38,7 @@
         }
         
     };
-    
+
     // 슬라이더 색깔관리
     $: gradient = (animationStep[0] === 0 || animationStep[1] === 0) ? 0 : (animationStep[0] / animationStep[1]) * 100;
     $: sliderStyle = `linear-gradient(to right, #509650 ${gradient}%, #585858 ${gradient}%)`;
@@ -86,10 +87,9 @@
         animationWorking = false;
         pausedIcon = true;
         isPaused = true;
-        isReplay = true;
+        isReplay = false;
         fromBtn = false;
         explanation = ``;
-        animationSpeed = 1;
         animationQuery = [];
         codeColor = Array(3).fill()
         animationStep = [0, 0]; 
@@ -115,8 +115,6 @@
         graphElements.forEach(element => {
             element.style.transition = "left 0.5s ease, height 0.5s ease";
         });
-
-        console.log(gradient);
     };
 
     const createRandomElement = (e) => {
@@ -138,7 +136,7 @@
     };
 
     // SelectionSort animation start
-    const startSelectionSort = (e) => {
+    const startSelectionSort = async (e) => {
         InitAnimation();
 
         const isAsc = e.detail.isAsc;
@@ -147,7 +145,7 @@
         animationWorking = true;
         pausedIcon = false;
         isPaused = false;
-        drawSelectionSort();
+        drawSelectionSort(asyncCnt++);
     };
 
     const changeCodeColor = (idx) => {
@@ -269,7 +267,7 @@
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
     };
 
-    const drawSelectionSort = async () => {
+    const drawSelectionSort = async (myAsync) => {
         animationStep = [0, animationQuery.length - 1];
 
         while(true) {
@@ -278,9 +276,7 @@
                 isPaused = true;
             }
             
-            if(!animationWorking) {
-                break;
-            }
+            if((myAsync + 1) != asyncCnt) break;
 
             await playSelectionSortAnimation(animationStep[0]);
             await waitPause();
@@ -292,15 +288,8 @@
         }
     };
 
-    let cnt = 0;
-
     const playSelectionSortAnimation = async (i) => {
-        let test = false;
-        if(fromBtn) test = true;
-        if(!animationWorking) {
-            return;
-        }
-        console.log({"애니메이션": i, "호출 순서": cnt++, "버튼 호출?": test});
+        // console.log({"애니메이션": i, "호출 순서": cnt++, "버튼 호출?": test});
         const graphElements = document.querySelectorAll('.graph');
         const elementElements = document.querySelectorAll('.element');
         const indexElements = document.querySelectorAll('.index');
@@ -350,7 +339,7 @@
         }
 
         // swap이 필요한 경우에만
-        if (!isPaused && animationQuery[i].curSwap1 != animationQuery[i].curSwap2) {
+        if (animationQuery[i].curSwap1 != animationQuery[i].curSwap2) {
             let swap1 = animationQuery[i].curSwap1;
             let swap2 = animationQuery[i].curSwap2;
             
