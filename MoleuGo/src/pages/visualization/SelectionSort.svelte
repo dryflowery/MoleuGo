@@ -3,7 +3,7 @@
     import Navigation from "../../component/navigation/SelectionSortNavigation.svelte";
     import {isListVisible} from "../../lib/store";
 
-    let numArr = [29, 10, 14, 37, 14]
+    let numArr = [15, 10, 20, 40, 7]
     let graphLeft = [];
     let indexLeft = [];
 
@@ -91,7 +91,7 @@
         fromBtn = false;
         explanation = ``;
         animationQuery = [];
-        codeColor = Array(3).fill()
+        codeColor = Array(3).fill();
         animationStep = [0, 0]; 
 
         const graphElements = document.querySelectorAll('.graph');
@@ -404,36 +404,37 @@
             </div>
 
             <div class="animation-control-container">
-                <ion-icon name="play-back" class="animation-control-btn" disabled={!animationWorking ? true : null} on:click={() => {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = 0;}}></ion-icon>
-                <ion-icon name="caret-back" class="animation-control-btn" disabled={!animationWorking ? true : null}  on:click={() => {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.max(animationStep[0] - 1, 0);}}></ion-icon>
+                <ion-icon name="play-back" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = 0;}}}></ion-icon>
+                <ion-icon name="caret-back" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.max(animationStep[0] - 1, 0);}}}></ion-icon>
 
                 {#if isPaused || pausedIcon} 
-                    <ion-icon name="play-outline" class="animation-control-btn" disabled={!animationWorking ? true : null} style="font-size: 2.5rem; color: #d9d9d9;" 
+                    <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" 
                         on:click={() => {
-                            if (animationStep[0] === animationStep[1]) {
-                                isReplay = true; animationStep[0] = -1;
-                            } 
+                            if(animationWorking) {
+                                if (animationStep[0] === animationStep[1]) {
+                                    isReplay = true; animationStep[0] = -1;
+                                } 
 
-                            isPaused = false; 
-                            pausedIcon = false;
+                                isPaused = false; 
+                                pausedIcon = false;
+                            }
                         }}>
                     </ion-icon>
             
                 {:else}
-                    <ion-icon name="pause-outline" class="animation-control-btn" disabled={!animationWorking ? true : null} style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => {isPaused = true; pausedIcon = true;}}></ion-icon>
+                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => {if(animationWorking) {isPaused = true; pausedIcon = true;}}}></ion-icon>
                 {/if}
 
-                <ion-icon name="caret-forward" class="animation-control-btn" disabled={!animationWorking ? true : null} on:click={() => {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.min(animationStep[0] + 1, animationStep[1]);}}></ion-icon>
-                <ion-icon name="play-forward" class="animation-control-btn" disabled={!animationWorking ? true : null} on:click={() => {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = animationStep[1];}}></ion-icon>
+                <ion-icon name="caret-forward" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.min(animationStep[0] + 1, animationStep[1]);}}}></ion-icon>
+                <ion-icon name="play-forward" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = animationStep[1];}}}></ion-icon>
 
                 <input class="animation-slider"
                     type="range"
-                    disabled={!animationWorking ? true : null}
                     style="background: {sliderStyle};"
-                    min={0}
+                    min=0
                     max={animationStep[1]}
                     bind:value={animationStep[0]}
-                    on:input={() => {isPaused = false; pausedIcon = true; fromBtn = true;}}
+                    on:input={() => {if(animationWorking) {isPaused = false; pausedIcon = true; fromBtn = true;}}}
                 />
 
                 <input class="speed-slider"

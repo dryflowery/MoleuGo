@@ -1,13 +1,21 @@
 <script>
     import Header from "../../component/Header.svelte";
-    import Navigation from "../../component/navigation/BubbleSortNavigation.svelte"; // Navigation 경로 수정
+    import Navigation from "../../component/navigation/BubbleSortNavigation.svelte";
     import {isListVisible} from "../../lib/store";
 
-    let isPaused = false;
+    let isPaused = true;
+    let pausedIcon = true;
+    let fromBtn = false;
+    let isReplay = false;
+
     let explanation = ``;
     let animationSpeed = 1;
-    let animationStep = [0, 0]; // [curStep, maxStep]
     let animationWorking = false;
+    let animationQuery = [];
+    let codeColor = Array(3).fill()
+    let animationStep = [0, 0]; // [curStep, maxStep]
+    let asyncCnt = 0; // 비동기 함수 한 번에 하나만 실행하기 위한 변수
+    let gradient = 0;
 
     // 슬라이더의 위치에 따른 animationSpeed 관리
     // 50%까지는 [1, 10], 51%부터는 [11, 1000]
@@ -26,7 +34,7 @@
         }
         
     };
-    
+
     // 슬라이더 색깔관리
     $: gradient = (animationStep[0] === 0 || animationStep[1] === 0) ? 0 : (animationStep[0] / animationStep[1]) * 100;
     $: sliderStyle = `linear-gradient(to right, #509650 ${gradient}%, #585858 ${gradient}%)`;
@@ -57,6 +65,29 @@
             checkPause();
         });
     };
+
+    const InitAnimation = () => {
+        animationWorking = false;
+        pausedIcon = true;
+        isPaused = true;
+        isReplay = false;
+        fromBtn = false;
+        explanation = ``;
+        animationQuery = [];
+        codeColor = Array(3).fill();
+        animationStep = [0, 0]; 
+    };
+
+    const changeCodeColor = (idx) => {
+        for(let i = 0; i < codeColor.length; i++) {
+            if(i == idx) {
+                codeColor[i] = "rgb(80, 150, 80)";
+            }
+            else {
+                codeColor[i] = "rgba(255, 255, 255, 0)";
+            }
+        }
+    };
 </script>
 
 <main>
@@ -72,7 +103,7 @@
         <div class="main-left-container">
             <!-- main-left-container, main-right-container 나누는 수직선 -->
             <div class="visualization-vertical-line"></div>
-            
+
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 버블 정렬(Bubble Sort) 
@@ -84,27 +115,37 @@
             </div>
 
             <div class="animation-control-container">
-                <!-- animation-control-btn은 on:click으로 애니메이션 제어 -->
-                <ion-icon name="play-back" class="animation-control-btn"></ion-icon>
-                <ion-icon name="caret-back" class="animation-control-btn"></ion-icon>
+                <ion-icon name="play-back" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = 0;}}}></ion-icon>
+                <ion-icon name="caret-back" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.max(animationStep[0] - 1, 0);}}}></ion-icon>
 
-                {#if isPaused}
-                    <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;"></ion-icon>
+                {#if isPaused || pausedIcon} 
+                    <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" 
+                        on:click={() => {
+                            if(animationWorking) {
+                                if (animationStep[0] === animationStep[1]) {
+                                    isReplay = true; animationStep[0] = -1;
+                                } 
+
+                                isPaused = false; 
+                                pausedIcon = false;
+                            }
+                        }}>
+                    </ion-icon>
+            
                 {:else}
-                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;"></ion-icon>
+                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => {if(animationWorking) {isPaused = true; pausedIcon = true;}}}></ion-icon>
                 {/if}
 
-                <ion-icon name="caret-forward" class="animation-control-btn"></ion-icon>
-                <ion-icon name="play-forward" class="animation-control-btn"></ion-icon>
+                <ion-icon name="caret-forward" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.min(animationStep[0] + 1, animationStep[1]);}}}></ion-icon>
+                <ion-icon name="play-forward" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = animationStep[1];}}}></ion-icon>
 
-                <!-- input은 on:input으로 애니메이션 제어 -->
                 <input class="animation-slider"
                     type="range"
-                    disabled={!animationWorking ? true : null}
                     style="background: {sliderStyle};"
-                    min={0}
+                    min=0
                     max={animationStep[1]}
                     bind:value={animationStep[0]}
+                    on:input={() => {if(animationWorking) {isPaused = false; pausedIcon = true; fromBtn = true;}}}
                 />
 
                 <input class="speed-slider"
@@ -116,7 +157,7 @@
                     on:input={updateSpeed}
                 />
                 <span class="speed-label">x {animationSpeed}</span>
-            </div> 
+            </div>      
         </div>
 
         <div class="main-right-container">
@@ -139,9 +180,9 @@
 
 <style>    
     main {
-        display: grid;
         height: 100vh;
-        grid-template-rows: 70px 1fr;
+        display: grid;
+        grid-template-rows: 70px 1fr;   
         user-select: none;
         -ms-use-select: none;
         -moz-user-select: none;
