@@ -1,23 +1,12 @@
 <script>
-    let isAlgoType = true;
+    import { push } from "svelte-spa-router";
 
-    const algoListType = () => {
-        isAlgoType = !isAlgoType;
-    }
 </script>
 
 <main>
     <div id="algo-list-header-container">
         <span id="algo-list-name">
             알고리즘 리스트
-        </span>
-        
-        <span id="algo-list-sort-btn">
-            {#if isAlgoType}
-                 <button id="algo-search-btn" on:click={algoListType}>종류</button>
-            {:else}
-                <button id="algo-search-btn" style="font-size: 0.9rem;" on:click={algoListType}>난이도</button>
-            {/if}
         </span>
     </div>
 
@@ -26,171 +15,183 @@
         <button id="algo-search-btn">검색</button>
     </div>
 
-
-    {#if isAlgoType}
-        <div id="algorithm-list">
-            <div>
-                <p class="algo-list-index-text">1. 선형 자료구조</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 연결리스트 <br>
-                    <input type="checkbox" /> 스택 <br>
-                    <input type="checkbox" /> 큐 <br>
-                    <input type="checkbox" /> 덱
-                </div>
+    <div id="algorithm-list">
+        <div>
+            <p class="algo-list-index-text">1. 선형 자료구조</p>
+            <div class="algo-list-text-div">
+                <span>연결 리스트</span>
             </div>
 
-            <div>
-                <p class="algo-list-index-text">2. 트리 자료구조</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 이진 탐색 트리 <br>
-                    <input type="checkbox" /> 힙 <br>
-                    <input type="checkbox" /> AVL트리 <br>
-                    <input type="checkbox" /> 레드-블랙 트리 <br>
-                    <input type="checkbox" /> 최소 신장 트리 <br>
-                    <input type="checkbox" /> 세그먼트 트리 <br>
-                    <input type="checkbox" /> 펜윅 트리 <br>
-                </div>
+            <div class="algo-list-text-div">
+                <span on:click={()=> push('/visualization/Stack')}>스택</span>
             </div>
 
-            <div>
-                <p class="algo-list-index-text">3. 탐색</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 이분 탐색
-                </div>
+            <div class="algo-list-text-div">
+                <span>큐</span>
             </div>
 
-            <div>
-                <p class="algo-list-index-text">4. 재귀</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 하노이 탑 <br>
-                    <input type="checkbox" /> N-Queen
-                </div>
+            <div class="algo-list-text-div">
+                <span>덱</span>
+            </div>
+        </div> 
+
+        <div class="algo-divider"></div>
+
+        <div>
+            <p class="algo-list-index-text">2. 트리 자료구조</p>
+            
+            <div class="algo-list-text-div">
+                <span>이진 탐색 트리</span>
             </div>
 
-            <div>
-                <p class="algo-list-index-text">5. 정렬</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 버블 정렬 <br>
-                    <input type="checkbox" /> 선택 정렬 <br>
-                    <input type="checkbox" /> 삽입 정렬 <br>
-                    <input type="checkbox" /> 병합 정렬 <br>
-                    <input type="checkbox" /> 퀵 정렬 <br>
-                    <input type="checkbox" /> 기수 정렬 <br>
-                </div>
+            <div class="algo-list-text-div">
+                <span>힙</span>
             </div>
 
-            <div>
-                <p class="algo-list-index-text">6. 그래프 탐색</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 깊이우선 탐색(DFS) <br>
-                    <input type="checkbox" /> 너비 우선 탐색(BFS) 
-                </div>
+            <div class="algo-list-text-div">
+                <span>AVL 트리</span>
             </div>
 
-            <div>
-                <p class="algo-list-index-text">7. 최단 경로</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 다익스트라 <br>
-                    <input type="checkbox" /> 벨만-포드 <br>
-                    <input type="checkbox" /> 플로이드 워셜 <br>
-                </div>
+            <div class="algo-list-text-div">
+                <span>레드-블랙 트리</span>
             </div>
 
-            <div>
-                <p class="algo-list-index-text">8. 그래프</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 최소 공통 조상(LCA) <br>
-                    <input type="checkbox" /> 강한 연결 요소(SCC) <br>
-                </div>
+            <div class="algo-list-text-div">
+                <span>최소 신장 트리</span>
             </div>
 
-            <div>
-                <p class="algo-list-index-text">9. 기하</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 블록 껍질(Convex Hull) <br>
-                </div>
+            <div class="algo-list-text-div">
+                <span>세그먼트 트리</span>
             </div>
 
-            <div>
-                <p class="algo-list-index-text">9. 기타</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 투 포인터 <br>
-                    <input type="checkbox" /> 위상 정렬 <br>
-                </div>
+            <div class="algo-list-text-div">
+                <span>펜윅 트리</span>
             </div>
         </div>
-    {:else}
-        <div id="algorithm-list">
-            <div>
-                <p class="algo-list-index-text">1, 쉬움</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 연결리스트 <br>
-                    <input type="checkbox" /> 스택 <br>
-                    <input type="checkbox" /> 큐 <br>
-                    <input type="checkbox" /> 덱 <br>
-                    <input type="checkbox" /> 버블 정렬 <br>
-                    <input type="checkbox" /> 선택 정렬 <br>
-                    <input type="checkbox" /> 삽입 정렬
-                </div>
-            </div>
 
-            <div>
-                <p class="algo-list-index-text">2. 보통</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 이분 탐색 <br>
-                    <input type="checkbox" /> 하노이 탑 <br>
-                    <input type="checkbox" /> N-Quuen <br>
-                    <input type="checkbox" /> 병합 정렬 <br>
-                    <input type="checkbox" /> 퀵 정렬 <br>
-                    <input type="checkbox" /> 깊이우선 탐색(DFS) <br>
-                    <input type="checkbox" /> 너비우선 탐색(BFS) <br>
-                    <input type="checkbox" /> 다익스트라 <br>
-                    <input type="checkbox" /> 플로이드 워셜 <br>
-                    <input type="checkbox" /> 투 포인터
-                </div>
-            </div>
+        <div class="algo-divider"></div>
 
-            <div>
-                <p class="algo-list-index-text">3. 어려움</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 이진 탐색 트르 <br>
-                    <input type="checkbox" /> 힙 <br>
-                    <input type="checkbox" /> 최소 신장 트리 <br>
-                    <input type="checkbox" /> 위상 정렬 <br>
-                    <input type="checkbox" /> 강한 연결 요소(SCC) <br>
-                    <input type="checkbox" />  레드-블랙 트리 <br>
-                    <input type="checkbox" /> AVL트리 <br>
-                    <input type="checkbox" /> 벨만 포드 <br>
-                    <input type="checkbox" /> 기수 정렬 <br>
-                </div>
-            </div>
-
-            <div>
-                <p class="algo-list-index-text">4. 매우 어려움</p>
-                
-                <div class="algo-list-text">
-                    <input type="checkbox" /> 최소 공통 조상(LCA) <br>
-                    <input type="checkbox" /> 블록 껍질(Convex Hull) <br>
-                    <input type="checkbox" /> 세그먼트 트리 <br>
-                    <input type="checkbox" /> 펜윅 트리
-                </div>
+        <div>
+           <p class="algo-list-index-text">3. 탐색</p>
+            
+           <div class="algo-list-text-div">
+                <span>이분 탐색</span>
             </div>
         </div>
-    {/if}
-    
+        
+        <div class="algo-divider"></div>
+
+        <div>
+           <p class="algo-list-index-text">4. 재귀</p>
+                
+           <div class="algo-list-text-div">
+                <span>하노이 탑</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>N-Queen</span>
+            </div>
+        </div>
+
+        <div class="algo-divider"></div>
+
+        <div>
+            <p class="algo-list-index-text">5. 정렬</p>
+            
+            <div class="algo-list-text-div">
+                <span on:click={()=> push('/visualization/BubbleSort')}>버블 정렬</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>선택 정렬</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>삽입 정렬</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>병합 정렬</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>퀵 정렬</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>기수 정렬</span>
+            </div>
+        </div>
+
+        <div class="algo-divider"></div>
+
+        <div>
+            <p class="algo-list-index-text">6. 그래프 탐색</p>
+                
+            <div class="algo-list-text-div">
+                <span>깊이 우선 탐색(DFS)</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>너비 우선 탐색(BFS)</span>
+            </div>
+        </div>
+
+        <div class="algo-divider"></div>
+
+        <div>
+            <p class="algo-list-index-text">7. 최단 경로</p>
+                
+            <div class="algo-list-text-div">
+                <span>다익스트라</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>벨만-포드</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>플로이드-워셜</span>
+            </div>
+        </div>
+
+        <div class="algo-divider"></div>
+
+        <div>
+            <p class="algo-list-index-text">8. 그래프</p>
+
+            <div class="algo-list-text-div">
+                <span>최소 공동 조상(LCA)</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>강한 연결 요소(SCC)</span>
+            </div>      
+        </div>
+
+        <div class="algo-divider"></div>
+
+        <div>
+            <p class="algo-list-index-text">9. 기하</p>
+                
+            <div class="algo-list-text-div">
+                <span>볼록 껍질(Convex Hull)</span>
+            </div>
+        </div>
+
+        <div class="algo-divider"></div>
+
+        <div>
+            <p class="algo-list-index-text">9. 기타</p>
+            
+            <div class="algo-list-text-div">
+                <span>투 포인터</span>
+            </div>
+
+            <div class="algo-list-text-div">
+                <span>위상 정렬</span>
+            </div>
+        </div>
 </main>
 
 <style>
@@ -267,14 +268,39 @@
     }
 
     #algorithm-list {
-        margin-top: -640px;
+        margin-top: -650px;
         height: 680px;
         padding-left: 20px; 
         border-radius: 5px;
         color: #333;
         font-size: 1rem;
-        overflow-y: auto; /* 수직 스크롤 활성화 */
-        overflow-x: hidden; /* 수평 스크롤 숨기기 */
+        overflow-y: auto; 
+        overflow-x: hidden; 
+        scrollbar-width: none; 
+    }
+
+    #algorithm-list:hover {
+        scrollbar-width: auto; 
+    }
+
+    #algorithm-list::-webkit-scrollbar {
+        width: 10px; 
+        display: none; 
+    }
+
+    #algorithm-list:hover::-webkit-scrollbar {
+        display: block; 
+    }
+
+    #algorithm-list::-webkit-scrollbar-track {
+        background: #181a1e; 
+        border-radius: 4px;
+    }
+
+    #algorithm-list::-webkit-scrollbar-thumb {
+        background: #656a73; 
+        border-radius: 4px; 
+        border: 2px solid #1e1e1e; 
     }
 
     .algo-list-index-text{
@@ -282,13 +308,34 @@
         color: #FFFFFF;
     }
 
-    .algo-list-text{
-        font-size: 1rem;
-        color: #8a8888;
-    }
-
     p{
         margin-bottom: 5px;
     }
 
+    .algo-list-text-div{
+        width: 300px;
+        height: 35px;
+        padding-left: 10px;
+        background-color: #181a1e;
+        border-radius: 8px;
+        display: flex; 
+        align-items: center; 
+        color: #a8a8a9; 
+        font-size: 1rem; 
+        margin: 5px; 
+        font-weight: bold;
+    }
+
+    .algo-list-text-div:hover {
+        background-color: #272a30; 
+        color: #ffffff; 
+        cursor: pointer; 
+    }
+
+    .algo-divider {
+        width: 90%; 
+        height: 1px; 
+        background-color: #3d444d; 
+        margin: 10px 0;
+    }
 </style>
