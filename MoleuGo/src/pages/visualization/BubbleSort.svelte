@@ -11,6 +11,7 @@
     let pausedIcon = true;
     let fromBtn = false;
     let isReplay = false;
+
     let explanation = ``;
     let animationSpeed = 2;
     let animationQuery = [];
@@ -272,7 +273,15 @@
         }
     };
 
+    let cnt = 0;
+
     const playBubbleSortAnimation = async (i) => {
+        let test = false;
+        if(fromBtn) test = true;
+        if(!$animationWorking) {
+            return;
+        }
+        console.log({"애니메이션": i, "호출 순서": cnt++, "버튼 호출?": test});
         const graphElements = document.querySelectorAll('.graph');
         const elementElements = document.querySelectorAll('.element');
         const indexElements = document.querySelectorAll('.index');
@@ -295,14 +304,8 @@
         });
 
         // animation-control 영역의 버튼을 통해서 함수가 호출된 경우, 애니메이션을 재생하지 않고 색상, 배열만 변경
-        if(fromBtn) {
-            if(!isReplay) {
-                isPaused = true;
-            }
-            else {
-                isReplay = false;
-            }
-
+        // replay인 경우, 항상 초기 상태의 배열만 출력
+        if(fromBtn || isReplay) {            
             fromBtn = false;
 
             graphElements.forEach(element => {
@@ -314,6 +317,14 @@
             }
             else {
                 numArr = [...animationQuery[i].curArr];
+            }
+
+            if(isReplay) {
+                await delay(2000 * (1 / animationSpeed));
+                isReplay = false;
+            }
+            else {
+                isPaused = true;
             }
 
             return;
@@ -391,7 +402,7 @@
                     <ion-icon name="play-outline" class="animation-control-btn" disabled={!$animationWorking ? true : null} style="font-size: 2.5rem; color: #d9d9d9;" 
                         on:click={() => {
                             if (animationStep[0] === animationStep[1]) {
-                                fromBtn = true; isPaused = false; isReplay = true; animationStep[0] = 0;
+                                isReplay = true; animationStep[0] = -1;
                             } 
 
                             isPaused = false; 

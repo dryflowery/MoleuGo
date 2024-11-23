@@ -1,16 +1,16 @@
 <script>
     import Header from "../../component/Header.svelte";
     import Navigation from "../../component/navigation/BubbleSortNavigation.svelte"; // Navigation 경로 수정
-    import {isListVisible} from "../../lib/store";
+    import {isListVisible, animationWorking} from "../../lib/store";
 
     let isPaused = false;
     let explanation = ``;
-    let animationSpeed = 1;
+    let animationSpeed = 2;
     let animationStep = [0, 0]; // [curStep, maxStep]
 
     // 슬라이더 색깔관리
-    $: gradientValue = (animationStep[0] / animationStep[1]) * 100;
-    $: sliderStyle = `linear-gradient(to right, #509650 ${gradientValue}%, #585858 ${gradientValue}%)`;
+    $: gradient = (animationStep[0] === 0 || animationStep[1] === 0) ? 0 : (animationStep[0] / animationStep[1]) * 100;
+    $: sliderStyle = `linear-gradient(to right, #509650 ${gradient}%, #585858 ${gradient}%)`;
 
     const delay = (duration) => {
         return new Promise((resolve) => { setTimeout(resolve, duration); });
@@ -70,9 +70,9 @@
                 <ion-icon name="caret-back" class="animation-control-btn"></ion-icon>
 
                 {#if isPaused}
-                    <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => isPaused = !isPaused}></ion-icon>
+                    <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;"></ion-icon>
                 {:else}
-                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => isPaused = !isPaused}></ion-icon>
+                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;"></ion-icon>
                 {/if}
 
                 <ion-icon name="caret-forward" class="animation-control-btn"></ion-icon>
@@ -81,6 +81,7 @@
                 <!-- input은 on:input으로 애니메이션 제어 -->
                 <input
                     type="range"
+                    disabled={!$animationWorking ? true : null}
                     style="background: {sliderStyle};"
                     min={0}
                     max={animationStep[1]}
