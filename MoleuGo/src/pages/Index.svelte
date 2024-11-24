@@ -2,6 +2,10 @@
     import { push } from "svelte-spa-router";
     import Footer from "../component/Footer.svelte";
     import Header from "../component/Header.svelte";
+    import { onMount } from "svelte";
+    import { isListVisible } from "../lib/store";
+
+    onMount(() => $isListVisible = false)
 </script>
   
 <main>

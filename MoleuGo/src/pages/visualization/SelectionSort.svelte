@@ -1,4 +1,5 @@
 <script>
+    import { onDestroy } from "svelte";
     import Header from "../../component/Header.svelte";
     import Navigation from "../../component/navigation/SelectionSortNavigation.svelte";
     import {isListVisible} from "../../lib/store";
@@ -11,15 +12,21 @@
     let pausedIcon = true;
     let fromBtn = false;
     let isReplay = false;
+    let isAsc = true;
 
     let explanation = ``;
     let animationSpeed = 1;
     let animationWorking = false;
     let animationQuery = [];
-    let codeColor = Array(3).fill()
+    let codeColor = Array(4).fill()
     let animationStep = [0, 0]; // [curStep, maxStep]
     let asyncCnt = 0; // 비동기 함수 한 번에 하나만 실행하기 위한 변수
     let gradient = 0;
+
+    // 페이지 바뀌면 애니메이션 종료
+    onDestroy(() => {
+        InitAnimation();
+    });
 
     // 슬라이더의 위치에 따른 animationSpeed 관리
     // 50%까지는 [1, 10], 51%부터는 [11, 1000]
@@ -91,7 +98,7 @@
         fromBtn = false;
         explanation = ``;
         animationQuery = [];
-        codeColor = Array(3).fill();
+        codeColor = Array(4).fill();
         animationStep = [0, 0]; 
 
         const graphElements = document.querySelectorAll('.graph');
@@ -139,7 +146,7 @@
     const startSelectionSort = async (e) => {
         InitAnimation();
 
-        const isAsc = e.detail.isAsc;
+        isAsc = e.detail.isAsc;
         preDrawSelectionSort(isAsc);
 
         animationWorking = true;
@@ -175,10 +182,11 @@
     };
 
     const preDrawSelectionSort = (isAsc) => {  
-        const graphBg = {normal: "#d9d9d9", selected: "#ecadae", sorted: "#9fda9b"};
-        const elementBg = {normal: "#737373", selected: "#ad7677", sorted: "#6a9068"};
-        const elementColor = {normal: "#dcdcdc", selected: "#ffebeb", sorted: "#e8ffe6"};
-        const indexColor = {normal: "#000000", selected: "#e05a5d", sorted: "#72c36b"};
+        // min, max 구분하지 않고 min으로 색깔 이름 통일
+        const graphBg = {normal: "#d9d9d9", selected: "#ecadae", sorted: "#9fda9b", min: "#adbfec"};
+        const elementBg = {normal: "#737373", selected: "#ad7677", sorted: "#6a9068", min: "#7687ad"};
+        const elementColor = {normal: "#dcdcdc", selected: "#ffebeb", sorted: "#e8ffe6", min: "#ebebff"};
+        const indexColor = {normal: "#000000", selected: "#e05a5d", sorted: "#72c36b", min: "#5577e6"};
 
         animationQuery = [];
         let tmpArr = [...numArr];
@@ -189,9 +197,10 @@
         let tmpSwap1 = 1000, tmpSwap2 = 1000;
         let tmpExplanation = ``;
         let tmpCode = 1000;
+        let minIdx = 1000;
 
         const initColor = (sortedIdx) => {
-            for(let i = 0; i < sortedIdx; i++) {
+            for(let i = sortedIdx + 1; i < tmpArr.length; i++) {
                 tmpGraphBgColor[i] = graphBg.normal; 
                 tmpElementBgColor[i] = elementBg.normal;
                 tmpElementColor[i] = elementColor.normal;
@@ -220,48 +229,76 @@
             tmpIndexColor[sortedIdx] = indexColor.sorted;
         };
 
+        const setMinColor = (minIdx) => {
+            tmpGraphBgColor[minIdx] = graphBg.min;
+            tmpElementBgColor[minIdx] = elementBg.min;
+            tmpElementColor[minIdx] = elementColor.min;
+            tmpIndexColor[minIdx] = indexColor.min;
+        }
+
         // 초기 상태
         tmpExplanation = `배열의 초기 상태입니다`
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
-        for(let i = 0; i < tmpArr.length; i++) {
-            // 인덱스 j부터 tmpArr.length - i - 1까지 정렬 시작
-            initColor(tmpArr.length - i);
-            tmpExplanation = `index ${0}부터 ${tmpArr.length - i - 1}까지 정렬을 시작합니다`;
+        for(let i = 0; i < tmpArr.length - 1; i++) {
+            // 인덱스 i부터 tmpArr.length - 1까지 정렬 시작
+            // 인덱스 i를 최소값으로 설정
+            initColor(i - 1);
+            minIdx = i;
+            setMinColor(minIdx);
+            tmpExplanation = isAsc ? `index ${i}부터 ${tmpArr.length - 1}까지 정렬을 시작합니다.<br>현재 최솟값: ${tmpArr[minIdx]}` :
+                                     `index ${i}부터 ${tmpArr.length - 1}까지 정렬을 시작합니다.<br>현재 최댓값: ${tmpArr[minIdx]}`;
             tmpCode = 0;
             pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
-            for(let j = 0; j < tmpArr.length - i - 1; j++) {
-                // isAsc ? tmpArr[j] > tmpArr[j + 1] : tmpArr[j] < tmpArr[j]면 두 원소 교환
-                setSelectedColor(j, j + 1);
-                tmpExplanation = isAsc ? `${tmpArr[j]} > ${tmpArr[j + 1]}(이)면 두 원소를 교환합니다` :
-                                         `${tmpArr[j]} < ${tmpArr[j + 1]}(이)면 두 원소를 교환합니다`;
+            for(let j = i + 1; j < tmpArr.length; j++) {
+                // minIdx의 조건 체크
+                setSelectedColor(j);
+                tmpExplanation = isAsc ? `${tmpArr[j]} < ${tmpArr[minIdx]}(이)면 최솟값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최솟값: ${tmpArr[minIdx]}` :
+                                         `${tmpArr[j]} > ${tmpArr[minIdx]}(이)면 최댓값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최댓값: ${tmpArr[minIdx]}`;
                 tmpCode = 1;
                 pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
-                if((isAsc && (tmpArr[j] > tmpArr[j + 1])) || (!isAsc && (tmpArr[j] < tmpArr[j + 1]))) {
-                    // 두 원소 교환
-                    [tmpArr[j], tmpArr[j + 1]] = [tmpArr[j + 1], tmpArr[j]];
-                    tmpExplanation = `${tmpArr[j]}과(와) ${tmpArr[j + 1]}을(를) 교환합니다`
+                if((isAsc && (tmpArr[j] < tmpArr[minIdx])) || (!isAsc && (tmpArr[j] > tmpArr[minIdx]))) {
+                    // 조건을 만족하면 minIdx 변경
+                    setNormalColor(minIdx);
+                    minIdx = j;
+                    setMinColor(minIdx);
+                    tmpExplanation = isAsc ? `최솟값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최솟값: ${tmpArr[minIdx]}` :
+                                            `최댓값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최댓값: ${tmpArr[minIdx]}`;
                     tmpCode = 2;
-                    pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, j, j + 1, tmpExplanation, tmpCode);
-                    setNormalColor(j);
+                    pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
                 }
                 else {
-                    // 교환이 발생하지 않으면 왼쪽 원소만 normal로 변경
                     setNormalColor(j);
                 }
             }
 
-            // tmpArr.length - i - 1까지 정렬 완료
-            setSortedColor(tmpArr.length - i - 1);
-            tmpExplanation = `index ${tmpArr.length - i - 1}까지 정렬이 완료되었습니다`;
-            tmpCode = 0;
+            // i != minIdx 체크
+            setSelectedColor(minIdx);
+            setSelectedColor(i);
+            tmpExplanation = `${i} != ${minIdx}면 두 원소를 교환합니다`
+            tmpCode = 3;
+            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
+            
+            if(i != minIdx) {
+                // 두 원소 교환
+                [tmpArr[i], tmpArr[minIdx]] = [tmpArr[minIdx], tmpArr[i]];
+                tmpExplanation = `${tmpArr[i]}과(와) ${tmpArr[minIdx]}을(를) 교환합니다`
+                tmpCode = 3;
+                pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, i, minIdx, tmpExplanation, tmpCode);
+                setNormalColor(minIdx);
+            }
+
+            // i까지 정렬 완료
+            setSortedColor(i);
+            tmpExplanation = `index ${i}까지 정렬이 완료되었습니다`;
+            tmpCode = 1000;
             pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
         }
         
         // 정렬 완료
-        initColor(tmpArr.length);
+        initColor(-1);
         tmpExplanation = `배열의 정렬이 완료되었습니다.`
         tmpCode = 1000;
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
@@ -461,10 +498,21 @@
                 <div class="code-area">
                     <!-- 코드의 class="code"로 설정 -->
                     <!-- 들여쓰기는 padding-left:35px -->
-                    <div class="code" style="background-color: {codeColor[0]}">for i = 1 to n - 1</div>
-                    <div class="code" style="background-color: {codeColor[0]}; padding-left: 35px">for j = n downto i + 1</div>
-                    <div class="code" style="background-color: {codeColor[1]}; padding-left: 70px">if A[j] &lt; A[j - 1]</div>
-                    <div class="code" style="background-color: {codeColor[2]}; padding-left: 105px">exchange A[j] with A[j - 1]</div>
+                    {#if isAsc}
+                        <div class="code" style="background-color: {codeColor[0]}">for i = 0 to n - 1</div>
+                        <div class="code" style="background-color: {codeColor[0]}">min = i</div>
+                        <div class="code" style="background-color: {codeColor[0]}">for j = i + 1 to n - 1</div>
+                        <div class="code" style="background-color: {codeColor[1]}; padding-left: 35px">if A[j] &lt; A[min] then</div>
+                        <div class="code" style="background-color: {codeColor[2]}; padding-left: 70px">min = j</div>
+                        <div class="code" style="background-color: {codeColor[3]}">if min != i then swap A[i] and A[min]</div>
+                    {:else}
+                        <div class="code" style="background-color: {codeColor[0]}">for i = 0 to n - 1</div>
+                        <div class="code" style="background-color: {codeColor[0]}">max = i</div>
+                        <div class="code" style="background-color: {codeColor[0]}">for j = i + 1 to n - 1</div>
+                        <div class="code" style="background-color: {codeColor[1]}; padding-left: 35px">if A[j] &gt; A[max] then</div>
+                        <div class="code" style="background-color: {codeColor[2]}; padding-left: 70px">max = j</div>
+                        <div class="code" style="background-color: {codeColor[3]}">if max != i then swap A[i] and A[max]</div>
+                    {/if}
                 </div>
             </div>
         </div>

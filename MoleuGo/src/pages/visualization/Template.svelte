@@ -1,4 +1,5 @@
 <script>
+    import { onDestroy } from "svelte";
     import Header from "../../component/Header.svelte";
     import Navigation from "../../component/navigation/BubbleSortNavigation.svelte";
     import {isListVisible} from "../../lib/store";
@@ -17,6 +18,11 @@
     let asyncCnt = 0; // 비동기 함수 한 번에 하나만 실행하기 위한 변수
     let gradient = 0;
 
+    // 페이지 바뀌면 애니메이션 종료
+    onDestroy(() => {
+        InitAnimation();
+    });
+    
     // 슬라이더의 위치에 따른 animationSpeed 관리
     // 50%까지는 [1, 10], 51%부터는 [11, 1000]
     const updateSpeed = (event) => {
