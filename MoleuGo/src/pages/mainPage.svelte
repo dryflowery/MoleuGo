@@ -5,7 +5,6 @@
   import {isLogin } from "../lib/store"
   import { push } from "svelte-spa-router";
 
-
   //임시로 사용하는 함수(로그인/비로그인)
   const changeLogin = ()=> {
     $isLogin = !$isLogin
@@ -241,7 +240,6 @@
     
   }
 
-
   #roadMap:nth-child(5) {
     grid-column: 4 / 5;
 	  grid-row: 1 / 3;
@@ -251,6 +249,7 @@
     box-sizing: border-box;
     width: 200px;
     height: 728px;
+
     background-color: #151b23;
     border: 3px solid #3d444d;
     border-radius: 8px;

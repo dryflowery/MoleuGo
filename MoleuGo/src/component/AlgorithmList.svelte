@@ -306,7 +306,7 @@
     }
 
     .algo-list-index-text{
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         color: #e4e4e4;
         font-weight: bold;
     }
@@ -325,7 +325,7 @@
         display: flex; 
         align-items: center; 
         color: #BDBDBD; 
-        font-size: 1.05rem; 
+        font-size: 1.1rem; 
         margin: 0px; 
         font-weight: bold;
     }
