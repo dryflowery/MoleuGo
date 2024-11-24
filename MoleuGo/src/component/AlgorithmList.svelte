@@ -210,8 +210,9 @@
 
     #algo-list-name {
         padding-top: 4px;
-        color: #FFFFFF;
+        color: #d3d3d3;
         font-size: 1.2rem;
+        font-weight: bold;
     }
 
     #algo-list-sort-btn {
@@ -268,15 +269,16 @@
     }
 
     #algorithm-list {
-        margin-top: -650px;
+        margin-top: -670px;
         height: 680px;
-        padding-left: 20px; 
+        padding-left: 25px; 
         border-radius: 5px;
         color: #333;
         font-size: 1rem;
         overflow-y: auto; 
         overflow-x: hidden; 
         scrollbar-width: none; 
+        
     }
 
     #algorithm-list:hover {
@@ -305,7 +307,9 @@
 
     .algo-list-index-text{
         font-size: 1.2rem;
-        color: #FFFFFF;
+        color: #e4e4e4;
+        font-weight: bold;
+        margin-left: 2px;
     }
 
     p{
@@ -315,20 +319,21 @@
     .algo-list-text-div{
         width: 300px;
         height: 35px;
-        padding-left: 10px;
+        padding: 5px;
+        padding-left: 6px;
         background-color: #181a1e;
         border-radius: 8px;
         display: flex; 
         align-items: center; 
-        color: #a8a8a9; 
-        font-size: 1rem; 
-        margin: 5px; 
+        color: #BDBDBD; 
+        font-size: 1.1rem; 
+        margin: 0px; 
         font-weight: bold;
     }
 
     .algo-list-text-div:hover {
         background-color: #272a30; 
-        color: #ffffff; 
+        color: #BDBDBD; 
         cursor: pointer; 
     }
 
