@@ -1,4 +1,5 @@
 <script>
+    import { onDestroy } from "svelte";
     import Header from "../../component/Header.svelte";
     import Navigation from "../../component/navigation/BubbleSortNavigation.svelte";
     import {isListVisible} from "../../lib/store";
@@ -11,15 +12,21 @@
     let pausedIcon = true;
     let fromBtn = false;
     let isReplay = false;
+    let isAsc = true;
 
     let explanation = ``;
     let animationSpeed = 1;
     let animationWorking = false;
     let animationQuery = [];
-    let codeColor = Array(3).fill();
+    let codeColor = Array(4).fill();
     let animationStep = [0, 0]; // [curStep, maxStep]
     let asyncCnt = 0; // 비동기 함수 한 번에 하나만 실행하기 위한 변수
     let gradient = 0;
+
+    // 페이지 바뀌면 애니메이션 종료
+    onDestroy(() => {
+        InitAnimation();
+    });
 
     // 슬라이더의 위치에 따른 animationSpeed 관리
     // 50%까지는 [1, 10], 51%부터는 [11, 1000]
@@ -91,7 +98,7 @@
         fromBtn = false;
         explanation = ``;
         animationQuery = [];
-        codeColor = Array(3).fill()
+        codeColor = Array(4).fill()
         animationStep = [0, 0]; 
 
         const graphElements = document.querySelectorAll('.graph');
@@ -139,7 +146,7 @@
     const startBubbleSort = async (e) => {
         InitAnimation();
 
-        const isAsc = e.detail.isAsc;
+        isAsc = e.detail.isAsc;
         preDrawBubbleSort(isAsc);
 
         animationWorking = true;
@@ -224,12 +231,14 @@
         tmpExplanation = `배열의 초기 상태입니다`
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
-        for(let i = 0; i < tmpArr.length; i++) {
-            // 인덱스 j부터 tmpArr.length - i - 1까지 정렬 시작
+        for(let i = 0; i < tmpArr.length - 1; i++) {
+            // 인덱스 0부터 tmpArr.length - i - 1까지 정렬 시작
             initColor(tmpArr.length - i);
             tmpExplanation = `index ${0}부터 ${tmpArr.length - i - 1}까지 정렬을 시작합니다`;
             tmpCode = 0;
             pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
+
+            let isSorted = true;
 
             for(let j = 0; j < tmpArr.length - i - 1; j++) {
                 // isAsc ? tmpArr[j] > tmpArr[j + 1] : tmpArr[j] < tmpArr[j]면 두 원소 교환
@@ -241,6 +250,7 @@
 
                 if((isAsc && (tmpArr[j] > tmpArr[j + 1])) || (!isAsc && (tmpArr[j] < tmpArr[j + 1]))) {
                     // 두 원소 교환
+                    isSorted = false;
                     [tmpArr[j], tmpArr[j + 1]] = [tmpArr[j + 1], tmpArr[j]];
                     tmpExplanation = `${tmpArr[j]}과(와) ${tmpArr[j + 1]}을(를) 교환합니다`
                     tmpCode = 2;
@@ -253,10 +263,14 @@
                 }
             }
 
+            if(isSorted) {
+                break;
+            }
+
             // tmpArr.length - i - 1까지 정렬 완료
             setSortedColor(tmpArr.length - i - 1);
             tmpExplanation = `index ${tmpArr.length - i - 1}까지 정렬이 완료되었습니다`;
-            tmpCode = 0;
+            tmpCode = 1000;
             pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
         }
         
@@ -264,6 +278,7 @@
         initColor(tmpArr.length);
         tmpExplanation = `배열의 정렬이 완료되었습니다.`
         tmpCode = 1000;
+        tmpCode = 3;
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
     };
 
@@ -461,10 +476,15 @@
                 <div class="code-area">
                     <!-- 코드의 class="code"로 설정 -->
                     <!-- 들여쓰기는 padding-left:35px -->
-                    <div class="code" style="background-color: {codeColor[0]}">for i = 1 to n - 1</div>
-                    <div class="code" style="background-color: {codeColor[0]}; padding-left: 35px">for j = n downto i + 1</div>
-                    <div class="code" style="background-color: {codeColor[1]}; padding-left: 70px">if A[j] &lt; A[j - 1]</div>
-                    <div class="code" style="background-color: {codeColor[2]}; padding-left: 105px">exchange A[j] with A[j - 1]</div>
+                    <div class="code" style="background-color: {codeColor[0]}">for i = 0 to n - 1</div>
+                    <div class="code" style="background-color: {codeColor[0]}; padding-left: 35px">for j = 0 to n - 1 - i</div>
+                    {#if isAsc}
+                        <div class="code" style="background-color: {codeColor[1]}; padding-left: 70px">if A[j] &gt; A[j + 1] then</div>
+                    {:else}
+                        <div class="code" style="background-color: {codeColor[1]}; padding-left: 70px">if A[j] &lt; A[j + 1] then</div>
+                    {/if}
+                    <div class="code" style="background-color: {codeColor[2]}; padding-left: 105px">swap A[j] and A[j + 1]</div>
+                    <div class="code" style="background-color: {codeColor[3]}">if sorted then END</div>
                 </div>
             </div>
         </div>

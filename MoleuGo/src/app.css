@@ -3,6 +3,11 @@
   font-size: 100%;
 }
 
+button, input, select, textarea, div, p {
+  font-family: inherit;
+  font-size: inherit;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -69,11 +74,13 @@ main {
 .theory-btn {
   background-color: #509f50;
   color: #FFFFFF;
+  font-size: 1rem;
   font-weight: bold;
   width: 100px;
   height: 26px;
   transform: translateY(-1px); 
   border: none;
+  margin-left: 10px;
 }
 
 .theory-btn:hover {
