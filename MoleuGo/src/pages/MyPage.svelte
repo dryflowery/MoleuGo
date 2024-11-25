@@ -10,7 +10,7 @@
     let isSpecialCharValid = false;
     let showResult = false; // 결과 메시지 표시 여부
     let saveMessage = ""; // 저장 메세지
-    let savedUserName = ""; // 저장된 이름
+    let savedUserName = "컴붕이2"; // 저장된 이름
 
     let usedNames = ["컴붕이1"]; // 이미 존재하는 닉네임들 (임의로 추가)
 
@@ -40,7 +40,9 @@
 
     let ispasswordCheckIcon = false ;// 비밀번호 설정 옆 아이콘 유/무
 
-    let isvisualableNickNameSetting = true;
+    let myEmail = "email@gmail.com";
+
+    let isVisualInformation = true;
     
 
     function checkOldPassword() {
@@ -164,6 +166,9 @@
       }
     }
 
+    let showSettingBox = true; // 기본적으로 setting-box 표시
+    let currentSetting = null; // 현재 설정 중인 항목 (null은 아무 것도 설정하지 않음)
+
 
   </script>
   
@@ -176,27 +181,112 @@
      
     <div class="content">
         
-      <div id="content-box">
-
-        <div id="left-container">
-
-          <div id="user-profile-container">
-            <div id="profile-image">
-              <button id="profile-edit-Btn">설정</button>
-            </div>
-            <div id="nickName"> 닉네임: {usedNames} </div>
+      <div id="profile-box">
+        <div id="profile-top-container">
+          <span id='profile-title'>내 프로필</span>
+          <div id="profile-image">
+            <button id="profile-edit-Btn">설정</button>
           </div>
-
-          <div class="user-imformation-container">
-
-          </div>
-        
-        </div><!--left-container 끝-->
-
-        <div id="right-container">
+          <div id='nickName'>닉네임: {savedUserName} </div>
         </div>
 
-      </div> <!--content-box 끝-->
+        <div id="profile-bottom-container">
+
+          <span id='setting-title'>기본 정보</span>
+
+          {#if showSettingBox}
+            <div id="setting-box">
+              <div id="email-setting">
+                <div id="email-title"> 이메일 </div>
+                <div id="email-icon"><ion-icon name="information-circle-outline"></ion-icon></div>
+                <div id="email-output"> {myEmail} </div>
+                <button id="email-btn" on:click={() => { showSettingBox = false; currentSetting = 'email'; }}>
+                  설정
+                </button>
+              </div>
+              <div id="nickname-setting"> 
+                <div id="nickname-title"> 닉네임 </div>
+                <div id="nickname-output"> {savedUserName} </div>
+                <button id="nickname-btn" on:click={() => { showSettingBox = false; currentSetting = 'nickname'; }}>
+                  설정
+                </button>
+              </div>
+              <div id="password-setting">
+                <div id="password-title"> 비밀번호</div>
+                <div id="password-output"> ****** </div>
+                <button id="password-btn" on:click={() => { showSettingBox = false; currentSetting = 'password'; }}>
+                  설정
+                </button>
+              </div>
+            </div><!--setting-box 끝-->
+
+            {:else if currentSetting === 'email'}
+              <div class="email-settings">
+                
+                
+                <button on:click={() => { showSettingBox = true; currentSetting = null; }}>완료</button>
+              </div>
+            {:else if currentSetting === 'nickname'}
+              <div class="nickname-settings">
+                <div id='change-userName-container'>
+                    <div id="change-userName-Title">
+                      <t style="color: #bbbbbb;">닉네임: {savedUserName || "컴붕이1"} </t>
+                      {#if saveMessage == '중복된 닉네임입니다. 다시 설정해주세요.'}
+                        <ion-icon name="warning-outline" style="color: yellow;"></ion-icon>
+                      {:else if saveMessage == "중복확인 닉네임 변경 완료"}
+                        <ion-icon name="checkmark-outline" style="color: green;" ></ion-icon>
+                      {/if}
+                    </div>
+  
+                    <div id="change-userName">
+                      <input type="text" placeholder="닉네임 변경 ..." bind:value="{userName}">
+                      <button id="userName-edit-Btn" on:click={saveUserName}>변경</button>
+                    </div>
+  
+                    <div id="verify-userName-container">
+  
+                      <div id="Requirements_1" 
+                          class:valid={isLengthValid}  
+                          class:invalid={!isLengthValid}> 
+                          <ion-icon name="checkmark-outline"></ion-icon> 
+                          2 ~ 10 글자 사이의 닉네임을 정해주세요
+                      </div>
+  
+                      <div id="Requirements_2" 
+                          class:valid={isSpecialCharValid}
+                          class:invalid={!isSpecialCharValid}> 
+                          <ion-icon name="checkmark-outline"></ion-icon> 
+                          띄어쓰기를 포함한 특수문자 X
+                      </div>
+  
+                      {#if showResult}
+                        <div id="Requirements_3" 
+                          class:success={saveMessage === "중복확인 닉네임 변경 완료"} 
+                          class:error={saveMessage === "중복된 닉네임입니다. 다시 설정해주세요." || saveMessage === "조건을 충족 해주세요"}>
+                          <ion-icon name="close"></ion-icon>
+                          {saveMessage}
+                        </div>
+                      {/if}
+                    </div>
+                </div>
+                <button on:click={() => { showSettingBox = true; currentSetting = null; }}>완료</button>
+              </div>
+            {:else if currentSetting === 'password'}
+              <div class="password-settings">
+                
+                
+                <button on:click={() => { showSettingBox = true; currentSetting = null; }}>완료</button>
+              </div>
+          {/if}
+        </div>
+
+      </div> <!--profile-box 끝-->
+
+      <div id="information-box">
+
+      </div> <!--information-box 끝-->
+
+
     </div> <!--content 끝-->
   </div> <!--main-container 끝-->
   
@@ -209,7 +299,6 @@
   
   main {
     align-items: center;
-    transition: transform 0.5s ease, margin 0.5s ease;
     
   }
 
@@ -220,59 +309,64 @@
   }
   
  .content {
-   column-gap: 35px;
-   row-gap: 6px;
+   display:grid;
+   grid-template-columns: 620px 1fr;
   }
 
   /* -------------------큰 틀------------------ */
- #content-box {
+ #profile-box {
    display: grid;
-   grid-template-columns: 0.35fr 0.65fr;
+   grid-template-rows: 270px 1fr;
    margin: 0px 0px 0px 200px;
-   width: 1200px;
-   height: 770px;
-   background-color: #151c23;
-   border: 3px solid #3d444d;
+   padding: 20px 0px 0px 0px;
+   width: 400px;
+   height: 60vh;
+   background-color: #151b23;
+   border: 1px solid #3d444d;
    border-radius: 8px;
    box-sizing: border-box;
   }
 
-  #left-container {
-   display:grid;
+  #information-box {
+   display: grid;
    grid-template-rows: 0.55fr 1fr;
-   border-right: 3px solid #3d444d;
-   background-color: #12181d;
-
-   border-top-left-radius: 8px;
-   border-bottom-left-radius: 8px;
-  }
-
-  #right-container {
-    display:grid;
-    grid-template-rows: 0.8fr 1fr;
+   margin: 0px 0px 0px 0px;
+   width: 800px;
+   height: 770px;
+   background-color: #151b23;
+   border: 1px solid #3d444d;
+   border-radius: 8px;
+   box-sizing: border-box;
   }
 
   /* -------------------큰 틀------------------ */
 
   /* -------------------프로필 칸------------------ */
 
-  #user-profile-container {
-    border-bottom: 3px solid #3d444d;
+  #profile-top-container {
+    border-bottom: 1px solid #3d444d;
+  }
+
+  #profile-title {
+    font-weight: bold;
+    font-size: 18px;
+    color: #d1d1d1;
+    margin-left: 20px;
   }
 
   #profile-image {
    width: 175px;
    height: 175px;
-   border-radius: 50%;
-   border: 4px solid #2e2e2e;
+   border-radius: 15%;
+   border: 1px solid #949494;
    background-color: rgb(88, 88, 88);
-   margin: 20px 0px 0px 110px;
+   margin: 10px 0px 0px 110px;
    
   }
 
   #profile-edit-Btn {
    position: relative;
-   background-color: #434343;
+   background-color: #3f3f3f;
    color: white;
    padding: 8px 16px;
    border: 0.5px solid #888888;
@@ -288,16 +382,82 @@
   #nickName {
     font-weight: bold;
     font-size: large;
-    color: #9e9e9e;
-    margin: 15px 0px 0px 135px;
+    color: #c4c4c4;
+    margin: 15px 0px 0px 132px;
   }
+
+
   /* -------------------프로필 칸------------------ */
 
   /* -------------------정보 수정 칸------------------ */
+
+  #profile-bottom-container {
+    padding: 20px 0px 0px 20px;
+  }
+
+  #setting-title {
+    font-weight: bold;
+    font-size: 18px;
+    color: #d1d1d1;
+  }
+
+  #setting-box {
+    margin-top: 30px;
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+  }
+
+  #email-setting, #nickname-setting, #password-setting {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  }
+
+  #nickname-title, #password-title {
+    padding: 10px 0;
+    flex: 0 0 105px;
+    color: #c7c7c7;
+  }
+
+  #email-title {
+    padding: 10px 0;
+    flex: 0 0 55px;
+    color: #c7c7c7;
+  }
+
+  #email-icon {
+    flex: 0 0 50px;
+  }
+
+  #password-output, #nickname-output, #email-output {
+    flex: 0 0 180px;
+  }
+
+  #email-btn, #nickname-btn, #password-btn {
+   position: relative;
+   background-color: #151c23;
+   border: 1px solid #3d444d;
+   color: white;
+   padding: 5px 10px;
+   font-size: 14px;
+   border-radius: 7px;
+   cursor: pointer;
+   margin: 0px 0px 0px 6px;
+   width: 70px;
+   height: 33px;
+  }
+
+  #email-btn:hover, #nickname-btn:hover, #password-btn:hover {
+   background-color: #11171d;
+  }
+
+  /*
   #password-btn {
     margin-top: 17px;
     margin-left: 150px;
   }
+  */
 
   #password-save-Btn {
    position: relative;
@@ -511,6 +671,8 @@
   .error {
   color: rgb(173, 44, 44);
   }
+
+  
 
 </style>
   
