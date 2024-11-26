@@ -1,7 +1,7 @@
 <script>
     import { onDestroy } from "svelte";
     import Header from "../../component/Header.svelte";
-    import Navigation from "../../component/navigation/BubbleSortNavigation.svelte";
+    import Navigation from "../../component/navigation/sort/BubbleSortNavigation.svelte";
     import {isListVisible} from "../../lib/store";
 
     let isPaused = true;
