@@ -295,7 +295,7 @@
 
             await playBubbleSortAnimation(animationStep[0]);
             await waitPause();
-            await delay(20);
+            if(animationSpeed <= 30) await delay(20);
 
             // 버튼을 통해서 제어하는 경우 animationStep의 값을 변경하면 안됨. 정해진 animationStep[0]의 값으로 설정해야 함.
             if(!fromBtn) {
@@ -334,16 +334,8 @@
             fromBtn = false;
 
             graphElements.forEach(element => {
-                element.style.transition = "left 0s ease, height 0s ease";
+                element.style.transition = "left 0.5s ease, height 0.5s ease";
             });
-
-            if(isSwap) {
-                swap1 = animationQuery[i].curSwap1;
-                swap2 = animationQuery[i].curSwap2;
-                
-                // swap animation
-                [[graphLeft[swap1], graphLeft[swap2]]] = [[graphLeft[swap2], graphLeft[swap1]]];
-            }
 
             numArr = [...animationQuery[i].curArr];
 
