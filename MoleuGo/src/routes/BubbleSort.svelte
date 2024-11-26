@@ -1,5 +1,5 @@
 <script>
-    import BubbleSort from "../pages/visualization/BubbleSort.svelte"
+    import BubbleSort from "../pages/visualization/sort/BubbleSort.svelte"
 </script>
   
 <main>

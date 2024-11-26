@@ -106,7 +106,7 @@
                 <span>선택 정렬</span>
             </div>
 
-            <div class="algo-list-text-div">
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/InsertionSort')}}>
                 <span>삽입 정렬</span>
             </div>
 
