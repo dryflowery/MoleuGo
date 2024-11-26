@@ -500,6 +500,7 @@
         -ms-use-select: none;
         -moz-user-select: none;
         -webkit-user-select: none;
+        overflow: hidden;
     }
 
     .main-container {
