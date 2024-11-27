@@ -48,7 +48,7 @@
     let showSettingBox = true; // 기본적으로 setting-box 표시
 
     let currentHeight = 525;   // 기본 높이
-    let isTransitioning = false; // 애니메이션 진행 상태
+    let currentHeight_U = 247;   // 기본 높이
 
     let showEmailInfo = false; // 설명 표시 여부
     
@@ -187,9 +187,35 @@
     else if (currentSetting === "nickname") currentHeight = 580;
     else if (currentSetting === "password") currentHeight = 720;
 
-    isTransitioning = true;
-    setTimeout(() => (isTransitioning = false), 300); // 애니메이션 끝나면 표시
   }
+
+  $: {  // 컬랙션 컨테이너 높이와 애니메이션 상태 업데이트 
+    if (currentSetting === null) currentHeight_U = 224;
+    else if (currentSetting === "email") currentHeight_U = 257;
+    else if (currentSetting === "nickname") currentHeight_U = 169;
+    else if (currentSetting === "password") currentHeight_U = 27;
+
+  }
+
+  let roadMap_h = 50;
+  let activity_h = 700;
+
+  let isRoadMapVisible = false;
+
+  $: {
+    if (isRoadMapVisible) {
+      roadMap_h = 710;
+      activity_h = 40;
+    } else {
+      roadMap_h = 50;
+      activity_h = 700;
+    }
+  }
+
+  function toggleView() {
+    isRoadMapVisible = !isRoadMapVisible;
+  }
+
 
   </script>
   
@@ -224,7 +250,7 @@
                 <div id="email-setting">
                   <div id="email-title"> 이메일 </div>
                   <div id="email-icon" on:mouseover={() => (showEmailInfo = true)} on:mouseout={() => (showEmailInfo = false)}>
-                    <ion-icon name="information-circle-outline"></ion-icon>
+                    <ion-icon name="activity-circle-outline"></ion-icon>
                     {#if showEmailInfo}
                     <div class="tooltip">이메일 인증이 필요합니다.</div>
                     {/if}
@@ -435,27 +461,58 @@
           </div>
         </div> <!--profile-box 끝-->
 
-        <div id="left-under-container">
-          <div id="left-under-box">
+        <div id="left-under-container"> 
+          <div id="left-under-box" style="height: {currentHeight_U}px; transition: height 0.3s ease;">
             <span id='under-title' style="color: #4C905E;">컬렉션</span>
           </div>
         </div>
+
       </div> <!--left-container 끝-->
 
       <div id="right-container">
-        <div id="information-box">
+        <div id="activity-box" style="height: {activity_h}px; padding-top: {isRoadMapVisible ? '10px' : '20px'}; transition: height 0.3s ease, padding 0.3s ease;" >
+          <span id='activity-title'>활동 내역</span>
+          <div id="activity-top-container">
+            <div class="lawn-container">
 
-          <div id="lawn-container">
-            
+              <span id='lawn-title'>2024년에 128 기여 했습니다.</span>
+
+              <div id="lawn-box"> </div>
+
+            </div>
+
+            <div id="activity-top-information-container">
+              <span id='informaition-txt'>최근 공부한 알고리즘: bubble-sort </span>
+              <span id='informaition-txt'>연속 출석일수: 3일 </span>
+              <span id='informaition-txt' style="color:#83b06d ">모은 commit: 162 </span>
+            </div>
+
           </div>
 
-          <div id="log-container">
-            
-          </div>
+          <div id="activity-bottom-container">
 
-        </div> <!--information-box 끝-->
+            <div id="wrote-container">
+              <span id='wrote-title'>내가 쓴 글</span>
+              <div id="wrote-box"></div>
+            </div>
+
+            <div id="comment-container" style="padding-left:10px;">
+              <span id='comment-title'>내가 쓴 댓글</span>
+              <div id="comment-box"></div>
+            </div>
+
+          </div>
+        </div> <!--activity-box 끝-->
+
+        <div class="roadMap" style="height: {roadMap_h}px; transition: height 0.3s ease; overflow: hidden;" >
+          <div id="goToRoadMap">
+            <div id="RoadMapBtn" style="margin-top:8px;" on:click={toggleView}>
+              <div style="margin-left: 22px;"><ion-icon size="large" name="map-outline"></ion-icon></div>
+            </div>
+          </div>
+        </div>
+        
       </div><!--right-container 끝-->
-
     </div> <!--content 끝-->
   </div> <!--main-container 끝-->
   
@@ -482,11 +539,11 @@
    grid-template-columns: 620px 1fr;
   }
 
-  .left-content  {
+  .left-container  {
     
   }
 
-  .right-content {
+  #right-container {
 
   }
 
@@ -507,16 +564,17 @@
 
   }
 
-  #information-box {
+  #activity-box {
    display: grid;
-   grid-template-rows: 0.55fr 1fr;
-   margin: 0px 0px 0px 0px;
+   grid-template-rows: 40px 1fr 1fr;
    width: 800px;
-   height: 770px;
+   height: 700px;
    background-color: #151b23;
    border: 1px solid #3d444d;
    border-radius: 8px;
    box-sizing: border-box;
+   padding: 0 0 0 20px;
+   overflow: hidden;
   }
 
   #left-under-box {
@@ -538,8 +596,6 @@
   #left-under-container {
     position: fixed;
     height: 247px;
-    
-    
   }
   
 
@@ -599,7 +655,7 @@
     padding: 20px 0px 0px 20px;
   }
 
-  #setting-title, #under-title, #information-title {
+  #setting-title, #under-title, #activity-title {
     font-weight: bold;
     font-size: 18px;
     color: #d1d1d1;
@@ -934,9 +990,94 @@
 
   /* -------------------이메일 변경 칸 끝 ------------------ */
 
+  /* -------------------  활동(잔디밭) 칸 ------------------ */
+  
+  #lawn-box {
+    height: 200px;
+    width: 700px;
+    background-color: #151b23;
+    border: 2px solid #3d444d;
+    border-radius: 5px;
+    margin-left: 28px;
+    box-sizing: border-box;
+  }
 
-  #information-box {
+  #lawn-title {
+    margin: 20px 0px 0px 28px;
+    font-size: 1.2rem;
+    color: #8d8d8d;
+  }
 
+
+  #activity-top-information-container {
+    padding: 28px 28px 0px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #dddddd;
+  }
+
+  #activity-bottom-container {
+    display: grid;
+    padding: 28px 28px 0px 28px;
+    grid-template-columns:1fr 1fr;
+  }
+
+  #wrote-title, #comment-container {
+    font-size: large;
+    color: #c9c9c9;
+    font-weight: bold;
+  }
+
+  #wrote-box, #comment-box {
+    width: 335px;
+    height: 200px;
+    border: 2px solid #3d444d;
+    border-radius: 5px;
+    margin-top: 5px;
+  }
+
+  #goToRoadMap {
+    margin: 0 auto;
+  }
+
+  #RoadMapBtn {
+    display: inline-block;
+    transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+    color: #858585;
+  }
+
+  #RoadMapBtn:hover {
+    animation: shake 0.5s ease-in-out infinite;
+    color: #1c682b;
+    
+  }
+
+  @keyframes shake {
+    0% { transform: translateY(0); }
+    20% { transform: translateY(-4px); }
+    40% { transform: translateY(-6px); }
+    50% { transform: translateY(-8px); }
+    70% { transform: translateY(-10px); }
+    90% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* -------------------활동 칸 끝 ------------------ */
+
+  /* -------------------  로드맵 ------------------ */
+
+  .roadMap {
+   display: grid;
+   grid-template-rows: 40px 1fr 0.8fr 60px;
+   margin:20px 0px 0px 0px;
+   width: 800px;
+   height: 50px;
+   background-color: #151b23;
+   border: 1px solid #3d444d;
+   border-radius: 8px;
+   box-sizing: border-box;
+   padding: 0px;
   }
 
 </style>
