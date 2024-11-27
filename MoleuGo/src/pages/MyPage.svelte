@@ -7,8 +7,8 @@
     import { onMount } from "svelte";
     import Template from "./visualization/Template.svelte";
 
-    let userName = "";
-    let isLengthValid = false;
+    let userName = ""; // 기존 유저 이름
+    let isLengthValid = false; // 길이 판별
     let isSpecialCharValid = false;
     let showResult = false; // 결과 메시지 표시 여부
     let saveMessage = ""; // 저장 메세지
@@ -486,11 +486,9 @@
               <span id='informaition-txt'>연속 출석일수: 3일 </span>
               <span id='informaition-txt' style="color:#83b06d ">모은 commit: 162 </span>
             </div>
-
           </div>
 
           <div id="activity-bottom-container">
-
             <div id="wrote-container">
               <span id='wrote-title'>내가 쓴 글</span>
               <div id="wrote-box"></div>
@@ -511,7 +509,6 @@
             </div>
           </div>
         </div>
-        
       </div><!--right-container 끝-->
     </div> <!--content 끝-->
   </div> <!--main-container 끝-->
@@ -559,7 +556,7 @@
    border: 1px solid #3d444d;
    border-radius: 8px;
    box-sizing: border-box;
-
+  
    overflow: hidden;
 
   }
@@ -575,7 +572,7 @@
    box-sizing: border-box;
    padding: 0 0 0 20px;
    overflow: hidden;
-  }
+   }
 
   #left-under-box {
    display: grid;
@@ -589,7 +586,6 @@
    border-radius: 8px;
    box-sizing: border-box;
    overflow: hidden; /* 높이를 초과하는 내용을 숨김 */
-   
 
   }
 
@@ -598,7 +594,6 @@
     height: 247px;
   }
   
-
   /* -------------------큰 틀------------------ */
 
   /* -------------------프로필 칸------------------ */
@@ -986,7 +981,6 @@
     z-index: 100;
   }
   
-
 
   /* -------------------이메일 변경 칸 끝 ------------------ */
 
