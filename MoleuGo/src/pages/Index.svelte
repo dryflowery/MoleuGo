@@ -30,7 +30,8 @@
      
         <div id="main-right-container">
              <div id="algo-gif-container">
-                <img src="assets/algoGif.gif" alt="visualized algorithm" id="algo-gif">
+                <!-- <img src="assets/algoGif.gif" alt="visualized algorithm" id="algo-gif"> -->
+                 <video src="assets/algoGif.mp4" width="800px" height="500px" autoplay muted loop></video>
              </div>
         </div>
     </div>
