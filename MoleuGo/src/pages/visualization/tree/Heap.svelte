@@ -1,8 +1,8 @@
 <script>
     import { onDestroy } from "svelte";
-    import Header from "../../component/Header.svelte";
-    import Navigation from "../../component/navigation/sort/BubbleSortNavigation.svelte";
-    import {isListVisible} from "../../lib/store";
+    import Header from "../../../component/Header.svelte";
+    import Navigation from "../../../component/navigation/sort/BubbleSortNavigation.svelte";
+    import {isListVisible} from "../../../lib/store";
 
     let isPaused = true;
     let pausedIcon = true;
@@ -112,7 +112,7 @@
 
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
-                버블 정렬(Bubble Sort) 
+                힙(Heap) 
             </div>
 
             <div class="canvas">

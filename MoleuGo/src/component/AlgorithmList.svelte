@@ -44,7 +44,7 @@
                 <span>이진 탐색 트리</span>
             </div>
 
-            <div class="algo-list-text-div">
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/tree/Heap');}}>
                 <span>힙</span>
             </div>
 
@@ -98,15 +98,15 @@
         <div>
             <p class="algo-list-index-text">5. 정렬</p>
             
-            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/BubbleSort');}}>
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/sort/BubbleSort');}}>
                 <span>버블 정렬</span>
             </div>
 
-            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/SelectionSort')}}>
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/sort/SelectionSort')}}>
                 <span>선택 정렬</span>
             </div>
 
-            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/InsertionSort')}}>
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/sort/InsertionSort')}}>
                 <span>삽입 정렬</span>
             </div>
 
