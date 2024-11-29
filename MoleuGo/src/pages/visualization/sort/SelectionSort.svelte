@@ -143,7 +143,7 @@
     };
 
     // SelectionSort animation start
-    const startSelectionSort = async (e) => {
+    const startSelectionSort = (e) => {
         InitAnimation();
 
         isAsc = e.detail.isAsc;
