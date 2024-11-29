@@ -9,6 +9,7 @@
   import SelectionSort from './routes/visualization/sort/SelectionSort.svelte';
   import InsertionSort from './routes/visualization/sort/InsertionSort.svelte';
   import Heap from './pages/visualization/tree/Heap.svelte';
+  import ConvexHull from './routes/visualization/geometry/ConvexHull.svelte';
 
   const routes = {
     '/': Index,
@@ -19,7 +20,8 @@
     '/visualization/sort/BubbleSort': BubbleSort,
     '/visualization/sort/SelectionSort': SelectionSort,
     '/visualization/sort/InsertionSort': InsertionSort,
-    '/visualization/tree/Heap': Heap
+    '/visualization/tree/Heap': Heap,
+    '/visualization/geometry/ConvexHull': ConvexHull
   };
 </script>
 

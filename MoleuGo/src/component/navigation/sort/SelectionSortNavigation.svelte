@@ -81,7 +81,11 @@
 
     // createRandomElements의 범위 체크 (1 ~ 20)
     const validElementCntRange = (e) => {
-        if (elementCnt > 20) {
+        if (!Number.isInteger(elementCnt)) {
+            alert("정수를 입력해주세요");
+            return false;
+        }
+        else if (elementCnt > 20) {
             elementCnt = 20;
             alert("20 이하의 숫자를 입력해주세요");
             return false;
@@ -113,7 +117,7 @@
 
         const isValid = elements.every(el => {
             const num = Number(el);
-            return !isNaN(num) && num >= 3 && num <= 40 && el !== '';
+            return !isNaN(num) && num >= 3 && num <= 40 && Number.isInteger(num) && el !== '';
         });
 
         if (isValid) {
@@ -124,7 +128,7 @@
             alert("유효하지 않은 문자가 있습니다");
             return false;
         } else {
-            alert("3이상, 40이하의 원소를 입력해주세요");
+            alert("3 이상, 40 이하의 정수를 입력해주세요");
             return false;
         }
 

@@ -106,6 +106,7 @@
         const indexElements = document.querySelectorAll('.index');
 
         // 색상 수정
+        
         graphElements.forEach(element => {
             element.style.backgroundColor = "#d9d9d9";
         });
@@ -143,7 +144,7 @@
     };
 
     // BubbleSort animation start
-    const startBubbleSort = async (e) => {
+    const startBubbleSort = (e) => {
         InitAnimation();
 
         isAsc = e.detail.isAsc;
