@@ -8,6 +8,7 @@
   import BubbleSort from './routes/BubbleSort.svelte';
   import SelectionSort from './routes/SelectionSort.svelte';
   import InsertionSort from './routes/InsertionSort.svelte';
+  import LinkedList from './routes/LinkedList.svelte';
 
   const routes = {
     '/': Index,
@@ -17,7 +18,8 @@
     '/main/myPage' : MyPage,
     '/visualization/BubbleSort': BubbleSort,
     '/visualization/SelectionSort': SelectionSort,
-    '/visualization/InsertionSort': InsertionSort
+    '/visualization/InsertionSort': InsertionSort,
+    '/visualization/LinkedList': LinkedList
   };
 </script>
 
