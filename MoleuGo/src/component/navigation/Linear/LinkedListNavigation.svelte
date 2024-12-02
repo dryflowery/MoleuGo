@@ -4,6 +4,7 @@
     import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
     export let animationWorking;
+    
     const dispatch = createEventDispatcher();
 
     let tooltip = Array(9).fill(false);
@@ -13,16 +14,41 @@
     let offsetX = 0; 
     let offsetY = 0; 
     let navigationPos = { top: "700px", left: "1300px" }; 
+    let arrowVisibility = { north: false, south: false }; // 화살표 표시 상태
 
     let NodeCnt = 5;
     let inputtedNode = ''
     let tmpNode = [];
+
+    
+
+    const updateArrowVisibility = () => {
+        const windowHeight = window.innerHeight; // 화면 전체 높이
+        const windowCenterY = windowHeight / 2; // 화면 중앙 Y 좌표
+        const navHeight = 125; // 네비게이션 높이
+        const navTop = parseFloat(navigationPos.top); // 네비게이션의 상단 위치
+        const navCenterY = navTop + navHeight / 2; // 네비게이션 중앙 Y 좌표
+
+        // 초기값: 모든 화살표 숨기기
+        arrowVisibility = { north: false, south: false };
+
+        // 네비게이션 위치를 기준으로 가시성 업데이트
+        if (navCenterY < windowCenterY) {
+            // 네비게이션이 화면 중앙보다 위쪽에 있으면 남쪽 화살표 표시
+            arrowVisibility.south = true;
+        } else {
+            // 네비게이션이 화면 중앙보다 아래쪽에 있으면 북쪽 화살표 표시
+            arrowVisibility.north = true;
+        }
+    };
+
 
     const toggleNavigation = (e) => {
         toggle = Array(9).fill(false);
         isActive = !isActive;
         e.preventDefault(); // 기본 우클릭 메뉴 나타나지 않게 설정
     };
+    
 
     const startDrag = (e) => {
         const dragElement = e.target.closest("#drag"); 
@@ -64,8 +90,10 @@
         });
     };
 
+
     const stopDrag = () => {
         isDragging = false;
+        updateArrowVisibility();
         document.removeEventListener("pointermove", onDrag);
         document.removeEventListener("pointerup", stopDrag);
     };
@@ -153,11 +181,26 @@
         isActive = false;
         dispatch('startLinkedList');
     }
+
+    $: {
+        updateArrowVisibility();
+
+    }
+
 </script>
 
 <main>
     <div class="navigation-container" on:pointerdown={startDrag}
     style="top: {navigationPos.top}; left: {navigationPos.left}; position: absolute; cursor: pointer;">
+
+        <div class="arrow north" class:visible={arrowVisibility.north} class:active={isActive}>
+            <ion-icon name="arrow-up-outline" size="large"></ion-icon>
+        </div>
+        
+        <div class="arrow south" class:visible={arrowVisibility.south} class:active={isActive}>
+            <ion-icon name="arrow-down-outline" size="large"></ion-icon>
+        </div>
+
         <!-- 툴팁 표시 -->
         <div class="navigation-tooltip">
             {#if isActive}
@@ -279,3 +322,41 @@
         </div>
     </div>
 </main>
+
+<style>
+
+    .arrow {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        opacity: 0;
+        transition: transform 0.5s ease, opacity 0.2s ease;
+
+    }
+    .arrow.visible {
+        opacity: 1;
+    }
+
+    .north {
+        top: -40px;
+        left: 40%;
+        transform: translateX(-50%);
+    }
+    .south {
+        bottom: -25px;
+        left: 38%;
+        transform: translateX(-50%);
+    }
+
+    .arrow.active.north {
+        transform: translate(-50%, -80px); /* 북쪽 화살표 위로 이동 */
+
+    }
+
+    .arrow.active.south {
+        transform: translate(-50%, 60px); /* 남쪽 화살표 아래로 이동 */
+
+    }
+
+
+</style>

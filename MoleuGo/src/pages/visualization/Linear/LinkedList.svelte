@@ -23,6 +23,7 @@
     $: totalWidth = numNode.length * (90); // 노드의 총 길이 계산 (노드 크기와 간격 포함)
     $: offsetX = (200 - totalWidth) / 2;
 
+
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
         InitAnimation();
