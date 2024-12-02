@@ -1,5 +1,5 @@
 <script>
-    import { onDestroy, onMount } from "svelte";
+    import { onDestroy, onMount, tick } from "svelte";
     import Header from "../../../component/Header.svelte";
     import Navigation from "../../../component/navigation/geometry/ConvexHullNavigation.svelte";
     import {isListVisible} from "../../../lib/store";
@@ -111,6 +111,8 @@
         const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
         const gridElements = document.querySelectorAll('.grid');
         const cellElements = document.querySelectorAll('.cell');
+        const paths = document.querySelectorAll('path');
+        paths.forEach(path => path.remove());
 
         gridElements.forEach(element => {
             element.style.transform = "scale(1)";
@@ -300,8 +302,7 @@
         let height = 0;
 
         while(true) {
-            if(await rowAnimate(height) === true) break;
-            height += 1;
+            if(await rowAnimate(height++) === true) break;
         }
 
         // 세로줄 그리기
@@ -335,8 +336,7 @@
         let width = 0;
 
         while(true) {
-            if(await colAnimate(width) === true) break;
-            width += 1;
+            if(await colAnimate(width++) === true) break;
         }
 
         // points[0] 번호 변경
@@ -520,11 +520,6 @@
             };
         };
 
-        await connectEdge(0, 1);
-        await delay(2000 * (1 / animationSpeed));
-
-        let stack = [0, 1];
-
         const ccw = (a, b, c) => {
             let ax = pointsInfo[a].x;
             let ay = pointsInfo[a].y;
@@ -546,15 +541,18 @@
             }
         };
 
+        await connectEdge(0, 1);
+        await delay(2000 * (1 / animationSpeed));
+
+        let stack = [0, 1];
+
         for(let i = 2; i < pointsInfo.length; i++) {
-            let first, second;
+            changePointColor(i, "5px solid #e97714", "#e97714", 1); // 체크할 노드 빨간색으로
+            await delay(2000 * (1 / animationSpeed));
 
-            while(stack.length >= 2) {
-                first = stack[stack.length - 2];
-                second = stack[stack.length - 1];
-
-                changePointColor(i, "5px solid #e97714", "#e97714", 1); // 체크할 노드 빨간색으로
-                await delay(2000 * (1 / animationSpeed));
+            while(stack.length >= 2 && pointsInfo.length > 3) {
+                let first = stack[stack.length - 2];
+                let second = stack[stack.length - 1];
 
                 if(ccw(first, second, i) >= 0) { // 뒤집어진 좌표라 ccw도 반대로
                     // 간선 끊고 opacity 0.1로 변경
@@ -563,15 +561,15 @@
                     await delay(2000 * (1 / animationSpeed));
 
                     changePointColor(second, "5px solid #000000", "#000000", 0.1);
+                    await delay(2000 * (1 / animationSpeed));
                 }
                 else {
                     break;
                 }
             }
 
-            // 간선 연결하고 노드 초록색으로 변경
             stack.push(i);  
-            await connectEdge(stack[stack.length - 1], i);
+            await connectEdge(stack[stack.length - 2], i);
             await delay(2000 * (1 / animationSpeed));
 
             changePointColor(i, "5px solid #50ad49", "#50ad49", 1);
