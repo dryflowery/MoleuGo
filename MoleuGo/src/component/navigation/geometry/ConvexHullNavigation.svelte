@@ -14,7 +14,7 @@
     let offsetY = 0; 
     let navigationPos = { top: "700px", left: "1300px" }; 
     
-    let pointCnt = 0;
+    let pointCnt = 3;
 
     const toggleNavigation = (e) => {
         toggle = Array(9).fill(false);
@@ -77,7 +77,7 @@
     };
 
     // createRandomElements의 범위 체크 (1 ~ 20)
-    const validPointCntRange = (e) => {
+    const validPointCntRange = (e, num) => {
         if (!Number.isInteger(pointCnt)) {
             alert("정수를 입력해주세요");
             return false;
@@ -86,9 +86,10 @@
             pointCnt = 54;
             alert("54 이하의 숫자를 입력해주세요");
             return false;
-        } else if (pointCnt < 0) {
-            pointCnt = 0;
-            alert("0 이상의 숫자를 입력해주세요");
+        } else if (pointCnt < 3) {
+            pointCnt = 3;
+            if(num == 0) alert("3 이상의 숫자를 입력해주세요");
+            else alert("3개 이상의 정점을 만들어주세요");
             return false;
         } else {
             pointCnt = pointCnt;
@@ -97,15 +98,14 @@
     };
 
     const createRandomPoint = (e) => {
-        if(!isActive || !validPointCntRange(e)) {
+        if(!isActive || !validPointCntRange(e, 0)) {
             return;
         }
-
         dispatch('createRandomPoint', {pointCnt});
     };
 
-    const constructConvexHull = () => {
-        if(!isActive || animationWorking) {
+    const constructConvexHull = (e) => {
+        if(!isActive || animationWorking || !validPointCntRange(e, 1)) {
             return;
         }
 
@@ -136,7 +136,7 @@
                       <!-- 원소 랜덤 생성 -->
                       <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>N</span> <span class='txt'>=</span>
-                        <input type="number" id="element-cnt-input" min="0" max="54" bind:value={pointCnt}>
+                        <input type="number" id="element-cnt-input" min="3" max="54" bind:value={pointCnt}>
                         <button style="white-space: nowrap;" on:click={createRandomPoint}>생성</button>
                     </div>
                 {/if}
