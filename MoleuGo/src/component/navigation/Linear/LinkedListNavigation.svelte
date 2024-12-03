@@ -7,6 +7,9 @@
     
     const dispatch = createEventDispatcher();
 
+    export let nodePositions = []; // LinkedList에서 전달받은 노드 위치 데이터
+    export let highlightedIndex = null; // 추가: 바인딩 가능하도록 설정
+
     let tooltip = Array(9).fill(false);
     let toggle = Array(9).fill(false);
     let isActive = false; 
@@ -29,6 +32,11 @@
         const navTop = parseFloat(navigationPos.top); // 네비게이션의 상단 위치
         const navCenterY = navTop + navHeight / 2; // 네비게이션 중앙 Y 좌표
 
+        const navY = parseFloat(navigationPos.top); // 네비게이션의 Y 좌표
+        const navX = parseFloat(navigationPos.left); // 네비게이션의 X 좌표
+
+        highlightedIndex = null; // 초기화
+
         // 초기값: 모든 화살표 숨기기
         arrowVisibility = { north: false, south: false };
 
@@ -40,6 +48,18 @@
             // 네비게이션이 화면 중앙보다 아래쪽에 있으면 북쪽 화살표 표시
             arrowVisibility.north = true;
         }
+
+        nodePositions.forEach((node, index) => {
+            // 네비게이션 위치와 노드 위치 비교
+            const dx = Math.abs(node.x - navX);
+            const dy = Math.abs(node.y - navY);
+
+            if (dx < 50 && dy < 200) {
+                // 가리키는 노드 탐지
+                console.log(`Arrow points to Node: Index=${node.index}, Value=${node.value}`);
+                highlightedIndex = index; // 가리키는 노드의 인덱스 저장
+            }
+        });
     };
 
 
@@ -88,6 +108,7 @@
             navigationPos.top = `${newTop}px`;
             navigationPos.left = `${newLeft}px`;
         });
+        updateArrowVisibility();
     };
 
 
@@ -317,7 +338,7 @@
             
             <!-- 8번 (알고리즘 실행) -->
             <div class="center">
-                <ion-icon name="planet-outline"></ion-icon>
+                
             </div>
         </div>
     </div>

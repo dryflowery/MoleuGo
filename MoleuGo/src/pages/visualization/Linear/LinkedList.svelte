@@ -1,10 +1,12 @@
 <script>
-    import { onDestroy } from "svelte";
+    import { onDestroy, onMount  } from "svelte";
     import Header from "../../../component/Header.svelte";
     import LinkedListNavigation from "../../../component/navigation/Linear/LinkedListNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
 
     let numNode = [15, 10, 20, 30, 7]
+    let nodePositions = []; // 노드의 실제 위치 저장
+    let highlightedIndex = null; // 추가: 강조된 노드의 인덱스
 
     let isPaused = true;
     let pausedIcon = true;
@@ -23,10 +25,29 @@
     $: totalWidth = numNode.length * (90); // 노드의 총 길이 계산 (노드 크기와 간격 포함)
     $: offsetX = (200 - totalWidth) / 2;
 
+    const updateNodePositions = () => {
+        const nodes = document.querySelectorAll(".linked-list-node-container");
+        nodePositions = Array.from(nodes).map((node, index) => {
+            const rect = node.getBoundingClientRect(); // 노드의 실제 위치 계산
+            return {
+                index,
+                value: numNode[index],
+                x: rect.left + rect.width / 2, // 노드의 중심 x 좌표
+                y: rect.top + rect.height / 2, // 노드의 중심 y 좌표
+            };
+        });
+    };
+
+    onMount(() => {
+        updateNodePositions();
+        window.addEventListener("resize", updateNodePositions); // 창 크기 조정 시 업데이트
+    });
+
 
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
         InitAnimation();
+        window.removeEventListener("resize", updateNodePositions);
     });
     
     // 슬라이더의 위치에 따른 animationSpeed 관리
@@ -140,6 +161,8 @@
 <main>
     <div class="navigation-container">
         <LinkedListNavigation 
+        {nodePositions} 
+        bind:highlightedIndex
         on:createRandomNode={createRandomNode} 
         on:createInputtedNode={createInputtedNode} 
         on:startBubbleSort={startLinkedList}
@@ -167,7 +190,7 @@
                     <div class="linked-list-node-container" 
                         style="transform: translateX({offsetX + index * 95}px);">
 
-                        <div class="linked-list-node">
+                        <div class="linked-list-node {highlightedIndex === index ? 'highlighted-node' : ''}">
                             <div class="node-value">{node}</div>
                         </div>
 
@@ -368,6 +391,13 @@
     .tail-label {
         left: 32%;
         transform: translateX(-50%);
+    }
+
+    .highlighted-node {
+        background-color: #adbfec;
+        border-color: #7687ad;
+        color: #ffffff;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
 
