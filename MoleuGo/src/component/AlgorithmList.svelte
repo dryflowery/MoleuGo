@@ -174,8 +174,8 @@
         <div>
             <p class="algo-list-index-text">9. 기하</p>
                 
-            <div class="algo-list-text-div">
-                <span on:click={()=> {$isListVisible = false; push('/visualization/geometry/ConvexHull');}}>볼록 껍질(Convex Hull)</span>
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/geometry/ConvexHull');}}>
+                <span>볼록 껍질(Convex Hull)</span>
             </div>
         </div>
 

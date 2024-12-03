@@ -362,7 +362,6 @@
 
             // swap animation
             [[graphLeft[swap1], graphLeft[swap2]]] = [[graphLeft[swap2], graphLeft[swap1]]];
-            console.log(graphLeft);
         }
 
         await delay(2000 * (1 / animationSpeed));
