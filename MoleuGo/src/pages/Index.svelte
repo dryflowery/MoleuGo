@@ -2,6 +2,10 @@
     import { push } from "svelte-spa-router";
     import Footer from "../component/Footer.svelte";
     import Header from "../component/Header.svelte";
+    import { onMount } from "svelte";
+    import { isListVisible } from "../lib/store";
+
+    onMount(() => $isListVisible = false)
 </script>
   
 <main>
@@ -26,7 +30,8 @@
      
         <div id="main-right-container">
              <div id="algo-gif-container">
-                <img src="assets/algoGif.gif" alt="visualized algorithm" id="algo-gif">
+                <!-- <img src="assets/algoGif.gif" alt="visualized algorithm" id="algo-gif"> -->
+                 <video src="assets/algoGif.mp4" width="800px" height="500px" autoplay muted loop></video>
              </div>
         </div>
     </div>

@@ -1,25 +1,33 @@
 <script>
-    import Header from "../../component/Header.svelte";
-    import Navigation from "../../component/navigation/SelectionSortNavigation.svelte";
-    import {isListVisible} from "../../lib/store";
+    import { onDestroy } from "svelte";
+    import Header from "../../../component/Header.svelte";
+    import Navigation from "../../../component/navigation/sort/InsertionSortNavigation.svelte";
+    import {isListVisible} from "../../../lib/store";
 
-    let numArr = [15, 10, 20, 40, 7]
+    let numArr = [15, 10, 20, 30, 7]
     let graphLeft = [];
     let indexLeft = [];
+    let graphBottom = [];
 
     let isPaused = true;
     let pausedIcon = true;
     let fromBtn = false;
     let isReplay = false;
+    let isAsc = true;
 
     let explanation = ``;
     let animationSpeed = 1;
     let animationWorking = false;
     let animationQuery = [];
-    let codeColor = Array(3).fill()
+    let codeColor = Array(5).fill()
     let animationStep = [0, 0]; // [curStep, maxStep]
     let asyncCnt = 0; // 비동기 함수 한 번에 하나만 실행하기 위한 변수
     let gradient = 0;
+
+    // 페이지 바뀌면 애니메이션 종료
+    onDestroy(() => {
+        InitAnimation();
+    });
 
     // 슬라이더의 위치에 따른 animationSpeed 관리
     // 50%까지는 [1, 10], 51%부터는 [11, 1000]
@@ -53,6 +61,10 @@
         for (let i = 0; i < numArr.length; i++) {
             graphLeft[i] = startX + i * elementWidth; 
             indexLeft[i] = startX + i * elementWidth; 
+
+            if(!animationWorking) {
+                graphBottom[i] = 30;
+            }
         }
     }
 
@@ -91,7 +103,7 @@
         fromBtn = false;
         explanation = ``;
         animationQuery = [];
-        codeColor = Array(3).fill();
+        codeColor = Array(5).fill();
         animationStep = [0, 0]; 
 
         const graphElements = document.querySelectorAll('.graph');
@@ -124,8 +136,10 @@
         numArr = [];  
 
         for (let i = 0; i < elementCnt; i++) {
-            numArr.push(Math.floor(Math.random() * 38) + 3);
+            numArr.push(Math.floor(Math.random() * 28) + 3);
         }
+
+        graphBottom = Array(numArr.length).fill(30);
     };
 
     const createInputtedElement = (e) => {
@@ -133,19 +147,21 @@
 
         const tmpArr = e.detail.tmpArr;
         numArr = tmpArr;
+
+        graphBottom = Array(numArr.length).fill(30);
     };
 
-    // SelectionSort animation start
-    const startSelectionSort = async (e) => {
+    // InsertionSort animation start
+    const startInsertionSort = (e) => {
         InitAnimation();
 
-        const isAsc = e.detail.isAsc;
-        preDrawSelectionSort(isAsc);
+        isAsc = e.detail.isAsc;
+        preDrawInsertionSort(isAsc);
 
         animationWorking = true;
         pausedIcon = false;
         isPaused = false;
-        drawSelectionSort(asyncCnt++);
+        drawInsertionSort(asyncCnt++);
     };
 
     const changeCodeColor = (idx) => {
@@ -159,8 +175,8 @@
         }
     };
 
-    const pushAnimationQuery = (tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, 
-                                tmpIndexColor,tmpSwap1, tmpSwap2, tmpExplanation, tmpCode) => {
+    const pushAnimationQuery = (tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor,
+                                tmpSwap1, tmpSwap2, tmpExplanation, tmpCode, tmpGraphBottom) => {
             animationQuery.push({
             curArr: [...tmpArr],
             curGraphBgColor: [...tmpGraphBgColor], 
@@ -170,11 +186,12 @@
             curSwap1: tmpSwap1, 
             curSwap2: tmpSwap2,
             curExplanation: tmpExplanation,
-            curCode: tmpCode // 색깔 바꿀 코드
+            curCode: tmpCode, // 색깔 바꿀 코드
+            curGraphBottom: [...tmpGraphBottom]
         })
     };
 
-    const preDrawSelectionSort = (isAsc) => {  
+    const preDrawInsertionSort = (isAsc) => {  
         const graphBg = {normal: "#d9d9d9", selected: "#ecadae", sorted: "#9fda9b"};
         const elementBg = {normal: "#737373", selected: "#ad7677", sorted: "#6a9068"};
         const elementColor = {normal: "#dcdcdc", selected: "#ffebeb", sorted: "#e8ffe6"};
@@ -189,22 +206,18 @@
         let tmpSwap1 = 1000, tmpSwap2 = 1000;
         let tmpExplanation = ``;
         let tmpCode = 1000;
+        let tmpKey = 1000;
+        let comp = 1000;
+        let tmpGraphBottom = Array(tmpArr.length).fill(30);
 
         const initColor = (sortedIdx) => {
-            for(let i = 0; i < sortedIdx; i++) {
+            for(let i = sortedIdx + 1; i < tmpArr.length; i++) {
                 tmpGraphBgColor[i] = graphBg.normal; 
                 tmpElementBgColor[i] = elementBg.normal;
                 tmpElementColor[i] = elementColor.normal;
                 tmpIndexColor[i] = indexColor.normal;
             }
         };
-
-        const setNormalColor = (idx) => {
-            tmpGraphBgColor[idx] = graphBg.normal;
-            tmpElementBgColor[idx] = elementBg.normal;
-            tmpElementColor[idx] = elementColor.normal;
-            tmpIndexColor[idx] = indexColor.normal;
-        }
 
         const setSelectedColor = (idx1, idx2) => {
             tmpGraphBgColor[idx1] = tmpGraphBgColor[idx2] = graphBg.selected;
@@ -222,52 +235,62 @@
 
         // 초기 상태
         tmpExplanation = `배열의 초기 상태입니다`
-        pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
+        setSortedColor(0);
+        pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode, tmpGraphBottom);
+ 
+        for(let i = 1; i < tmpArr.length; i++) {
+            // i를 현재 키로 설정
+            setSelectedColor(i, i);
+            tmpKey = i;
+            tmpExplanation = `현재 key = ${tmpArr[i]}`;
+            tmpCode = 1;
+            comp = i - 1;
+            tmpGraphBottom[tmpKey] -= (tmpArr[tmpKey] * 9 + 30);
+            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode, tmpGraphBottom);
 
-        for(let i = 0; i < tmpArr.length; i++) {
-            // 인덱스 j부터 tmpArr.length - i - 1까지 정렬 시작
-            initColor(tmpArr.length - i);
-            tmpExplanation = `index ${0}부터 ${tmpArr.length - i - 1}까지 정렬을 시작합니다`;
-            tmpCode = 0;
-            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
+            while(true) {
+                // 조건 만족하는지 체크
+                setSelectedColor(comp, comp);
+                tmpExplanation = isAsc ? `${tmpArr[comp]} > ${tmpArr[tmpKey]}(이)면, ${tmpArr[tmpKey]}을(를) 한 칸 앞으로 옮깁니다` :
+                                         `${tmpArr[comp]} < ${tmpArr[tmpKey]}(이)면, ${tmpArr[tmpKey]}을(를) 한 칸 앞으로 옮깁니다`;
+                tmpCode = 2;
+                pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode, tmpGraphBottom);
 
-            for(let j = 0; j < tmpArr.length - i - 1; j++) {
-                // isAsc ? tmpArr[j] > tmpArr[j + 1] : tmpArr[j] < tmpArr[j]면 두 원소 교환
-                setSelectedColor(j, j + 1);
-                tmpExplanation = isAsc ? `${tmpArr[j]} > ${tmpArr[j + 1]}(이)면 두 원소를 교환합니다` :
-                                         `${tmpArr[j]} < ${tmpArr[j + 1]}(이)면 두 원소를 교환합니다`;
-                tmpCode = 1;
-                pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
-
-                if((isAsc && (tmpArr[j] > tmpArr[j + 1])) || (!isAsc && (tmpArr[j] < tmpArr[j + 1]))) {
-                    // 두 원소 교환
-                    [tmpArr[j], tmpArr[j + 1]] = [tmpArr[j + 1], tmpArr[j]];
-                    tmpExplanation = `${tmpArr[j]}과(와) ${tmpArr[j + 1]}을(를) 교환합니다`
-                    tmpCode = 2;
-                    pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, j, j + 1, tmpExplanation, tmpCode);
-                    setNormalColor(j);
+                if(comp >= 0 && (isAsc ? tmpArr[comp] > tmpArr[tmpKey] : tmpArr[comp] < tmpArr[tmpKey])) {
+                    tmpExplanation = `${tmpArr[tmpKey]}을(를) 한 칸 앞으로 옮깁니다`;
+                    tmpCode = 3;
+                    [[tmpArr[comp], tmpArr[tmpKey]]] = [[tmpArr[tmpKey], tmpArr[comp]]];
+                    [[tmpGraphBottom[comp], tmpGraphBottom[tmpKey]]] = [[tmpGraphBottom[tmpKey], tmpGraphBottom[comp]]];
+                    pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpKey, comp, tmpExplanation, tmpCode, tmpGraphBottom);
+                    setSortedColor(comp + 1);
+                    tmpKey--;
                 }
                 else {
-                    // 교환이 발생하지 않으면 왼쪽 원소만 normal로 변경
-                    setNormalColor(j);
+                    setSortedColor(comp);
+                    break;
+                }
+
+                if(--comp < 0) {
+                    break;
                 }
             }
 
-            // tmpArr.length - i - 1까지 정렬 완료
-            setSortedColor(tmpArr.length - i - 1);
-            tmpExplanation = `index ${tmpArr.length - i - 1}까지 정렬이 완료되었습니다`;
-            tmpCode = 0;
-            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
+            // 인덱스 0부터 i까지 정렬된 상태
+            setSortedColor(tmpKey);
+            tmpExplanation = `index ${i}까지 정렬 완료.`;
+            tmpCode = 4;
+            tmpGraphBottom[tmpKey] += (tmpArr[tmpKey] * 9 + 30);
+            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode, tmpGraphBottom);
         }
         
         // 정렬 완료
-        initColor(tmpArr.length);
+        initColor(-1);
         tmpExplanation = `배열의 정렬이 완료되었습니다.`
         tmpCode = 1000;
-        pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
+        pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode, tmpGraphBottom);
     };
 
-    const drawSelectionSort = async (myAsync) => {
+    const drawInsertionSort = async (myAsync) => {
         animationStep = [0, animationQuery.length - 1];
 
         while(true) {
@@ -278,8 +301,9 @@
             
             if((myAsync + 1) != asyncCnt) break;
 
-            await playSelectionSortAnimation(animationStep[0]);
+            await playInsertionSortAnimation(animationStep[0]);
             await waitPause();
+            if(animationSpeed <= 30) await delay(20);
 
             // 버튼을 통해서 제어하는 경우 animationStep의 값을 변경하면 안됨. 정해진 animationStep[0]의 값으로 설정해야 함.
             if(!fromBtn) {
@@ -288,8 +312,8 @@
         }
     };
 
-    const playSelectionSortAnimation = async (i) => {
-        // console.log({"애니메이션": i, "호출 순서": cnt++, "버튼 호출?": test});
+    const playInsertionSortAnimation = async (i) => {
+        const isSwap = animationQuery[i].curSwap1 != animationQuery[i].curSwap2;
         const graphElements = document.querySelectorAll('.graph');
         const elementElements = document.querySelectorAll('.element');
         const indexElements = document.querySelectorAll('.index');
@@ -311,21 +335,19 @@
             element.style.color = animationQuery[i].curIndexColor[idx];
         });
 
+        let swap1, swap2;
+
         // animation-control 영역의 버튼을 통해서 함수가 호출된 경우, 애니메이션을 재생하지 않고 색상, 배열만 변경
         // replay인 경우, 항상 초기 상태의 배열만 출력
         if(fromBtn || isReplay) {            
             fromBtn = false;
 
             graphElements.forEach(element => {
-                element.style.transition = "left 0.5s ease, height 0.5s ease";
+                element.style.transition = "left 0.5s ease, height 0.5s ease, bottom 0.5s ease";
             });
 
-            if(animationQuery[i].curSwap1 != animationQuery[i].curSwap2) {
-                numArr = [...animationQuery[i + 1].curArr];
-            }
-            else {
-                numArr = [...animationQuery[i].curArr];
-            }
+            graphBottom = [...animationQuery[i].curGraphBottom];
+            numArr = [...animationQuery[i].curArr];
 
             if(isReplay) {
                 await delay(2000 * (1 / animationSpeed));
@@ -339,31 +361,34 @@
         }
 
         // swap이 필요한 경우에만
-        if (animationQuery[i].curSwap1 != animationQuery[i].curSwap2) {
-            let swap1 = animationQuery[i].curSwap1;
-            let swap2 = animationQuery[i].curSwap2;
+        if (isSwap) {
+            swap1 = animationQuery[i].curSwap1;
+            swap2 = animationQuery[i].curSwap2;
             
             graphElements.forEach(element => {
-                element.style.transition = `left ${(1 / animationSpeed)}s ease`;
+                element.style.transition = `left ${(1 / animationSpeed)}s ease, bottom ${(1 / animationSpeed)}s ease`;
             });
 
             // swap animation
-            var tmp = graphLeft[swap1];
-            graphLeft[swap1] = graphLeft[swap2];
-            graphLeft[swap2] = tmp;
+            [[graphLeft[swap1], graphLeft[swap2]]] = [[graphLeft[swap2], graphLeft[swap1]]];
+        }
+        else {
+            graphElements.forEach(element => {
+                element.style.transition = `bottom ${(1 / animationSpeed)}s ease`;
+            });
+
+            graphBottom = animationQuery[i].curGraphBottom;
         }
 
         await delay(2000 * (1 / animationSpeed));
 
         graphElements.forEach(element => {
-            element.style.transition = "left 0s ease, height 0s ease";
+            element.style.transition = "left 0s ease, height 0s ease, bottom 0s ease";
         });
 
-        if(animationQuery[i].curSwap1 != animationQuery[i].curSwap2) {
-            numArr = [...animationQuery[i + 1].curArr];
-        }
-        else {
+        if(isSwap) {
             numArr = [...animationQuery[i].curArr];
+            [[graphBottom[swap1], graphBottom[swap2]]] = [[graphBottom[swap2], graphBottom[swap1]]];
         }
     };
 </script>
@@ -372,7 +397,7 @@
     <div class="navigation-container">
         <Navigation on:createRandomElement={createRandomElement} 
         on:createInputtedElement={createInputtedElement} 
-        on:startSelectionSort={startSelectionSort}
+        on:startInsertionSort={startInsertionSort}
         animationWorking={animationWorking}/>
     </div>
 
@@ -387,15 +412,14 @@
 
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
-                선택 정렬(Selection Sort) 
-                <button class="theory-btn">이론 설명</button> 
+                삽입 정렬(Insertion Sort) 
             </div>
 
             <div class="canvas">
                 <!-- canvas안에 자료구조, 알고리즘 구현 -->
                 <table>
                     {#each numArr as element, index}
-                        <div class="graph" style="height: {element * 8}px; left: {graphLeft[index]}px;">
+                        <div class="graph" style="height: {element * 8}px; left: {graphLeft[index]}px; bottom: {graphBottom[index]}px;">
                             <span class="element">{element}</span>
                         </div>
                         <span class="index" style="left: {indexLeft[index]}px;">{index}</span>
@@ -461,10 +485,23 @@
                 <div class="code-area">
                     <!-- 코드의 class="code"로 설정 -->
                     <!-- 들여쓰기는 padding-left:35px -->
-                    <div class="code" style="background-color: {codeColor[0]}">for i = 1 to n - 1</div>
-                    <div class="code" style="background-color: {codeColor[0]}; padding-left: 35px">for j = n downto i + 1</div>
-                    <div class="code" style="background-color: {codeColor[1]}; padding-left: 70px">if A[j] &lt; A[j - 1]</div>
-                    <div class="code" style="background-color: {codeColor[2]}; padding-left: 105px">exchange A[j] with A[j - 1]</div>
+                    {#if isAsc}
+                        <div class="code" style="background-color: {codeColor[0]}">for i = 1 to n - 1</div>
+                        <div class="code" style="background-color: {codeColor[1]}; padding-left: 35px">key = A[i]</div>
+                        <div class="code" style="background-color: {codeColor[1]}; padding-left: 35px">j = i - 1</div>
+                        <div class="code" style="background-color: {codeColor[2]}; padding-left: 35px">while j &ge; 0 and A[j] &gt; key</div>
+                        <div class="code" style="background-color: {codeColor[3]}; padding-left: 70px">A[j + 1] = A[j]</div>
+                        <div class="code" style="background-color: {codeColor[3]}; padding-left: 70px">j = j - 1</div>
+                        <div class="code" style="background-color: {codeColor[4]}; padding-left: 35px">A[j + 1] = key</div>
+                    {:else}
+                        <div class="code" style="background-color: {codeColor[0]}">for i = 1 to n - 1</div>
+                        <div class="code" style="background-color: {codeColor[1]}; padding-left: 35px">key = A[i]</div>
+                        <div class="code" style="background-color: {codeColor[1]}; padding-left: 35px">j = i - 1</div>
+                        <div class="code" style="background-color: {codeColor[2]}; padding-left: 35px">while j &ge; 0 and A[j] &lt; key</div>
+                        <div class="code" style="background-color: {codeColor[3]}; padding-left: 70px">A[j + 1] = A[j]</div>
+                        <div class="code" style="background-color: {codeColor[3]}; padding-left: 70px">j = j - 1</div>
+                        <div class="code" style="background-color: {codeColor[4]}; padding-left: 35px">A[j + 1] = key</div>
+                    {/if}
                 </div>
             </div>
         </div>
@@ -480,6 +517,7 @@
         -ms-use-select: none;
         -moz-user-select: none;
         -webkit-user-select: none;
+        overflow: hidden;
     }
 
     .main-container {
@@ -504,7 +542,7 @@
         background-color: #d9d9d9;
         display: flex;
         position: absolute;
-        bottom: 0; 
+        bottom: 30px; 
         width: 50px;
         text-align: center;
         transition: left 0.5s ease, height 0.5s ease; 
@@ -523,7 +561,7 @@
 
     .index {
         position: absolute;
-        bottom: -30px; 
+        bottom: 0px; 
         font-size: 18px;
         font-weight: bold;
         color: #000000; 
