@@ -1,5 +1,5 @@
 <script>
-    import { onDestroy, onMount, tick } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import Header from "../../../component/Header.svelte";
     import Navigation from "../../../component/navigation/geometry/ConvexHullNavigation.svelte";
     import {isListVisible} from "../../../lib/store";
@@ -532,10 +532,11 @@
 
             const crossProduct = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
 
+            // y축이 뒤집어진 좌표라 ccw도 반대로
             if (crossProduct > 0) {
-                return 1; 
-            } else if (crossProduct < 0) {
                 return -1; 
+            } else if (crossProduct < 0) {
+                return 1; 
             } else {
                 return 0; 
             }
@@ -554,7 +555,7 @@
                 let first = stack[stack.length - 2];
                 let second = stack[stack.length - 1];
 
-                if(ccw(first, second, i) >= 0) { // 뒤집어진 좌표라 ccw도 반대로
+                if(ccw(first, second, i) <= 0) { 
                     // 간선 끊고 opacity 0.1로 변경
                     stack.pop();
                     await disconnectEdge(second)
@@ -577,6 +578,10 @@
         }
 
         await connectEdge(stack[stack.length - 1], 0);
+    };
+
+    const playConvexHullAnimation = (i) => {
+
     };
 </script>
 
