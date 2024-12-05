@@ -377,7 +377,7 @@
                 element.style.transition = `bottom ${(1 / animationSpeed)}s ease`;
             });
 
-            graphBottom = animationQuery[i].curGraphBottom;
+            graphBottom = [...animationQuery[i].curGraphBottom];
         }
 
         await delay(2000 * (1 / animationSpeed));
