@@ -5,11 +5,12 @@
   import SignupPage from './routes/SignupPage.svelte';
   import FindPassword from './routes/FindPassword.svelte';
   import MyPage from './routes/MyPage.svelte';
-  import BubbleSort from './routes/visualization/sort/BubbleSort.svelte';
-  import SelectionSort from './routes/visualization/sort/SelectionSort.svelte';
-  import InsertionSort from './routes/visualization/sort/InsertionSort.svelte';
-  import Heap from './pages/visualization/tree/Heap.svelte';
-  import ConvexHull from './routes/visualization/geometry/ConvexHull.svelte';
+  import BubbleSort from './routes/BubbleSort.svelte';
+  import SelectionSort from './routes/SelectionSort.svelte';
+  import InsertionSort from './routes/InsertionSort.svelte';
+  import LinkedList from './routes/LinkedList.svelte';
+
+
 
   const routes = {
     '/': Index,
@@ -17,11 +18,10 @@
     '/signup': SignupPage,
     '/findpassword' : FindPassword,
     '/main/myPage' : MyPage,
-    '/visualization/sort/BubbleSort': BubbleSort,
-    '/visualization/sort/SelectionSort': SelectionSort,
-    '/visualization/sort/InsertionSort': InsertionSort,
-    '/visualization/tree/Heap': Heap,
-    '/visualization/geometry/ConvexHull': ConvexHull
+    '/visualization/BubbleSort': BubbleSort,
+    '/visualization/SelectionSort': SelectionSort,
+    '/visualization/InsertionSort': InsertionSort,
+    '/visualization/LinkedList': LinkedList
   };
 </script>
 
