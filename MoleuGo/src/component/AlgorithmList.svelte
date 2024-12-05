@@ -44,7 +44,7 @@
                 <span>이진 탐색 트리</span>
             </div>
 
-            <div class="algo-list-text-div">
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/tree/Heap');}}>
                 <span>힙</span>
             </div>
 
@@ -98,15 +98,15 @@
         <div>
             <p class="algo-list-index-text">5. 정렬</p>
             
-            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/BubbleSort');}}>
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/sort/BubbleSort');}}>
                 <span>버블 정렬</span>
             </div>
 
-            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/SelectionSort')}}>
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/sort/SelectionSort')}}>
                 <span>선택 정렬</span>
             </div>
 
-            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/InsertionSort')}}>
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/sort/InsertionSort')}}>
                 <span>삽입 정렬</span>
             </div>
 
@@ -174,7 +174,7 @@
         <div>
             <p class="algo-list-index-text">9. 기하</p>
                 
-            <div class="algo-list-text-div">
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/geometry/ConvexHull');}}>
                 <span>볼록 껍질(Convex Hull)</span>
             </div>
         </div>
@@ -213,25 +213,6 @@
         color: #d3d3d3;
         font-size: 1.2rem;
         font-weight: bold;
-    }
-
-    #algo-list-sort-btn {
-        padding-left: 161px;
-    }
-
-    #algo-list-sort-btn button {
-        color: #FFFFFF;
-        background-color: #238636;
-        border: none;
-        border-radius: 4px;
-        margin-left: 6px;
-        padding: 6px 6px;
-        font-size: 1rem;
-        cursor: pointer
-    }
-
-    #algo-list-sort-btn button:hover {
-        background-color: #1A6A2D;
     }
 
     #algo-search-container {

@@ -10,6 +10,8 @@
   import InsertionSort from './routes/InsertionSort.svelte';
   import LinkedList from './routes/LinkedList.svelte';
 
+
+
   const routes = {
     '/': Index,
     '/main' : MainPage,

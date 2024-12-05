@@ -113,7 +113,6 @@
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 버블 정렬(Bubble Sort) 
-                <button class="theory-btn">이론 설명</button> 
             </div>
 
             <div class="canvas">

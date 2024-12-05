@@ -106,6 +106,7 @@
         const indexElements = document.querySelectorAll('.index');
 
         // 색상 수정
+        
         graphElements.forEach(element => {
             element.style.backgroundColor = "#d9d9d9";
         });
@@ -143,7 +144,7 @@
     };
 
     // BubbleSort animation start
-    const startBubbleSort = async (e) => {
+    const startBubbleSort = (e) => {
         InitAnimation();
 
         isAsc = e.detail.isAsc;
@@ -361,7 +362,6 @@
 
             // swap animation
             [[graphLeft[swap1], graphLeft[swap2]]] = [[graphLeft[swap2], graphLeft[swap1]]];
-            console.log(graphLeft);
         }
 
         await delay(2000 * (1 / animationSpeed));

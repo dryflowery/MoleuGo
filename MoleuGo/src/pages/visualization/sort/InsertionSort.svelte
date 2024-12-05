@@ -1,5 +1,5 @@
 <script>
-    import { onDestroy, tick } from "svelte";
+    import { onDestroy } from "svelte";
     import Header from "../../../component/Header.svelte";
     import Navigation from "../../../component/navigation/sort/InsertionSortNavigation.svelte";
     import {isListVisible} from "../../../lib/store";
@@ -152,7 +152,7 @@
     };
 
     // InsertionSort animation start
-    const startInsertionSort = async (e) => {
+    const startInsertionSort = (e) => {
         InitAnimation();
 
         isAsc = e.detail.isAsc;
@@ -209,8 +209,6 @@
         let tmpKey = 1000;
         let comp = 1000;
         let tmpGraphBottom = Array(tmpArr.length).fill(30);
-        let tmpUp = 1000;
-        let tmpDown = 1000;
 
         const initColor = (sortedIdx) => {
             for(let i = sortedIdx + 1; i < tmpArr.length; i++) {
@@ -379,7 +377,7 @@
                 element.style.transition = `bottom ${(1 / animationSpeed)}s ease`;
             });
 
-            graphBottom = animationQuery[i].curGraphBottom;
+            graphBottom = [...animationQuery[i].curGraphBottom];
         }
 
         await delay(2000 * (1 / animationSpeed));
