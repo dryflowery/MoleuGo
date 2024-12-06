@@ -34,6 +34,18 @@ main {
   bottom: 0;
 }
 
+.index-list-visible {
+  transform: scale(0.79) translateX(250px);
+  transform-origin: center; 
+  transition: transform 0.5s ease;
+}
+
+.index-list-invisible {
+  transform: scale(1.0) translateX(0px);
+  transform-origin: center; 
+  transition: transform 0.5s ease; 
+}
+
 .main-list-visible {
   transform: translateX(220px); 
   transition: transform 0.5s ease;

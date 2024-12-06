@@ -147,12 +147,12 @@
         InitAnimation();
 
         isAsc = e.detail.isAsc;
-        preDrawSelectionSort(isAsc);
+        generateSelectionSortQuries(isAsc);
 
         animationWorking = true;
         pausedIcon = false;
         isPaused = false;
-        drawSelectionSort(asyncCnt++);
+        executeSelectionSortQuries(asyncCnt++);
     };
 
     const changeCodeColor = (idx) => {
@@ -181,7 +181,7 @@
         })
     };
 
-    const preDrawSelectionSort = (isAsc) => {  
+    const generateSelectionSortQuries = (isAsc) => {  
         // min, max 구분하지 않고 min으로 색깔 이름 통일
         const graphBg = {normal: "#d9d9d9", selected: "#ecadae", sorted: "#9fda9b", min: "#adbfec"};
         const elementBg = {normal: "#737373", selected: "#ad7677", sorted: "#6a9068", min: "#7687ad"};
@@ -303,7 +303,7 @@
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
     };
 
-    const drawSelectionSort = async (myAsync) => {
+    const executeSelectionSortQuries = async (myAsync) => {
         animationStep = [0, animationQuery.length - 1];
 
         while(true) {
@@ -314,7 +314,7 @@
             
             if((myAsync + 1) != asyncCnt) break;
 
-            await playSelectionSortAnimation(animationStep[0]);
+            await drawSelectionSortAnimation(animationStep[0]);
             await waitPause();
             if(animationSpeed <= 30) await delay(20);
 
@@ -325,7 +325,7 @@
         }
     };
 
-    const playSelectionSortAnimation = async (i) => {
+    const drawSelectionSortAnimation = async (i) => {
         const isSwap = animationQuery[i].curSwap1 != animationQuery[i].curSwap2;
         const graphElements = document.querySelectorAll('.graph');
         const elementElements = document.querySelectorAll('.element');

@@ -186,24 +186,31 @@
     const constructConvexHull = (e) => {
         InitAnimation();
 
-        preDrawConvexHull();
+        generateConvexHullQueries();
 
         animationWorking = true;
         pausedIcon = false;
         isPaused = false;
-        drawConvexHull(asyncCnt++);
+        executeConvexHullQueries(asyncCnt++);
     };
 
-    const pushAnimationQuery = (tmpExplanation, tmpCode, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum) => {
+    const pushAnimationQuery = (tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, 
+                                isDisconnect, disconnectNum, tmpLastNum) => {
             animationQuery.push({
             curExplanation: tmpExplanation,
             curCode: tmpCode,
-            curConnect: { isConnect, connectStart, connectEnd },
-            curDisconnect: { isDisconnect, disconnectNum }
+            curStack: tmpStack,
+            curSelect: tmpSelect,
+            isConnect: isConnect,
+            connectStart: connectStart,
+            connectEnd: connectEnd,
+            isDisconnect: isDisconnect, 
+            disconnectNum: disconnectNum,
+            curLastNum: tmpLastNum
         })
     };
 
-    const preDrawConvexHull = () => {
+    const generateConvexHullQueries = () => {
         // ccw 함수
         const ccw = (a, b, c) => {
             let ax = pointsInfo[a].x;
@@ -260,64 +267,66 @@
 
         pointsInfo = [pointsInfo[0], ...sortedPoints];
 
-        
-        // =================================================================================================================================================
-        // pseudo code, explanation만 있는 쿼리 5개 push
+        // construct convex hull query start
         let tmpExplanation = ``;
         let tmpCode = 1000;
+        let tmpStack = undefined;
+        let tmpSelect = undefined;
         let isConnect = false;
-        let isDisconnect = false;
         let connectStart = undefined;
         let connectEnd = undefined;
+        let isDisconnect = false;
         let disconnectNum = undefined;
-        
+        let tmpLastNum = undefined;
+
         // 0. initialize points
-        tmpExplanation = "Test query 0";
-        pushAnimationQuery(tmpExplanation, tmpCode, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum);
+        tmpExplanation = "점들의 초기 상태입니다";
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 1. set points[0]
-        tmpExplanation = "Test query 1";
+        tmpExplanation = "y좌표가 가장 작은 점 중, x좌표가 가장 작은 점을<br>0번 점으로 설정합니다.";
         tmpCode = 0;
-        pushAnimationQuery(tmpExplanation, tmpCode, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum);
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 2. sort by ccw
-        tmpExplanation = "Test query 2";
+        tmpExplanation = "0번 점을 기준으로 점들을 반시계 방향으로 정렬합니다";
         tmpCode = 1;
-        pushAnimationQuery(tmpExplanation, tmpCode, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum);
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 3. stack.push(points[0]) 
-        tmpExplanation = "Test query 3";
+        tmpExplanation = "스택에 0번 점을 넣습니다";
         tmpCode = 2;
-        pushAnimationQuery(tmpExplanation, tmpCode, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum);
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 4. stack.push(points[1]) 
-        tmpExplanation = "Test query 4";
+        tmpExplanation = "스택에 1번 점을 넣습니다";
         tmpCode = 3;
-        pushAnimationQuery(tmpExplanation, tmpCode, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum);
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 5. connect 0 to 1
         let stack = [0, 1];
-        tmpExplanation = "Test connect 0 to 1"
+        tmpExplanation = "0번 점과 1번 점을 연결합니다"
         tmpCode = 3;
-        pushAnimationQuery(tmpExplanation, tmpCode, true, 0, 1, isDisconnect, disconnectNum);
+        pushAnimationQuery(tmpExplanation, tmpCode, [...stack], tmpSelect, true, 0, 1, isDisconnect, disconnectNum, 1);
 
         // while stack.size() >= 2 and CCW() > 0;
         for(let i = 2; i < pointsInfo.length; i++) {
-            changePointColor(i, "5px solid #e97714", "#e97714", 1); // 체크할 점 빨간색으로
-            await delay(2000 * (1 / animationSpeed));
+            // 점 선택하고 색깔 변경
+            tmpExplanation = `${i}번 점이 스택의 마지막 두 점과 반시계 방향을<br>이룰 때까지 스택에서 원소를 제거합니다`
+            tmpCode = 4;
+            pushAnimationQuery(tmpExplanation, tmpCode, [...stack], i, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, i);
 
             while(stack.length >= 2 && pointsInfo.length > 3) {
                 let first = stack[stack.length - 2];
                 let second = stack[stack.length - 1];
 
                 if(ccw(first, second, i) <= 0) { 
-                    // 간선 끊고 opacity 0.1로 변경
                     stack.pop();
-                    await disconnectEdge(second)
-                    await delay(2000 * (1 / animationSpeed));
 
-                    changePointColor(second, "5px solid #000000", "#000000", 0.1);
-                    await delay(2000 * (1 / animationSpeed));
+                    // 간선 끊고 색상, opacity 변경
+                    tmpExplanation = `${second}번 점을 스택에서 빼고, 점의 연결을 끊습니다`
+                    tmpCode = 5;
+                    pushAnimationQuery(tmpExplanation, tmpCode, [...stack], i, isConnect, connectStart, connectEnd, true, second, i);
                 }
                 else {
                     break;
@@ -325,18 +334,22 @@
             }
 
             stack.push(i);  
-            await connectEdge(stack[stack.length - 2], i);
-            await delay(2000 * (1 / animationSpeed));
-
-            changePointColor(i, "5px solid #50ad49", "#50ad49", 1);
-            await delay(2000 * (1 / animationSpeed));
+            tmpExplanation = `${i}번 점을 스택에 넣고, ${stack[stack.length - 2]}번 점과 ${i}번 점을 연결합니다`
+            tmpCode = 6;
+            pushAnimationQuery(tmpExplanation, tmpCode, [...stack], tmpSelect, true, stack[stack.length - 2], i, isDisconnect, disconnectNum, i);
         }
 
-        await connectEdge(stack[stack.length - 1], 0);
+        tmpExplanation = `${stack[stack.length - 1]}번 점과 0번 점을 연결합니다`
+        tmpCode = 6;
+        pushAnimationQuery(tmpExplanation, tmpCode, [...stack], tmpSelect, true, stack[stack.length - 1], 0, isDisconnect, disconnectNum, pointsInfo.length - 1);
+
+        tmpExplanation = "볼록 껍질이 완성되었습니다"
+        tmpCode = 1000;
+        pushAnimationQuery(tmpExplanation, tmpCode, [...stack], tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, pointsInfo.length - 1);
     };
 
-    const drawConvexHull = async (myAsync) => {
-        await playConvexHullAnimation(-1, myAsync);
+    const executeConvexHullQueries = async (myAsync) => {
+        await drawConvexHullAnimation(-1, myAsync);
 
         animationStep = [0, animationQuery.length - 1];
 
@@ -348,7 +361,7 @@
             
             if((myAsync + 1) != asyncCnt) break;
 
-            await playConvexHullAnimation(animationStep[0], myAsync);
+            await drawConvexHullAnimation(animationStep[0], myAsync);
             await waitPause();
 
             // 버튼을 통해서 제어하는 경우 animationStep의 값을 변경하면 안됨. 정해진 animationStep[0]의 값으로 설정해야 함.
@@ -358,7 +371,7 @@
         }
     };
 
-    const playConvexHullAnimation = async (i, myAsync) => {
+    const drawConvexHullAnimation = async (queryNum, myAsync) => {
         // point 속성 변경 함수
         const changePointColor = (pointElements, pointNum, border, color, opacity) => {
             pointElements[pointsInfo[pointNum].pointElementsIdx].style.border = border;
@@ -389,6 +402,12 @@
             const pathLength = path.getTotalLength();
 
             path.style.strokeDasharray = pathLength;
+
+            if(fromBtn) {
+                path.style.strokeDashoffset = 0;
+                return;
+            }
+
             path.style.strokeDashoffset = pathLength;
 
             // 애니메이션 추가
@@ -463,9 +482,7 @@
         };
 
         // 가로줄 그리는 함수
-        const drawRowLine = async (svg, canvasRect, startY, dist) => {
-            await waitPause();
-
+        const drawRowLine = async (svg, canvasRect, startY, dist, queryNum) => {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             path.setAttribute('d', `M${canvasRect.left - 54.5},${canvasRect.top - 125 + dist} L${canvasRect.right - 54.5},${canvasRect.top - 125 + dist}`);
             path.setAttribute("stroke", "black");
@@ -481,6 +498,15 @@
                 return true;
             }
 
+            if(queryNum != animationStep[0]) {
+                return;
+            }
+
+            if(isPaused == true) {
+                await waitPause();
+            }
+            
+
             setTimeout(() => {
                 path.remove(); 
             }, 1 / animationSpeed * 5);
@@ -491,9 +517,7 @@
         };
 
         // 세로줄 그리는 함수
-        const drawColLine = async (svg, canvasRect, startX, dist) => {
-            await waitPause();
-
+        const drawColLine = async (svg, canvasRect, startX, dist, queryNum) => {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             path.setAttribute('d', `M${canvasRect.left - 54.5 + dist},${canvasRect.top - 125} L${canvasRect.left - 54.5 + dist},${canvasRect.bottom - 125}`);
             path.setAttribute("stroke", "black");
@@ -510,6 +534,14 @@
                 return true;
             }
 
+            if(queryNum != animationStep[0]) {
+                return;
+            }
+
+            if(isPaused) {
+                await waitPause();
+            }
+
             setTimeout(() => {
                 path.remove(); 
             }, 1 / animationSpeed * 5);
@@ -519,7 +551,14 @@
             return false;
         };
 
-        if(i == -1) { // 처음 한 번만 실행됨
+        // 점 내부의 숫자 표시
+        const displayAllPointsNum = () => {
+            for(let i = 0; i < pointsInfo.length; i++) {
+                pointsNum[pointsInfo[i].pointsNumIdx] = i;
+            }
+        };
+
+        if(queryNum == -1) { // 처음 한 번만 실행됨
             const gridElements = document.querySelectorAll('.grid');
             const cellElements = document.querySelectorAll('.cell');
 
@@ -547,14 +586,12 @@
 
             await delay(2000 * (1 / animationSpeed));
         }
-        else if(i == 0) { // 0. initialize points
-            explanation = animationQuery[i].curExplanation; 
-            changeCodeColor(animationQuery[i].curCode); 
+        else if(queryNum == 0) { // 0. initialize points
+            explanation = animationQuery[queryNum].curExplanation; 
+            changeCodeColor(animationQuery[queryNum].curCode); 
 
             // 버튼을 사용해서 재생하거나 리플레이인 경우, 간선을 전부 삭제하고 점 속성 초기화
             if(fromBtn || isReplay) { 
-                fromBtn = false;
-
                 deleteAllPaths();
                 initPoints();
 
@@ -565,15 +602,18 @@
                 else {
                     isPaused = true;
                 }
+
+                fromBtn = false;
             }
             else {
                 initPoints();
+                deleteAllPaths();
                 await delay(2000 * (1 / animationSpeed));
             }
         }
-        else if(i == 1) { // 1. set points[0]
-            explanation = animationQuery[i].curExplanation; 
-            changeCodeColor(animationQuery[i].curCode); 
+        else if(queryNum == 1) { // 1. set points[0]
+            explanation = animationQuery[queryNum].curExplanation; 
+            changeCodeColor(animationQuery[queryNum].curCode); 
 
             const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
             let firstRect = pointElements[pointsInfo[0].pointElementsIdx].getBoundingClientRect();
@@ -587,8 +627,6 @@
 
             // 버튼을 사용해서 재생하는 경우
             if(fromBtn) { 
-                fromBtn = false;
-
                 deleteAllPaths();
                 initPoints();
                 pointsNum[pointsInfo[0].pointsNumIdx] = 0;
@@ -598,19 +636,32 @@
                 drawColLine(svg, canvasRect, firstX, firstX - canvasRect.left + 54.5);
 
                 isPaused = true;
+                fromBtn = false;
                 return;
             }
         
             // 가로줄 그리기
             while(true) {
-                if(((myAsync + 1) != asyncCnt) || (await drawRowLine(svg, canvasRect, firstY, dist++) === true)) break;
+                if(queryNum != animationStep[0]) {
+                    return;
+                }
+
+                if(((myAsync + 1) != asyncCnt) || (await drawRowLine(svg, canvasRect, firstY, dist++, queryNum) === true)) {
+                    break;
+                }
             }
 
             dist = 0;
            
             // 세로줄 그리기
             while(true) {
-                if(((myAsync + 1) != asyncCnt) || (await drawColLine(svg, canvasRect, firstX, dist++) === true)) break;
+                if(queryNum != animationStep[0]) {
+                    return;
+                }
+
+                if(((myAsync + 1) != asyncCnt) || (await drawColLine(svg, canvasRect, firstX, dist++, queryNum) === true) || queryNum != animationStep[0]) {
+                    break;
+                }
             }
 
             // points[0] 번호 변경
@@ -618,11 +669,9 @@
 
             await delay(2000 * (1 / animationSpeed));
         }
-        else if(i == 2) { // 2. sort by ccw
+        else if(queryNum == 2) { // 2. sort by ccw
             // 반시계 방향으로 이동하는 선 그리는 함수
-            const drawSemiCircleLine = async (startX, startY) => {
-                await waitPause();
-
+            const drawSemiCircleLine = async (startX, startY, queryNum) => {
                 let radian = (Math.PI / 180) * angle;
                 let endX = startX + 1200 * Math.cos(radian);
                 let endY = startY - 1200 * Math.sin(radian);
@@ -649,6 +698,8 @@
                     path.setAttribute("id", "semiCircle");
                     svg.appendChild(path);
 
+                    isPaused = true;
+                    fromBtn = false;
                     return;
                 }
 
@@ -672,11 +723,19 @@
                     return false;
                 }
 
+                if(queryNum != animationStep[0]) {
+                    return;
+                }
+
+                if(isPaused) {
+                    await waitPause();
+                }
+
                 setTimeout(() => {
                     path.remove(); 
                 }, 1 / animationSpeed * 5);
 
-                await delay(1 / animationSpeed * 5);
+                await delay(1 / animationSpeed * 5  );
 
                 return true;
             };
@@ -695,8 +754,8 @@
                 return false;
             };
 
-            explanation = animationQuery[i].curExplanation; 
-            changeCodeColor(animationQuery[i].curCode); 
+            explanation = animationQuery[queryNum].curExplanation; 
+            changeCodeColor(animationQuery[queryNum].curCode); 
 
             const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
             const svg = document.getElementById("svg");
@@ -709,13 +768,12 @@
             
             // 버튼을 사용해서 재생하는 경우
             if(fromBtn) {
-                fromBtn = false;
-
                 deleteAllPaths();
                 initPoints();
+                displayAllPointsNum();
 
                 // 마지막 점을 가리키는 선 그리기
-                drawSemiCircleLine(firstX, firstY);
+                drawSemiCircleLine(firstX, firstY, queryNum);
 
                 // 0번 점에 가로 줄, 세로 줄 추가
                 const canvasElement = document.querySelector('.canvas');
@@ -724,17 +782,24 @@
                 drawRowLine(svg, canvasRect, firstY, firstY - canvasRect.top + 125);
                 drawColLine(svg, canvasRect, firstX, firstX - canvasRect.left + 54.5);
 
+                fromBtn = false;
                 isPaused = true;
                 return;
             }
             
             while(angle <= 180) {
-                if(((myAsync + 1) != asyncCnt) || (await drawSemiCircleLine(firstX, firstY) === false)) break;
+                if(queryNum != animationStep[0]) {
+                    return;
+                }
+                
+                if(((myAsync + 1) != asyncCnt) || (await drawSemiCircleLine(firstX, firstY, queryNum) === false)) {
+                    break;
+                }
             }
 
             await delay(2000 * (1 / animationSpeed));
 
-            // svg path 전부 삭제
+            // search line 전부 삭제
             let rowDel = document.querySelector('#rowLine');
             let colDel = document.querySelector('#colLine');
             let semiDel = document.querySelector('#semiCircle');
@@ -747,21 +812,33 @@
 
             await delay(2000 * (1 / animationSpeed));
         }
-        else if(i == 3) { // 3. stack.push(points[0]) 
-            explanation = animationQuery[i].curExplanation; 
-            changeCodeColor(animationQuery[i].curCode); 
+        else if(queryNum == 3) { // 3. stack.push(points[0]) 
+            // search line 전부 삭제(query 2를 frombtn으로 간 후, 재생 버튼을 누르면 query 2에서 search line이 삭제되지 않음)
+            let rowDel = document.querySelector('#rowLine');
+            let colDel = document.querySelector('#colLine');
+            let semiDel = document.querySelector('#semiCircle');
+
+            setTimeout(() => {
+                rowDel.remove(); 
+                colDel.remove();
+                semiDel.remove();
+            }, 0);
+
+
+            explanation = animationQuery[queryNum].curExplanation; 
+            changeCodeColor(animationQuery[queryNum].curCode); 
 
             const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
 
             // 버튼을 사용해서 재생하는 경우
             if(fromBtn) {
-                fromBtn = false;
-
                 deleteAllPaths();
                 initPoints();
+                displayAllPointsNum();
                 
                 changePointColor(pointElements, 0, "5px solid #50ad49", "#50ad49", 1); 
 
+                fromBtn = false;
                 isPaused = true;
                 return;
             }
@@ -770,22 +847,22 @@
             changePointColor(pointElements, 0, "5px solid #50ad49", "#50ad49", 1); 
             await delay(2000 * (1 / animationSpeed));
         }
-        else if(i == 4) { // 4. stack.push(points[1])
-            explanation = animationQuery[i].curExplanation; 
-            changeCodeColor(animationQuery[i].curCode); 
+        else if(queryNum == 4) { // 4. stack.push(points[1])
+            explanation = animationQuery[queryNum].curExplanation; 
+            changeCodeColor(animationQuery[queryNum].curCode); 
 
             const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
 
             // 버튼을 사용해서 재생하는 경우
             if(fromBtn) {
-                fromBtn = false;
-
                 deleteAllPaths();
                 initPoints();
+                displayAllPointsNum();
 
-                // 1번 점 속성 변경
+                changePointColor(pointElements, 0, "5px solid #50ad49", "#50ad49", 1); 
                 changePointColor(pointElements, 1, "5px solid #50ad49", "#50ad49", 1);
 
+                fromBtn = false;
                 isPaused = true;
                 return;
             }
@@ -795,44 +872,68 @@
             await delay(2000 * (1 / animationSpeed));
         }
         else { // 5. construct convex hull. connect edge or disconnect edge
-            // fromBtn 채우기@@@@@@@@@@@@@@@@@
+            const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
 
-            await connectEdge(0, 1);
-            await delay(2000 * (1 / animationSpeed));
+            explanation = animationQuery[queryNum].curExplanation; 
+            changeCodeColor(animationQuery[queryNum].curCode); 
 
-            let stack = [0, 1];
+            // 버튼을 사용해서 재생하는 경우
+            if(fromBtn) {
+                deleteAllPaths();
+                initPoints();
+                displayAllPointsNum();
 
-            for(let i = 2; i < pointsInfo.length; i++) {
-                changePointColor(i, "5px solid #e97714", "#e97714", 1); // 체크할 점 빨간색으로
-                await delay(2000 * (1 / animationSpeed));
+                let stack = [...animationQuery[queryNum].curStack];
+                let lastNum = animationQuery[queryNum].curLastNum;
+                changePointColor(pointElements, 0, "5px solid #50ad49", "#50ad49", 1);
 
-                while(stack.length >= 2 && pointsInfo.length > 3) {
-                    let first = stack[stack.length - 2];
-                    let second = stack[stack.length - 1];
+                for(let i = 0; i < stack.length - 1; i++) {
+                    let start = stack[i];
+                    let end = stack[i + 1];
+                    connectEdge(pointElements, start, end);
+                    changePointColor(pointElements, start, "5px solid #50ad49", "#50ad49", 1);
+                    changePointColor(pointElements, end, "5px solid #50ad49", "#50ad49", 1);
 
-                    if(ccw(first, second, i) <= 0) { 
-                        // 간선 끊고 opacity 0.1로 변경
-                        stack.pop();
-                        await disconnectEdge(second)
-                        await delay(2000 * (1 / animationSpeed));
-
-                        changePointColor(second, "5px solid #000000", "#000000", 0.1);
-                        await delay(2000 * (1 / animationSpeed));
-                    }
-                    else {
-                        break;
+                    for(let j = start + 1; j < end; j++) {// 연결되지 않은 점의 색깔 변경
+                        changePointColor(pointElements, j, "5px solid #000000", "#000000", 0.1);
                     }
                 }
 
-                stack.push(i);  
-                await connectEdge(stack[stack.length - 2], i);
-                await delay(2000 * (1 / animationSpeed));
+                if(stack[stack.length - 1] < lastNum) {
+                    for(let i = stack[stack.length - 1] + 1; i <= lastNum; i++) {
+                        changePointColor(pointElements, i, "5px solid #000000", "#000000", 0.1);
+                    }
+                }
 
-                changePointColor(i, "5px solid #50ad49", "#50ad49", 1);
-                await delay(2000 * (1 / animationSpeed));
+                if(queryNum + 1 >= animationStep[1]) { // connect의 마지막 쿼리인 경우에만 마지막 점과 0번 점을 연결
+                    connectEdge(pointElements, stack[stack.length - 1], 0);
+                }
+
+                if(animationQuery[queryNum].curSelect != undefined) {
+                    changePointColor(pointElements, animationQuery[queryNum].curSelect, "5px solid #e97714", "#e97714", 1); // 체크할 점 빨간색으로
+                }
+
+                fromBtn = false;
+                isPaused = true;
+                return;
             }
 
-            await connectEdge(stack[stack.length - 1], 0);
+            if(animationQuery[queryNum].isDisconnect == true) { // 점의 연결을 끊는 경우
+                console.log("절단");
+                changePointColor(pointElements, animationQuery[queryNum].disconnectNum, "5px solid #000000", "#000000", 0.1);
+                await disconnectEdge(animationQuery[queryNum].disconnectNum);
+                await delay(2000 * (1 / animationSpeed));
+            }
+            else if(animationQuery[queryNum].curSelect != undefined) { // 점을 선택하는 경우
+                changePointColor(pointElements, animationQuery[queryNum].curSelect, "5px solid #e97714", "#e97714", 1); // 체크할 점 빨간색으로
+                await delay(2000 * (1 / animationSpeed));
+            }
+            else if(animationQuery[queryNum].isConnect == true) { // 점을 연결하는 경우
+                changePointColor(pointElements, animationQuery[queryNum].connectEnd, "5px solid #50ad49", "#50ad49", 1);
+                changePointColor(pointElements, animationQuery[queryNum].connectStart, "5px solid #50ad49", "#50ad49", 1);
+                await connectEdge(pointElements, animationQuery[queryNum].connectStart, animationQuery[queryNum].connectEnd);
+                await delay(2000 * (1 / animationSpeed));
+            }
         }
     };
 </script>

@@ -156,12 +156,12 @@
         InitAnimation();
 
         isAsc = e.detail.isAsc;
-        preDrawInsertionSort(isAsc);
+        generateInsertionSortQuries(isAsc);
 
         animationWorking = true;
         pausedIcon = false;
         isPaused = false;
-        drawInsertionSort(asyncCnt++);
+        executeInsertionSortQuries(asyncCnt++);
     };
 
     const changeCodeColor = (idx) => {
@@ -191,7 +191,7 @@
         })
     };
 
-    const preDrawInsertionSort = (isAsc) => {  
+    const generateInsertionSortQuries = (isAsc) => {  
         const graphBg = {normal: "#d9d9d9", selected: "#ecadae", sorted: "#9fda9b"};
         const elementBg = {normal: "#737373", selected: "#ad7677", sorted: "#6a9068"};
         const elementColor = {normal: "#dcdcdc", selected: "#ffebeb", sorted: "#e8ffe6"};
@@ -290,7 +290,7 @@
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode, tmpGraphBottom);
     };
 
-    const drawInsertionSort = async (myAsync) => {
+    const executeInsertionSortQuries = async (myAsync) => {
         animationStep = [0, animationQuery.length - 1];
 
         while(true) {
@@ -301,7 +301,7 @@
             
             if((myAsync + 1) != asyncCnt) break;
 
-            await playInsertionSortAnimation(animationStep[0]);
+            await drawInsertionSortAnimation(animationStep[0]);
             await waitPause();
             if(animationSpeed <= 30) await delay(20);
 
@@ -312,7 +312,7 @@
         }
     };
 
-    const playInsertionSortAnimation = async (i) => {
+    const drawInsertionSortAnimation = async (i) => {
         const isSwap = animationQuery[i].curSwap1 != animationQuery[i].curSwap2;
         const graphElements = document.querySelectorAll('.graph');
         const elementElements = document.querySelectorAll('.element');

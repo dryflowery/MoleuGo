@@ -1,6 +1,5 @@
 <script>
-    // import ConvexHull from "../../../pages/visualization/geometry/ConvexHull.svelte";
-    import ConvexHull from "../../../pages/visualization/geometry/copy.svelte";
+    import ConvexHull from "../../../pages/visualization/geometry/ConvexHull.svelte";
 </script>
   
 <main>

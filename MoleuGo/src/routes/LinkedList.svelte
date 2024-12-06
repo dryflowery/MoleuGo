@@ -1,5 +1,5 @@
 <script>
-    import LinkedList from "../pages/visualization/Linear/LinkedList.svelte";
+    import LinkedList from "../pages/visualization/linear/LinkedList.svelte";
 </script>
 
 <main>

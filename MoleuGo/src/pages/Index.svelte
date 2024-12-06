@@ -15,7 +15,7 @@
         <Header/>
     </div>
 
-    <div class="main-container">
+    <div class="main-container" class:index-list-visible={$isListVisible} class:index-list-invisible={!$isListVisible}>
         <div id="main-left-container">
             <div id="main-title">알고리즘의 시각화를 경험해보세요</div>
             <div id="sub-title">궁금한 알고리즘 검색하기</div>
