@@ -30,7 +30,7 @@
     });
 
     // 슬라이더의 위치에 따른 animationSpeed 관리
-    // 50%까지는 [1, 10], 51%부터는 [11, 1000]
+    // 50%까지는 [1, 10], 51%부터는 [11, 500]
     const updateSpeed = (event) => {
         const sliderValue = event.target.value;
         
@@ -42,7 +42,7 @@
             }
         } 
         else {
-            animationSpeed = Math.min(1000, Math.round(10 + (sliderValue - 50) * 20));  
+            animationSpeed = Math.min(500, Math.round(10 + (sliderValue - 50) * 20));  
         }
         
     };
@@ -294,12 +294,14 @@
         animationStep = [0, animationQuery.length - 1];
 
         while(true) {
+            if((myAsync + 1) != asyncCnt) {
+                break;
+            }
+
             if(animationStep[0] == animationStep[1]) {
                 pausedIcon = true;
                 isPaused = true;
             }
-            
-            if((myAsync + 1) != asyncCnt) break;
 
             await drawInsertionSortAnimation(animationStep[0]);
             await waitPause();

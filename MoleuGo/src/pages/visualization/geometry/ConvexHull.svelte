@@ -13,6 +13,7 @@
     let pausedIcon = true;
     let fromBtn = false;
     let isReplay = false;
+    let isFirstAnimation = false;
 
     let explanation = ``;
     let animationSpeed = 1;
@@ -22,6 +23,7 @@
     let animationStep = [0, 0]; // [curStep, maxStep]
     let asyncCnt = 0; // 비동기 함수 한 번에 하나만 실행하기 위한 변수
     let gradient = 0;
+    let pointElements;
 
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
@@ -45,7 +47,7 @@
     });
 
     // 슬라이더의 위치에 따른 animationSpeed 관리
-    // 50%까지는 [1, 10], 51%부터는 [11, 1000]
+    // 50%까지는 [1, 10], 51%부터는 [11, 500]
     const updateSpeed = (event) => {
         const sliderValue = event.target.value;
         
@@ -57,7 +59,7 @@
             }
         } 
         else {
-            animationSpeed = Math.min(1000, Math.round(10 + (sliderValue - 50) * 20));  
+            animationSpeed = Math.min(500, Math.round(10 + (sliderValue - 50) * 10));  
         }
         
     };
@@ -110,7 +112,7 @@
     const InitAnimation = () => {
         asyncCnt++;
 
-        const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
+        pointElements = document.querySelectorAll('.point:not(.point-invisible)');
         const gridElements = document.querySelectorAll('.grid');
         const cellElements = document.querySelectorAll('.cell');
         const paths = document.querySelectorAll('path');
@@ -142,6 +144,7 @@
             element.style.opacity = "";
         });
         
+        isFirstAnimation = false;
         animationWorking = false;
         pausedIcon = true;
         isPaused = true;
@@ -191,6 +194,7 @@
         animationWorking = true;
         pausedIcon = false;
         isPaused = false;
+
         executeConvexHullQueries(asyncCnt++);
     };
 
@@ -235,7 +239,7 @@
         };
 
         // visible point의 pointInfo 설정하기
-        const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
+        pointElements = document.querySelectorAll('.point:not(.point-invisible)');
         const leftTopCell = document.querySelector('.cell');
         const leftTopCellRect = leftTopCell.getBoundingClientRect();
 
@@ -354,12 +358,14 @@
         animationStep = [0, animationQuery.length - 1];
 
         while(true) {
+            if((myAsync + 1) != asyncCnt) {
+                break;
+            }
+
             if(animationStep[0] == animationStep[1]) {
                 pausedIcon = true;
                 isPaused = true;
             }
-            
-            if((myAsync + 1) != asyncCnt) break;
 
             await drawConvexHullAnimation(animationStep[0], myAsync);
             await waitPause();
@@ -373,14 +379,14 @@
 
     const drawConvexHullAnimation = async (queryNum, myAsync) => {
         // point 속성 변경 함수
-        const changePointColor = (pointElements, pointNum, border, color, opacity) => {
+        const changePointColor = (pointNum, border, color, opacity) => {
             pointElements[pointsInfo[pointNum].pointElementsIdx].style.border = border;
             pointElements[pointsInfo[pointNum].pointElementsIdx].style.color = color;
             pointElements[pointsInfo[pointNum].pointElementsIdx].style.opacity = opacity; 
         };
 
         // start에서 end로 간선 연결
-        const connectEdge = (pointElements, start, end) => {
+        const connectEdge = (start, end) => {
             let startRect = pointElements[pointsInfo[start].pointElementsIdx].getBoundingClientRect();
             let startX = startRect.left + (startRect.width / 2) - 54.5; 
             let startY = startRect.top + (startRect.height / 2) - 125; 
@@ -464,7 +470,6 @@
         // 점 속성 초기화
         const initPoints = () => {
             pointsNum = Array(54).fill(undefined);
-            const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
 
             pointElements.forEach(element => {
                 element.style.width = "50px";
@@ -494,7 +499,7 @@
                 return;
             }
 
-            if(Math.abs(startY - (canvasRect.top - 125 + dist)) <= 1) {
+            if(Math.abs(startY - (canvasRect.top - 125 + dist)) <= Math.min(10, animationSpeed)) {
                 return true;
             }
 
@@ -530,7 +535,7 @@
                 return;
             }
 
-            if(Math.abs(startX - (canvasRect.left - 54.5 + dist)) <= 1) {
+            if(Math.abs(startX - (canvasRect.left - 54.5 + dist)) <= Math.min(10, animationSpeed)) {
                 return true;
             }
 
@@ -559,6 +564,8 @@
         };
 
         if(queryNum == -1) { // 처음 한 번만 실행됨
+            isFirstAnimation = true;
+
             const gridElements = document.querySelectorAll('.grid');
             const cellElements = document.querySelectorAll('.cell');
 
@@ -568,7 +575,7 @@
                 element.style.transform = "scale(0)";
             });
 
-            await delay(2000 * (1 / animationSpeed));
+            await delay(Math.max(200, 2000 * (1 / animationSpeed)));
 
             // 원래 위치에서 visibility만 hidden으로 바꾸고 point 그리기
             gridElements.forEach(element => {
@@ -576,7 +583,7 @@
                 element.style.transform = "scale(1)";
                 element.style.visibility = "hidden";
             });
-
+  
             cellElements.forEach(element => {
                 element.style.transform = "scale(1)";
                 element.style.visibility = "hidden";
@@ -584,9 +591,12 @@
 
             initPoints();
 
-            await delay(2000 * (1 / animationSpeed));
+            await delay(Math.max(200, 2000 * (1 / animationSpeed)));
+
+            isFirstAnimation = false;
         }
         else if(queryNum == 0) { // 0. initialize points
+            pointElements = document.querySelectorAll('.point:not(.point-invisible)');
             explanation = animationQuery[queryNum].curExplanation; 
             changeCodeColor(animationQuery[queryNum].curCode); 
 
@@ -615,7 +625,6 @@
             explanation = animationQuery[queryNum].curExplanation; 
             changeCodeColor(animationQuery[queryNum].curCode); 
 
-            const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
             let firstRect = pointElements[pointsInfo[0].pointElementsIdx].getBoundingClientRect();
             let firstX = firstRect.left + (firstRect.width / 2) - 54.5; 
             let firstY = firstRect.top + (firstRect.height / 2) - 125; 
@@ -646,9 +655,11 @@
                     return;
                 }
 
-                if(((myAsync + 1) != asyncCnt) || (await drawRowLine(svg, canvasRect, firstY, dist++, queryNum) === true)) {
+                if(((myAsync + 1) != asyncCnt) || (await drawRowLine(svg, canvasRect, firstY, dist, queryNum) === true)) {
                     break;
                 }
+
+                dist += Math.min(10, animationSpeed);
             }
 
             dist = 0;
@@ -659,9 +670,11 @@
                     return;
                 }
 
-                if(((myAsync + 1) != asyncCnt) || (await drawColLine(svg, canvasRect, firstX, dist++, queryNum) === true) || queryNum != animationStep[0]) {
+                if(((myAsync + 1) != asyncCnt) || (await drawColLine(svg, canvasRect, firstX, dist, queryNum) === true)) {
                     break;
                 }
+
+                dist += Math.min(10, animationSpeed);
             }
 
             // points[0] 번호 변경
@@ -711,7 +724,7 @@
                 path.setAttribute("id", "semiCircle");
                 svg.appendChild(path);
 
-                angle += 0.1;
+                angle += Math.min(0.1 * animationSpeed, 1);
 
                 while(pointNum < pointsInfo.length) {
                     if(await isPositionOnLine(startX, startY, endX, endY) === false) {
@@ -735,7 +748,7 @@
                     path.remove(); 
                 }, 1 / animationSpeed * 5);
 
-                await delay(1 / animationSpeed * 5  );
+                await delay(1 / animationSpeed * 5);
 
                 return true;
             };
@@ -746,7 +759,7 @@
                 let curX = rect.left + (rect.width / 2) - 54.5; 
                 let curY = rect.top + (rect.height / 2) - 125; 
 
-                if(Math.abs((endX - startX) * (curY - startY) - (endY - startY) * (curX - startX)) <= 3000) {
+                if(Math.abs((endX - startX) * (curY - startY) - (endY - startY) * (curX - startX)) <= Math.min(10000, 1000 * animationSpeed)) {
                     pointsNum[pointsInfo[pointNum].pointsNumIdx] = pointNum++;
                     return true;
                 }
@@ -757,7 +770,6 @@
             explanation = animationQuery[queryNum].curExplanation; 
             changeCodeColor(animationQuery[queryNum].curCode); 
 
-            const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
             const svg = document.getElementById("svg");
             let firstRect = pointElements[pointsInfo[0].pointElementsIdx].getBoundingClientRect();
             let firstX = firstRect.left + (firstRect.width / 2) - 54.5; 
@@ -828,15 +840,13 @@
             explanation = animationQuery[queryNum].curExplanation; 
             changeCodeColor(animationQuery[queryNum].curCode); 
 
-            const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
-
             // 버튼을 사용해서 재생하는 경우
             if(fromBtn) {
                 deleteAllPaths();
                 initPoints();
                 displayAllPointsNum();
                 
-                changePointColor(pointElements, 0, "5px solid #50ad49", "#50ad49", 1); 
+                changePointColor(0, "5px solid #50ad49", "#50ad49", 1); 
 
                 fromBtn = false;
                 isPaused = true;
@@ -844,14 +854,12 @@
             }
 
             // 0번 점 속성 변경
-            changePointColor(pointElements, 0, "5px solid #50ad49", "#50ad49", 1); 
+            changePointColor(0, "5px solid #50ad49", "#50ad49", 1); 
             await delay(2000 * (1 / animationSpeed));
         }
         else if(queryNum == 4) { // 4. stack.push(points[1])
             explanation = animationQuery[queryNum].curExplanation; 
             changeCodeColor(animationQuery[queryNum].curCode); 
-
-            const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
 
             // 버튼을 사용해서 재생하는 경우
             if(fromBtn) {
@@ -859,8 +867,8 @@
                 initPoints();
                 displayAllPointsNum();
 
-                changePointColor(pointElements, 0, "5px solid #50ad49", "#50ad49", 1); 
-                changePointColor(pointElements, 1, "5px solid #50ad49", "#50ad49", 1);
+                changePointColor(0, "5px solid #50ad49", "#50ad49", 1); 
+                changePointColor(1, "5px solid #50ad49", "#50ad49", 1);
 
                 fromBtn = false;
                 isPaused = true;
@@ -868,12 +876,10 @@
             }
 
             // 1번 점 속성 변경
-            changePointColor(pointElements, 1, "5px solid #50ad49", "#50ad49", 1);
+            changePointColor(1, "5px solid #50ad49", "#50ad49", 1);
             await delay(2000 * (1 / animationSpeed));
         }
         else { // 5. construct convex hull. connect edge or disconnect edge
-            const pointElements = document.querySelectorAll('.point:not(.point-invisible)');
-
             explanation = animationQuery[queryNum].curExplanation; 
             changeCodeColor(animationQuery[queryNum].curCode); 
 
@@ -885,32 +891,32 @@
 
                 let stack = [...animationQuery[queryNum].curStack];
                 let lastNum = animationQuery[queryNum].curLastNum;
-                changePointColor(pointElements, 0, "5px solid #50ad49", "#50ad49", 1);
+                changePointColor(0, "5px solid #50ad49", "#50ad49", 1);
 
                 for(let i = 0; i < stack.length - 1; i++) {
                     let start = stack[i];
                     let end = stack[i + 1];
-                    connectEdge(pointElements, start, end);
-                    changePointColor(pointElements, start, "5px solid #50ad49", "#50ad49", 1);
-                    changePointColor(pointElements, end, "5px solid #50ad49", "#50ad49", 1);
+                    connectEdge(start, end);
+                    changePointColor(start, "5px solid #50ad49", "#50ad49", 1);
+                    changePointColor(end, "5px solid #50ad49", "#50ad49", 1);
 
                     for(let j = start + 1; j < end; j++) {// 연결되지 않은 점의 색깔 변경
-                        changePointColor(pointElements, j, "5px solid #000000", "#000000", 0.1);
+                        changePointColor(j, "5px solid #000000", "#000000", 0.1);
                     }
                 }
 
                 if(stack[stack.length - 1] < lastNum) {
                     for(let i = stack[stack.length - 1] + 1; i <= lastNum; i++) {
-                        changePointColor(pointElements, i, "5px solid #000000", "#000000", 0.1);
+                        changePointColor(i, "5px solid #000000", "#000000", 0.1);
                     }
                 }
 
                 if(queryNum + 1 >= animationStep[1]) { // connect의 마지막 쿼리인 경우에만 마지막 점과 0번 점을 연결
-                    connectEdge(pointElements, stack[stack.length - 1], 0);
+                    connectEdge(stack[stack.length - 1], 0);
                 }
 
                 if(animationQuery[queryNum].curSelect != undefined) {
-                    changePointColor(pointElements, animationQuery[queryNum].curSelect, "5px solid #e97714", "#e97714", 1); // 체크할 점 빨간색으로
+                    changePointColor(animationQuery[queryNum].curSelect, "5px solid #e97714", "#e97714", 1); // 체크할 점 빨간색으로
                 }
 
                 fromBtn = false;
@@ -919,19 +925,18 @@
             }
 
             if(animationQuery[queryNum].isDisconnect == true) { // 점의 연결을 끊는 경우
-                console.log("절단");
-                changePointColor(pointElements, animationQuery[queryNum].disconnectNum, "5px solid #000000", "#000000", 0.1);
+                changePointColor(animationQuery[queryNum].disconnectNum, "5px solid #000000", "#000000", 0.1);
                 await disconnectEdge(animationQuery[queryNum].disconnectNum);
                 await delay(2000 * (1 / animationSpeed));
             }
             else if(animationQuery[queryNum].curSelect != undefined) { // 점을 선택하는 경우
-                changePointColor(pointElements, animationQuery[queryNum].curSelect, "5px solid #e97714", "#e97714", 1); // 체크할 점 빨간색으로
+                changePointColor(animationQuery[queryNum].curSelect, "5px solid #e97714", "#e97714", 1); // 체크할 점 빨간색으로
                 await delay(2000 * (1 / animationSpeed));
             }
             else if(animationQuery[queryNum].isConnect == true) { // 점을 연결하는 경우
-                changePointColor(pointElements, animationQuery[queryNum].connectEnd, "5px solid #50ad49", "#50ad49", 1);
-                changePointColor(pointElements, animationQuery[queryNum].connectStart, "5px solid #50ad49", "#50ad49", 1);
-                await connectEdge(pointElements, animationQuery[queryNum].connectStart, animationQuery[queryNum].connectEnd);
+                changePointColor(animationQuery[queryNum].connectEnd, "5px solid #50ad49", "#50ad49", 1);
+                changePointColor(animationQuery[queryNum].connectStart, "5px solid #50ad49", "#50ad49", 1);
+                await connectEdge(animationQuery[queryNum].connectStart, animationQuery[queryNum].connectEnd);
                 await delay(2000 * (1 / animationSpeed));
             }
         }
@@ -976,13 +981,13 @@
             </div>
 
             <div class="animation-control-container">
-                <ion-icon name="play-back" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = 0;}}}></ion-icon>
-                <ion-icon name="caret-back" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.max(animationStep[0] - 1, 0);}}}></ion-icon>
+                <ion-icon name="play-back" class="animation-control-btn" on:click={() => {if(animationWorking && !isFirstAnimation) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = 0;}}}></ion-icon>
+                <ion-icon name="caret-back" class="animation-control-btn" on:click={() => {if(animationWorking && !isFirstAnimation) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.max(animationStep[0] - 1, 0);}}}></ion-icon>
 
                 {#if isPaused || pausedIcon} 
                     <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" 
                         on:click={() => {
-                            if(animationWorking) {
+                            if(animationWorking && !isFirstAnimation) {
                                 if (animationStep[0] === animationStep[1]) {
                                     isReplay = true; animationStep[0] = -1;
                                 } 
@@ -994,17 +999,18 @@
                     </ion-icon>
             
                 {:else}
-                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => {if(animationWorking) {isPaused = true; pausedIcon = true;}}}></ion-icon>
+                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => {if(animationWorking && !isFirstAnimation) {isPaused = true; pausedIcon = true;}}}></ion-icon>
                 {/if}
 
-                <ion-icon name="caret-forward" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.min(animationStep[0] + 1, animationStep[1]);}}}></ion-icon>
-                <ion-icon name="play-forward" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = animationStep[1];}}}></ion-icon>
+                <ion-icon name="caret-forward" class="animation-control-btn" on:click={() => {if(animationWorking && !isFirstAnimation) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.min(animationStep[0] + 1, animationStep[1]);}}}></ion-icon>
+                <ion-icon name="play-forward" class="animation-control-btn" on:click={() => {if(animationWorking && !isFirstAnimation) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = animationStep[1];}}}></ion-icon>
 
                 <input class="animation-slider"
                     type="range"
                     style="background: {sliderStyle};"
                     min=0
                     max={animationStep[1]}
+                    disabled={isFirstAnimation}
                     bind:value={animationStep[0]}
                     on:input={() => {if(animationWorking) {isPaused = false; pausedIcon = true; fromBtn = true;}}}
                 />
@@ -1015,6 +1021,7 @@
                     max="100" 
                     step="1" 
                     value="0"
+                    disabled={isFirstAnimation}
                     on:input={updateSpeed}
                 />
                 <span class="speed-label">x {animationSpeed}</span>
@@ -1048,13 +1055,6 @@
 </main>
 
 <style>    
-    #svg {
-        z-index: 0; /* SVG를 가장 뒤로 이동 */
-        pointer-events: none; /* 클릭 이벤트를 SVG 아래 요소로 전달 */
-        margin-left: 54.5px;
-        margin-top: 55px;
-    }
-
     main {
         height: 100vh;
         display: grid;
@@ -1151,5 +1151,16 @@
     .point-invisible {
         transform: scale(0);
         transition: transform 0.25s ease;
+    }
+
+    #svg {
+        z-index: 0; /* SVG를 가장 뒤로 이동 */
+        pointer-events: none; /* 클릭 이벤트를 SVG 아래 요소로 전달 */
+        margin-left: 54.5px;
+        margin-top: 55px;
+    }
+
+    input:disabled {
+        opacity: 0.5;
     }
 </style>
