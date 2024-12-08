@@ -1,26 +1,14 @@
 <script>
     import { onDestroy, onMount  } from "svelte";
     import Header from "../../../component/Header.svelte";
-    import LinkedListNavigation from "../../../component/navigation/Linear/LinkedListNavigation.svelte";
+    import LinkedListNavigation from "../../../component/navigation/linear/LinkedListNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
+    import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
+             asyncCnt, gradient, indentSize } from "../../../lib/visualizationStore";
 
     let numNode = [15, 10, 20, 30, 7]
     let nodePositions = []; // 노드의 실제 위치 저장
     let highlightedIndex = null; // 추가: 강조된 노드의 인덱스
-
-    let isPaused = true;
-    let pausedIcon = true;
-    let fromBtn = false;
-    let isReplay = false;
-
-    let explanation = ``;
-    let animationSpeed = 1;
-    let animationWorking = false;
-    let animationQuery = [];
-    let codeColor = Array(3).fill()
-    let animationStep = [0, 0]; // [curStep, maxStep]
-    let asyncCnt = 0; // 비동기 함수 한 번에 하나만 실행하기 위한 변수
-    let gradient = 0;
 
     $: totalWidth = numNode.length * (90); // 노드의 총 길이 계산 (노드 크기와 간격 포함)
     $: offsetX = (200 - totalWidth) / 2;
@@ -46,31 +34,32 @@
 
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
+        $animationSpeed = 1;
         InitAnimation();
         window.removeEventListener("resize", updateNodePositions);
     });
     
-    // 슬라이더의 위치에 따른 animationSpeed 관리
+    // 슬라이더의 위치에 따른 $animationSpeed 관리
     // 50%까지는 [1, 10], 51%부터는 [11, 1000]
     const updateSpeed = (event) => {
         const sliderValue = event.target.value;
         
         if (sliderValue <= 50) {
-            animationSpeed = Math.round(sliderValue / 5); 
+            $animationSpeed = Math.round(sliderValue / 5); 
             
-            if(animationSpeed == 0) {
-                animationSpeed = 1;
+            if($animationSpeed == 0) {
+                $animationSpeed = 1;
             }
         } 
         else {
-            animationSpeed = Math.min(1000, Math.round(10 + (sliderValue - 50) * 20));  
+            $animationSpeed = Math.min(1000, Math.round(10 + (sliderValue - 50) * 20));  
         }
         
     };
 
     // 슬라이더 색깔관리
-    $: gradient = (animationStep[0] === 0 || animationStep[1] === 0) ? 0 : (animationStep[0] / animationStep[1]) * 100;
-    $: sliderStyle = `linear-gradient(to right, #509650 ${gradient}%, #585858 ${gradient}%)`;
+    $: $gradient = ($animationStep[0] === 0 || $animationStep[1] === 0) ? 0 : ($animationStep[0] / $animationStep[1]) * 100;
+    $: sliderStyle = `linear-gradient(to right, #509650 ${$gradient}%, #585858 ${$gradient}%)`;
 
     const delay = (duration) => {
         return new Promise((resolve) => { setTimeout(resolve, duration); });
@@ -80,12 +69,12 @@
     const waitPause = async () => {
         return new Promise((resolve) => {
             const checkPause = () => {
-                if (isPaused === false) {
+                if ($isPaused === false) {
                     setTimeout(resolve, 0);
                 } 
                 else {
                     setTimeout(() => {
-                        if (isPaused === true) {
+                        if ($isPaused === true) {
                             checkPause(); 
                         } 
                         else {
@@ -100,24 +89,24 @@
     };
 
     const InitAnimation = () => {
-        animationWorking = false;
-        pausedIcon = true;
-        isPaused = true;
-        isReplay = false;
-        fromBtn = false;
-        explanation = ``;
-        animationQuery = [];
-        codeColor = Array(3).fill();
-        animationStep = [0, 0]; 
+        $animationWorking = false;
+        $pausedIcon = true;
+        $isPaused = true;
+        $isReplay = false;
+        $fromBtn = false;
+        $explanation = ``;
+        $animationQuery = [];
+        $codeColor = Array($codeColor.length).fill();
+        $animationStep = [0, 0]; 
     };
 
-    const changeCodeColor = (idx) => {
-        for(let i = 0; i < codeColor.length; i++) {
+    const change$codeColor = (idx) => {
+        for(let i = 0; i < $codeColor.length; i++) {
             if(i == idx) {
-                codeColor[i] = "rgb(80, 150, 80)";
+                $codeColor[i] = "rgb(80, 150, 80)";
             }
             else {
-                codeColor[i] = "rgba(255, 255, 255, 0)";
+                $codeColor[i] = "rgba(255, 255, 255, 0)";
             }
         }
     };
@@ -125,9 +114,9 @@
     const startLinkedList = async (e) => {
         InitAnimation();
 
-        animationWorking = true;
-        pausedIcon = false;
-        isPaused = false;
+        $animationWorking = true;
+        $pausedIcon = false;
+        $isPaused = false;
     };
 
     const createRandomNode = (e) => { 
@@ -165,8 +154,7 @@
         bind:highlightedIndex
         on:createRandomNode={createRandomNode} 
         on:createInputtedNode={createInputtedNode} 
-        on:startBubbleSort={startLinkedList}
-        animationWorking={animationWorking}/>
+        on:startBubbleSort={startLinkedList}/>
     </div>
 
     <div class="header-container">
@@ -217,37 +205,37 @@
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="animation-control-container">
-                <ion-icon name="play-back" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = 0;}}}></ion-icon>
-                <ion-icon name="caret-back" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.max(animationStep[0] - 1, 0);}}}></ion-icon>
+                <ion-icon name="play-back" class="animation-control-btn" on:click={() => {if($animationWorking) {$fromBtn = true; $isPaused = false; $pausedIcon = true; $animationStep[0] = 0;}}}></ion-icon>
+                <ion-icon name="caret-back" class="animation-control-btn" on:click={() => {if($animationWorking) {$fromBtn = true; $isPaused = false; $pausedIcon = true; $animationStep[0] = Math.max($animationStep[0] - 1, 0);}}}></ion-icon>
 
-                {#if isPaused || pausedIcon} 
+                {#if $isPaused || $pausedIcon} 
                     <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" 
                         on:click={() => {
-                            if(animationWorking) {
-                                if (animationStep[0] === animationStep[1]) {
-                                    isReplay = true; animationStep[0] = -1;
+                            if($animationWorking) {
+                                if ($animationStep[0] === $animationStep[1]) {
+                                    $isReplay = true; $animationStep[0] = -1;
                                 } 
 
-                                isPaused = false; 
-                                pausedIcon = false;
+                                $isPaused = false; 
+                                $pausedIcon = false;
                             }
                         }}>
                     </ion-icon>
             
                 {:else}
-                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => {if(animationWorking) {isPaused = true; pausedIcon = true;}}}></ion-icon>
+                    <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => {if($animationWorking) {$isPaused = true; $pausedIcon = true;}}}></ion-icon>
                 {/if}
 
-                <ion-icon name="caret-forward" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = Math.min(animationStep[0] + 1, animationStep[1]);}}}></ion-icon>
-                <ion-icon name="play-forward" class="animation-control-btn" on:click={() => {if(animationWorking) {fromBtn = true; isPaused = false; pausedIcon = true; animationStep[0] = animationStep[1];}}}></ion-icon>
+                <ion-icon name="caret-forward" class="animation-control-btn" on:click={() => {if($animationWorking) {$fromBtn = true; $isPaused = false; $pausedIcon = true; $animationStep[0] = Math.min($animationStep[0] + 1, $animationStep[1]);}}}></ion-icon>
+                <ion-icon name="play-forward" class="animation-control-btn" on:click={() => {if($animationWorking) {$fromBtn = true; $isPaused = false; $pausedIcon = true; $animationStep[0] = $animationStep[1];}}}></ion-icon>
 
                 <input class="animation-slider"
                     type="range"
                     style="background: {sliderStyle};"
                     min=0
-                    max={animationStep[1]}
-                    bind:value={animationStep[0]}
-                    on:input={() => {if(animationWorking) {isPaused = false; pausedIcon = true; fromBtn = true;}}}
+                    max={$animationStep[1]}
+                    bind:value={$animationStep[0]}
+                    on:input={() => {if($animationWorking) {$isPaused = false; $pausedIcon = true; $fromBtn = true;}}}
                 />
 
                 <input class="speed-slider"
@@ -258,14 +246,14 @@
                     value="0"
                     on:input={updateSpeed}
                 />
-                <span class="speed-label">x {animationSpeed}</span>
+                <span class="speed-label">x {$animationSpeed}</span>
             </div>      
         </div>
 
         <div class="main-right-container">
             <div class="explanation-container">
                 <div class="explanation-title">단계별 알고리즘 설명</div>
-                <div class="explanation">{@html explanation}</div>
+                <div class="explanation">{@html $explanation}</div>
             </div>
 
             <div class="code-container">

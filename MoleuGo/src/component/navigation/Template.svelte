@@ -2,6 +2,7 @@
 <!-- active 상태에서는 #drag(손 아이콘)만 drag 가능  -->
 <script>
     import { createEventDispatcher } from 'svelte';
+    import { animationWorking } from '../../lib/visualizationStore';
     const dispatch = createEventDispatcher();
 
     let tooltip = Array(9).fill(false);
