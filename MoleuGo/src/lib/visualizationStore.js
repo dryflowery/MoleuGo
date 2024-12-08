@@ -14,3 +14,4 @@ export const animationStep = writable([0, 0]); // [curStep, maxStep]
 export const asyncCnt = writable(0); // 비동기 함수 한 번에 하나만 실행하기 위한 변수
 export const gradient = writable(0);
 export const indentSize = writable(35);
+export const maxSpeed = writable(500);

@@ -4,7 +4,7 @@
     import Navigation from "../../../component/navigation/geometry/ConvexHullNavigation.svelte";
     import {isListVisible} from "../../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
-             asyncCnt, gradient, indentSize } from "../../../lib/visualizationStore";
+             asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
 
     let pointElements;
     let pointsInfo = [];
@@ -48,7 +48,7 @@
             }
         } 
         else {
-            $animationSpeed = Math.min(500, Math.round(10 + (sliderValue - 50) * 10));  
+            $animationSpeed = Math.min($maxSpeed, Math.round(10 + (sliderValue - 50) * 10));  
         }
         
     };

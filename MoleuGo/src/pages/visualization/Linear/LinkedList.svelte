@@ -4,7 +4,7 @@
     import LinkedListNavigation from "../../../component/navigation/linear/LinkedListNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
-             asyncCnt, gradient, indentSize } from "../../../lib/visualizationStore";
+             asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
 
     let numNode = [15, 10, 20, 30, 7]
     let nodePositions = []; // 노드의 실제 위치 저장
@@ -40,7 +40,7 @@
     });
     
     // 슬라이더의 위치에 따른 $animationSpeed 관리
-    // 50%까지는 [1, 10], 51%부터는 [11, 1000]
+    // 50%까지는 [1, 10], 51%부터는 [11, 500]
     const updateSpeed = (event) => {
         const sliderValue = event.target.value;
         
@@ -52,7 +52,7 @@
             }
         } 
         else {
-            $animationSpeed = Math.min(1000, Math.round(10 + (sliderValue - 50) * 20));  
+            $animationSpeed = Math.min($maxSpeed, Math.round(10 + (sliderValue - 50) * 20));  
         }
         
     };

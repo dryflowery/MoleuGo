@@ -4,7 +4,7 @@
     import Navigation from "../../../component/navigation/sort/BubbleSortNavigation.svelte";
     import {isListVisible} from "../../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
-             asyncCnt, gradient, indentSize } from "../../../lib/visualizationStore";
+             asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
 
     let numArr = [15, 10, 20, 30, 7]
     let graphLeft = [];
@@ -31,7 +31,7 @@
             }
         } 
         else {
-            $animationSpeed = Math.min(500, Math.round(10 + (sliderValue - 50) * 20));  
+            $animationSpeed = Math.min($maxSpeed, Math.round(10 + (sliderValue - 50) * 20));  
         }
         
     };
