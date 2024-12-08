@@ -3,7 +3,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
-    export let animationWorking;
+    import { animationWorking } from '../../../lib/visualizationStore';
     const dispatch = createEventDispatcher();
 
     let tooltip = Array(9).fill(false);
@@ -161,7 +161,7 @@
     };
 
     const startSelectionSort = () => {
-        if(!isActive || animationWorking) {
+        if(!isActive || $animationWorking) {
             return;
         }
 
