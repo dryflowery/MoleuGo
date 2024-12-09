@@ -146,7 +146,7 @@
         pointsInfo = [];
     };
 
-    const change$codeColor = (idx) => {
+    const changeCodeColor = (idx) => {
         for(let i = 0; i < $codeColor.length; i++) {
             if(i == idx) {
                 $codeColor[i] = "rgb(80, 150, 80)";
@@ -186,10 +186,10 @@
         executeConvexHullQueries($asyncCnt++);
     };
 
-    const push$animationQuery = (tmp$explanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, 
+    const pushAnimationQuery = (tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, 
                                 isDisconnect, disconnectNum, tmpLastNum) => {
             $animationQuery.push({
-            cur$explanation: tmp$explanation,
+            curExplanation: tmpExplanation,
             curCode: tmpCode,
             curStack: tmpStack,
             curSelect: tmpSelect,
@@ -260,7 +260,7 @@
         pointsInfo = [pointsInfo[0], ...sortedPoints];
 
         // construct convex hull query start
-        let tmp$explanation = ``;
+        let tmpExplanation = ``;
         let tmpCode = 1000;
         let tmpStack = undefined;
         let tmpSelect = undefined;
@@ -272,41 +272,41 @@
         let tmpLastNum = undefined;
 
         // 0. initialize points
-        tmp$explanation = "점들의 초기 상태입니다";
-        push$animationQuery(tmp$explanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
+        tmpExplanation = "점들의 초기 상태입니다";
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 1. set points[0]
-        tmp$explanation = "y좌표가 가장 작은 점 중, x좌표가 가장 작은 점을<br>0번 점으로 설정합니다.";
+        tmpExplanation = "y좌표가 가장 작은 점 중, x좌표가 가장 작은 점을<br>0번 점으로 설정합니다.";
         tmpCode = 0;
-        push$animationQuery(tmp$explanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 2. sort by ccw
-        tmp$explanation = "0번 점을 기준으로 점들을 반시계 방향으로 정렬합니다";
+        tmpExplanation = "0번 점을 기준으로 점들을 반시계 방향으로 정렬합니다";
         tmpCode = 1;
-        push$animationQuery(tmp$explanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 3. stack.push(points[0]) 
-        tmp$explanation = "스택에 0번 점을 넣습니다";
+        tmpExplanation = "스택에 0번 점을 넣습니다";
         tmpCode = 2;
-        push$animationQuery(tmp$explanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 4. stack.push(points[1]) 
-        tmp$explanation = "스택에 1번 점을 넣습니다";
+        tmpExplanation = "스택에 1번 점을 넣습니다";
         tmpCode = 3;
-        push$animationQuery(tmp$explanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
+        pushAnimationQuery(tmpExplanation, tmpCode, tmpStack, tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, tmpLastNum);
 
         // 5. connect 0 to 1
         let stack = [0, 1];
-        tmp$explanation = "0번 점과 1번 점을 연결합니다"
+        tmpExplanation = "0번 점과 1번 점을 연결합니다"
         tmpCode = 3;
-        push$animationQuery(tmp$explanation, tmpCode, [...stack], tmpSelect, true, 0, 1, isDisconnect, disconnectNum, 1);
+        pushAnimationQuery(tmpExplanation, tmpCode, [...stack], tmpSelect, true, 0, 1, isDisconnect, disconnectNum, 1);
 
         // while stack.size() >= 2 and CCW() > 0;
         for(let i = 2; i < pointsInfo.length; i++) {
             // 점 선택하고 색깔 변경
-            tmp$explanation = `${i}번 점이 스택의 마지막 두 점과 반시계 방향을<br>이룰 때까지 스택에서 원소를 제거합니다`
+            tmpExplanation = `${i}번 점이 스택의 마지막 두 점과 반시계 방향을<br>이룰 때까지 스택에서 원소를 제거합니다`
             tmpCode = 4;
-            push$animationQuery(tmp$explanation, tmpCode, [...stack], i, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, i);
+            pushAnimationQuery(tmpExplanation, tmpCode, [...stack], i, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, i);
 
             while(stack.length >= 2 && pointsInfo.length > 3) {
                 let first = stack[stack.length - 2];
@@ -316,9 +316,9 @@
                     stack.pop();
 
                     // 간선 끊고 색상, opacity 변경
-                    tmp$explanation = `${second}번 점을 스택에서 빼고, 점의 연결을 끊습니다`
+                    tmpExplanation = `${second}번 점을 스택에서 빼고, 점의 연결을 끊습니다`
                     tmpCode = 5;
-                    push$animationQuery(tmp$explanation, tmpCode, [...stack], i, isConnect, connectStart, connectEnd, true, second, i);
+                    pushAnimationQuery(tmpExplanation, tmpCode, [...stack], i, isConnect, connectStart, connectEnd, true, second, i);
                 }
                 else {
                     break;
@@ -326,18 +326,18 @@
             }
 
             stack.push(i);  
-            tmp$explanation = `${i}번 점을 스택에 넣고, ${stack[stack.length - 2]}번 점과 ${i}번 점을 연결합니다`
+            tmpExplanation = `${i}번 점을 스택에 넣고, ${stack[stack.length - 2]}번 점과 ${i}번 점을 연결합니다`
             tmpCode = 6;
-            push$animationQuery(tmp$explanation, tmpCode, [...stack], tmpSelect, true, stack[stack.length - 2], i, isDisconnect, disconnectNum, i);
+            pushAnimationQuery(tmpExplanation, tmpCode, [...stack], tmpSelect, true, stack[stack.length - 2], i, isDisconnect, disconnectNum, i);
         }
 
-        tmp$explanation = `${stack[stack.length - 1]}번 점과 0번 점을 연결합니다`
+        tmpExplanation = `${stack[stack.length - 1]}번 점과 0번 점을 연결합니다`
         tmpCode = 6;
-        push$animationQuery(tmp$explanation, tmpCode, [...stack], tmpSelect, true, stack[stack.length - 1], 0, isDisconnect, disconnectNum, pointsInfo.length - 1);
+        pushAnimationQuery(tmpExplanation, tmpCode, [...stack], tmpSelect, true, stack[stack.length - 1], 0, isDisconnect, disconnectNum, pointsInfo.length - 1);
 
-        tmp$explanation = "볼록 껍질이 완성되었습니다"
+        tmpExplanation = "볼록 껍질이 완성되었습니다"
         tmpCode = 1000;
-        push$animationQuery(tmp$explanation, tmpCode, [...stack], tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, pointsInfo.length - 1);
+        pushAnimationQuery(tmpExplanation, tmpCode, [...stack], tmpSelect, isConnect, connectStart, connectEnd, isDisconnect, disconnectNum, pointsInfo.length - 1);
     };
 
     const executeConvexHullQueries = async (myAsync) => {
@@ -585,8 +585,8 @@
         }
         else if(queryNum == 0) { // 0. initialize points
             pointElements = document.querySelectorAll('.point:not(.point-invisible)');
-            $explanation = $animationQuery[queryNum].cur$explanation; 
-            change$codeColor($animationQuery[queryNum].curCode); 
+            $explanation = $animationQuery[queryNum].curExplanation; 
+            changeCodeColor($animationQuery[queryNum].curCode); 
 
             // 버튼을 사용해서 재생하거나 리플레이인 경우, 간선을 전부 삭제하고 점 속성 초기화
             if($fromBtn || $isReplay) { 
@@ -610,8 +610,8 @@
             }
         }
         else if(queryNum == 1) { // 1. set points[0]
-            $explanation = $animationQuery[queryNum].cur$explanation; 
-            change$codeColor($animationQuery[queryNum].curCode); 
+            $explanation = $animationQuery[queryNum].curExplanation; 
+            changeCodeColor($animationQuery[queryNum].curCode); 
 
             let firstRect = pointElements[pointsInfo[0].pointElementsIdx].getBoundingClientRect();
             let firstX = firstRect.left + (firstRect.width / 2) - 54.5; 
@@ -755,8 +755,8 @@
                 return false;
             };
 
-            $explanation = $animationQuery[queryNum].cur$explanation; 
-            change$codeColor($animationQuery[queryNum].curCode); 
+            $explanation = $animationQuery[queryNum].curExplanation; 
+            changeCodeColor($animationQuery[queryNum].curCode); 
 
             const svg = document.getElementById("svg");
             let firstRect = pointElements[pointsInfo[0].pointElementsIdx].getBoundingClientRect();
@@ -825,8 +825,8 @@
             }, 0);
 
 
-            $explanation = $animationQuery[queryNum].cur$explanation; 
-            change$codeColor($animationQuery[queryNum].curCode); 
+            $explanation = $animationQuery[queryNum].curExplanation; 
+            changeCodeColor($animationQuery[queryNum].curCode); 
 
             // 버튼을 사용해서 재생하는 경우
             if($fromBtn) {
@@ -846,8 +846,8 @@
             await delay(2000 * (1 / $animationSpeed));
         }
         else if(queryNum == 4) { // 4. stack.push(points[1])
-            $explanation = $animationQuery[queryNum].cur$explanation; 
-            change$codeColor($animationQuery[queryNum].curCode); 
+            $explanation = $animationQuery[queryNum].curExplanation; 
+            changeCodeColor($animationQuery[queryNum].curCode); 
 
             // 버튼을 사용해서 재생하는 경우
             if($fromBtn) {
@@ -868,8 +868,8 @@
             await delay(2000 * (1 / $animationSpeed));
         }
         else { // 5. construct convex hull. connect edge or disconnect edge
-            $explanation = $animationQuery[queryNum].cur$explanation; 
-            change$codeColor($animationQuery[queryNum].curCode); 
+            $explanation = $animationQuery[queryNum].curExplanation; 
+            changeCodeColor($animationQuery[queryNum].curCode); 
 
             // 버튼을 사용해서 재생하는 경우
             if($fromBtn) {

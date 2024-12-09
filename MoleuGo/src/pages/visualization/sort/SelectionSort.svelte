@@ -144,7 +144,7 @@
         executeSelectionSortQuries($asyncCnt++);
     };
 
-    const change$codeColor = (idx) => {
+    const changeCodeColor = (idx) => {
         for(let i = 0; i < $codeColor.length; i++) {
             if(i == idx) {
                 $codeColor[i] = "rgb(80, 150, 80)";
@@ -155,8 +155,8 @@
         }
     };
 
-    const push$animationQuery = (tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, 
-                                tmpIndexColor,tmpSwap1, tmpSwap2, tmp$explanation, tmpCode) => {
+    const pushAnimationQuery = (tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, 
+                                tmpIndexColor,tmpSwap1, tmpSwap2, tmpExplanation, tmpCode) => {
             $animationQuery.push({
             curArr: [...tmpArr],
             curGraphBgColor: [...tmpGraphBgColor], 
@@ -165,7 +165,7 @@
             curIndexColor: [...tmpIndexColor],
             curSwap1: tmpSwap1, 
             curSwap2: tmpSwap2,
-            cur$explanation: tmp$explanation,
+            curExplanation: tmpExplanation,
             curCode: tmpCode // 색깔 바꿀 코드
         })
     };
@@ -184,7 +184,7 @@
         let tmpElementColor = Array(tmpArr.length).fill(elementColor.normal);
         let tmpIndexColor = Array(tmpArr.length).fill(indexColor.normal);
         let tmpSwap1 = 1000, tmpSwap2 = 1000;
-        let tmp$explanation = ``;
+        let tmpExplanation = ``;
         let tmpCode = 1000;
         let minIdx = 1000;
 
@@ -226,8 +226,8 @@
         }
 
         // 초기 상태
-        tmp$explanation = `배열의 초기 상태입니다`
-        push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+        tmpExplanation = `배열의 초기 상태입니다`
+        pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
         for(let i = 0; i < tmpArr.length - 1; i++) {
             // 인덱스 i부터 tmpArr.length - 1까지 정렬 시작
@@ -235,28 +235,28 @@
             initColor(i - 1);
             minIdx = i;
             setMinColor(minIdx);
-            tmp$explanation = isAsc ? `index ${i}부터 ${tmpArr.length - 1}까지 정렬을 시작합니다.<br>현재 최솟값: ${tmpArr[minIdx]}` :
+            tmpExplanation = isAsc ? `index ${i}부터 ${tmpArr.length - 1}까지 정렬을 시작합니다.<br>현재 최솟값: ${tmpArr[minIdx]}` :
                                      `index ${i}부터 ${tmpArr.length - 1}까지 정렬을 시작합니다.<br>현재 최댓값: ${tmpArr[minIdx]}`;
             tmpCode = 0;
-            push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
             for(let j = i + 1; j < tmpArr.length; j++) {
                 // minIdx의 조건 체크
                 setSelectedColor(j, j);
-                tmp$explanation = isAsc ? `${tmpArr[j]} < ${tmpArr[minIdx]}(이)면 최솟값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최솟값: ${tmpArr[minIdx]}` :
+                tmpExplanation = isAsc ? `${tmpArr[j]} < ${tmpArr[minIdx]}(이)면 최솟값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최솟값: ${tmpArr[minIdx]}` :
                                          `${tmpArr[j]} > ${tmpArr[minIdx]}(이)면 최댓값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최댓값: ${tmpArr[minIdx]}`;
                 tmpCode = 1;
-                push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+                pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
                 if((isAsc && (tmpArr[j] < tmpArr[minIdx])) || (!isAsc && (tmpArr[j] > tmpArr[minIdx]))) {
                     // 조건을 만족하면 minIdx 변경
                     setNormalColor(minIdx);
                     minIdx = j;
                     setMinColor(minIdx);
-                    tmp$explanation = isAsc ? `최솟값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최솟값: ${tmpArr[minIdx]}` :
+                    tmpExplanation = isAsc ? `최솟값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최솟값: ${tmpArr[minIdx]}` :
                                             `최댓값을 ${tmpArr[j]}(으)로 설정합니다<br>현재 최댓값: ${tmpArr[minIdx]}`;
                     tmpCode = 2;
-                    push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+                    pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
                 }
                 else {
                     setNormalColor(j);
@@ -265,31 +265,31 @@
 
             // i != minIdx 체크
             setSelectedColor(i, minIdx);
-            tmp$explanation = `${i} != ${minIdx}면 두 원소를 교환합니다`
+            tmpExplanation = `${i} != ${minIdx}면 두 원소를 교환합니다`
             tmpCode = 3;
-            push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
             
             if(i != minIdx) {
                 // 두 원소 교환
                 [tmpArr[i], tmpArr[minIdx]] = [tmpArr[minIdx], tmpArr[i]];
-                tmp$explanation = `${tmpArr[i]}과(와) ${tmpArr[minIdx]}을(를) 교환합니다`
+                tmpExplanation = `${tmpArr[i]}과(와) ${tmpArr[minIdx]}을(를) 교환합니다`
                 tmpCode = 3;
-                push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, i, minIdx, tmp$explanation, tmpCode);
+                pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, i, minIdx, tmpExplanation, tmpCode);
                 setNormalColor(minIdx);
             }
 
             // i까지 정렬 완료
             setSortedColor(i);
-            tmp$explanation = `index ${i}까지 정렬이 완료되었습니다`;
+            tmpExplanation = `index ${i}까지 정렬이 완료되었습니다`;
             tmpCode = 1000;
-            push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
         }
         
         // 정렬 완료
         initColor(-1);
-        tmp$explanation = `배열의 정렬이 완료되었습니다.`
+        tmpExplanation = `배열의 정렬이 완료되었습니다.`
         tmpCode = 1000;
-        push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+        pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
     };
 
     const executeSelectionSortQuries = async (myAsync) => {
@@ -322,8 +322,8 @@
         const elementElements = document.querySelectorAll('.element');
         const indexElements = document.querySelectorAll('.index');
 
-        $explanation = $animationQuery[i].cur$explanation; // $explanation 수정
-        change$codeColor($animationQuery[i].curCode); // $codeColor 수정
+        $explanation = $animationQuery[i].curExplanation; // $explanation 수정
+        changeCodeColor($animationQuery[i].curCode); // $codeColor 수정
 
         // 색상 수정
         graphElements.forEach((element, idx) => {
