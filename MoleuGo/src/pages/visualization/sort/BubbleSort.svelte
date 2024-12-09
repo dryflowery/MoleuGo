@@ -146,7 +146,7 @@
         executeBubbleSortQuries($asyncCnt++);
     };
 
-    const change$codeColor = (idx) => {
+    const changeCodeColor = (idx) => {
         for(let i = 0; i < $codeColor.length; i++) {
             if(i == idx) {
                 $codeColor[i] = "rgb(80, 150, 80)";
@@ -157,8 +157,8 @@
         }
     };
 
-    const push$animationQuery = (tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, 
-                                tmpIndexColor,tmpSwap1, tmpSwap2, tmp$explanation, tmpCode) => {
+    const pushAnimationQuery = (tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, 
+                                tmpIndexColor,tmpSwap1, tmpSwap2, tmpExplanation, tmpCode) => {
             $animationQuery.push({
             curArr: [...tmpArr],
             curGraphBgColor: [...tmpGraphBgColor], 
@@ -167,7 +167,7 @@
             curIndexColor: [...tmpIndexColor],
             curSwap1: tmpSwap1, 
             curSwap2: tmpSwap2,
-            cur$explanation: tmp$explanation,
+            curExplanation: tmpExplanation,
             curCode: tmpCode // 색깔 바꿀 코드
         })
     };
@@ -185,7 +185,7 @@
         let tmpElementColor = Array(tmpArr.length).fill(elementColor.normal);
         let tmpIndexColor = Array(tmpArr.length).fill(indexColor.normal);
         let tmpSwap1 = 1000, tmpSwap2 = 1000;
-        let tmp$explanation = ``;
+        let tmpExplanation = ``;
         let tmpCode = 1000;
 
         const initColor = (sortedIdx) => {
@@ -219,33 +219,33 @@
         };
 
         // 초기 상태
-        tmp$explanation = `배열의 초기 상태입니다`
-        push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+        tmpExplanation = `배열의 초기 상태입니다`
+        pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
         for(let i = 0; i < tmpArr.length - 1; i++) {
             // 인덱스 0부터 tmpArr.length - i - 1까지 정렬 시작
             initColor(tmpArr.length - i);
-            tmp$explanation = `index ${0}부터 ${tmpArr.length - i - 1}까지 정렬을 시작합니다`;
+            tmpExplanation = `index ${0}부터 ${tmpArr.length - i - 1}까지 정렬을 시작합니다`;
             tmpCode = 0;
-            push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
             let isSorted = true;
 
             for(let j = 0; j < tmpArr.length - i - 1; j++) {
                 // isAsc ? tmpArr[j] > tmpArr[j + 1] : tmpArr[j] < tmpArr[j]면 두 원소 교환
                 setSelectedColor(j, j + 1);
-                tmp$explanation = isAsc ? `${tmpArr[j]} > ${tmpArr[j + 1]}(이)면 두 원소를 교환합니다` :
+                tmpExplanation = isAsc ? `${tmpArr[j]} > ${tmpArr[j + 1]}(이)면 두 원소를 교환합니다` :
                                          `${tmpArr[j]} < ${tmpArr[j + 1]}(이)면 두 원소를 교환합니다`;
                 tmpCode = 1;
-                push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+                pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
 
                 if((isAsc && (tmpArr[j] > tmpArr[j + 1])) || (!isAsc && (tmpArr[j] < tmpArr[j + 1]))) {
                     // 두 원소 교환
                     isSorted = false;
                     [tmpArr[j], tmpArr[j + 1]] = [tmpArr[j + 1], tmpArr[j]];
-                    tmp$explanation = `${tmpArr[j]}과(와) ${tmpArr[j + 1]}을(를) 교환합니다`
+                    tmpExplanation = `${tmpArr[j]}과(와) ${tmpArr[j + 1]}을(를) 교환합니다`
                     tmpCode = 2;
-                    push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, j, j + 1, tmp$explanation, tmpCode);
+                    pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, j, j + 1, tmpExplanation, tmpCode);
                     setNormalColor(j);
                 }
                 else {
@@ -260,17 +260,17 @@
 
             // tmpArr.length - i - 1까지 정렬 완료
             setSortedColor(tmpArr.length - i - 1);
-            tmp$explanation = `index ${tmpArr.length - i - 1}까지 정렬이 완료되었습니다`;
+            tmpExplanation = `index ${tmpArr.length - i - 1}까지 정렬이 완료되었습니다`;
             tmpCode = 1000;
-            push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+            pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
         }
         
         // 정렬 완료
         initColor(tmpArr.length);
-        tmp$explanation = `배열의 정렬이 완료되었습니다.`
+        tmpExplanation = `배열의 정렬이 완료되었습니다.`
         tmpCode = 1000;
         tmpCode = 3;
-        push$animationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmp$explanation, tmpCode);
+        pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
     };
 
     const executeBubbleSortQuries = async (myAsync) => {
@@ -303,8 +303,8 @@
         const elementElements = document.querySelectorAll('.element');
         const indexElements = document.querySelectorAll('.index');
 
-        $explanation = $animationQuery[i].cur$explanation; // $explanation 수정
-        change$codeColor($animationQuery[i].curCode); // $codeColor 수정
+        $explanation = $animationQuery[i].curExplanation; // $explanation 수정
+        changeCodeColor($animationQuery[i].curCode); // $codeColor 수정
 
         // 색상 수정
         graphElements.forEach((element, idx) => {

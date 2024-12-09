@@ -73,7 +73,7 @@
         $animationStep = [0, 0]; 
     };
 
-    const change$codeColor = (idx) => {
+    const changeCodeColor = (idx) => {
         for(let i = 0; i < $codeColor.length; i++) {
             if(i == idx) {
                 $codeColor[i] = "rgb(80, 150, 80)";
