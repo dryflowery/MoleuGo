@@ -5,7 +5,10 @@
     import {isLogin } from "../lib/store"
     import { push } from "svelte-spa-router";
     import { onMount } from "svelte";
+    import { writable } from "svelte/store";
     import Template from "./visualization/Template.svelte";
+
+    
 
     let userName = ""; // 기존 유저 이름
     let isLengthValid = false; // 길이 판별
@@ -47,10 +50,27 @@
     let currentSetting = null; // 현재 설정 상태
     let showSettingBox = true; // 기본적으로 setting-box 표시
 
-    let currentHeight = 525;   // 기본 높이
-    let currentHeight_U = 247;   // 기본 높이
+    const scaleFactorStore = writable(1);
+
+    function updateScaleFactor() {
+    const width = window.innerWidth;
+    const isHighResolution = width >= 2560;
+    scaleFactorStore.set(isHighResolution ? 1.333 : 1);
+  }
+
+  updateScaleFactor();
+  window.addEventListener("resize", updateScaleFactor);
+
+  let scaleFactor;
+  scaleFactorStore.subscribe((value) => (scaleFactor = value));
+
+
+    let currentHeight = 525 * scaleFactor; // 기본 높이
+    let currentHeight_U = 224 * scaleFactor; // 기본 높이
 
     let showEmailInfo = false; // 설명 표시 여부
+
+    
     
 
     function checkOldPassword() {
@@ -180,35 +200,35 @@
       }
     }
 
-    // 높이와 애니메이션 상태 업데이트  
-    $: {
-    if (currentSetting === null) currentHeight = 525;
-    else if (currentSetting === "email") currentHeight = 490;
-    else if (currentSetting === "nickname") currentHeight = 580;
-    else if (currentSetting === "password") currentHeight = 720;
-
+  $: {
+    // currentHeight와 같은 동적 높이 업데이트도 고려
+    if (currentSetting === null) currentHeight = 525 * scaleFactor;
+    else if (currentSetting === "email") currentHeight = 490 * scaleFactor;
+    else if (currentSetting === "nickname") currentHeight = 580 * scaleFactor;
+    else if (currentSetting === "password") currentHeight = 720 * scaleFactor;
   }
 
   $: {  // 컬랙션 컨테이너 높이와 애니메이션 상태 업데이트 
-    if (currentSetting === null) currentHeight_U = 224;
-    else if (currentSetting === "email") currentHeight_U = 257;
-    else if (currentSetting === "nickname") currentHeight_U = 169;
-    else if (currentSetting === "password") currentHeight_U = 27;
+    if (currentSetting === null) currentHeight_U = 224 * scaleFactor;
+    else if (currentSetting === "email") currentHeight_U = 257 * scaleFactor;
+    else if (currentSetting === "nickname") currentHeight_U = 169 * scaleFactor;
+    else if (currentSetting === "password") currentHeight_U = 27 * scaleFactor;
 
   }
 
-  let roadMap_h = 50;
-  let activity_h = 700;
+  let roadMap_h = 50 * scaleFactor;
+  let activity_h = 700 * scaleFactor;
 
   let isRoadMapVisible = false;
 
+
   $: {
     if (isRoadMapVisible) {
-      roadMap_h = 710;
-      activity_h = 40;
+      roadMap_h = 710 * scaleFactor;
+      activity_h = 40 * scaleFactor;
     } else {
-      roadMap_h = 50;
-      activity_h = 700;
+      roadMap_h = 50 * scaleFactor;
+      activity_h = 700 * scaleFactor;
     }
   }
 
@@ -224,14 +244,14 @@
     <Header />
   </div>
   
-  <div class="main-container" style="transform: translateX({$isListVisible ? 360 : 155}px); margin-right: {$isListVisible ? 360: 155}px; "> <!--알고리즘 리스트 유무에 따른 위치,크기 조절-->
+  <div class="main-container" style="transform: translateX({$isListVisible ? 400 : 0}px); margin-right: {$isListVisible ? 400: 0}px; "> <!--알고리즘 리스트 유무에 따른 위치,크기 조절-->
      
     <div class="content">
 
       <div class="left-content ">
         
         <div id="profile-box" 
-            style="height: {currentHeight}px; transition: height 0.3s ease; overflow: hidden;">
+            style="height: {currentHeight}px; transition: height 0.3s ease;">
 
           <div id="profile-top-container">
             <span id='profile-title'>내 프로필</span>
@@ -529,11 +549,15 @@
    transition: transform 0.5s ease, margin 0.5s ease;
    justify-content: center;
    overflow: hidden;
+   display: flex; /* 추가 */
+   align-items: center; /* 추가 */
+   justify-content: center; /* 추가 */
+   
   }
   
  .content {
    display:grid;
-   grid-template-columns: 620px 1fr;
+   grid-template-columns: 1fr 1.9fr;
   }
 
   .left-container  {
@@ -548,7 +572,7 @@
  #profile-box {
    display: grid;
    grid-template-rows: 270px 1fr;
-   margin: 0px 0px 0px 200px;
+   margin: 0px 0px 0px 0px;
    padding: 20px 0px 0px 0px;
    width: 400px;
    height: 520px;
@@ -577,7 +601,7 @@
   #left-under-box {
    display: grid;
    grid-template-rows: 270px 1fr;
-   margin: 20px 0px 0px 200px;
+   margin: 20px 0px 0px 0px;
    padding: 20px 0px 0px 20px;
    width: 400px;
    height: 224px;
@@ -1073,6 +1097,46 @@
    box-sizing: border-box;
    padding: 0px;
   }
+
+  @media screen and (min-width: 2560px)  {
+    .main-container {
+      transform: scale(1.333); /* 모든 요소를 1.333배 확대 */
+      transform-origin: top left; /* 왼쪽 상단 기준 확대 */
+    }
+
+    #profile-box {
+      width: 533px; /* 400px x 1.333 */
+      height: 700px; /* 525px x 1.333 */
+    }
+
+    #activity-box {
+      width: 1066px; /* 800px x 1.333 */
+      height: 933px; /* 700px x 1.333 */
+    }
+
+    #left-under-box {
+      width: 533px; /* 400px x 1.333 */
+      height: 298px; /* 224px x 1.333 */
+    }
+
+    #lawn-box {
+      height: 266px; /* 200px x 1.333 */
+      width: 933px; /* 700px x 1.333 */
+    }
+
+    #wrote-box, #comment-box {
+      width: 444px; /* 333px x 1.333 */
+      height: 266px; /* 200px x 1.333 */
+    }
+
+    .roadMap {
+      width: 1066px; /* 800px x 1.333 */
+      height: 67px; /* 50px x 1.333 */
+    }
+
+    
+  }
+  
 
 </style>
   
