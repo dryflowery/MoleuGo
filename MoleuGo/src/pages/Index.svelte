@@ -5,7 +5,7 @@
     import { onMount } from "svelte";
     import { isListVisible } from "../lib/store";
 
-    onMount(() => $isListVisible = false)
+    onMount(() => $isListVisible = false);
 </script>
   
 <main>
@@ -16,23 +16,22 @@
     </div>
 
     <div class="main-container" class:index-list-visible={$isListVisible} class:index-list-invisible={!$isListVisible}>
-        <div id="main-left-container">
+        <div id="index-txt-container">
             <div id="main-title">알고리즘의 시각화를 경험해보세요</div>
             <div id="sub-title">궁금한 알고리즘 검색하기</div>
             <input type="text" placeholder="Search algorithms...">
-    
+
             <div>
                 <button id="learn-more-btn" on:click={()=> push('/main')}> 더 알아보기</button>
                 <!-- 임시로 추가. 나중에 삭제 -->
                 <button id="search-start-btn">검색</button> 
             </div>
+    
         </div>
-     
-        <div id="main-right-container">
-             <div id="algo-gif-container">
-                <!-- <img src="assets/algoGif.gif" alt="visualized algorithm" id="algo-gif"> -->
-                 <video src="assets/algoGif.mp4" width="800px" height="500px" autoplay muted loop></video>
-             </div>
+
+        <div id="algo-gif-container">
+            <!-- <img src="assets/algoGif.gif" alt="visualized algorithm" id="algo-gif"> -->
+            <video src="assets/algoGif.mp4" width="800px" height="500px" autoplay muted loop></video>
         </div>
     </div>
 
@@ -44,12 +43,9 @@
   
 <style>
     .main-container {
-        display: grid;
-        grid-template-columns: 1030px auto;
-    }
-
-    #main-left-container {
-        padding: 280px 0px 0px 120px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     #main-title {
@@ -63,7 +59,7 @@
         color: #dedede;
     }
 
-    #main-left-container input[type="text"] {
+    .main-container input[type="text"] {
         padding: 10px;
         margin-top: 20px;
         border-radius: 5px;
@@ -75,7 +71,7 @@
         color: #FFFFFF;
     }
 
-    #main-left-container button {
+    .main-container button {
         padding: 10px 20px;
         margin: 20px 10px 0px 0px;
         border-radius: 5px;
@@ -104,12 +100,12 @@
 
     #algo-gif-container {
         background-color: #dcddde;
-        margin-top: 150px;
         border-radius: 10px;
         width: 800px;
         height: 500px;
         display: flex;
         justify-content: center;
         align-items: center;
+        margin-left: 50px
     }
 </style>

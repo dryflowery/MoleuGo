@@ -70,7 +70,7 @@ main {
 .visualization-vertical-line {
   position: absolute;
   top: 0;
-  left: 1500px;
+  left: 78vw;
   height: calc(100vh - 70px); 
   width: 1px; 
   background-color: #414852; 
