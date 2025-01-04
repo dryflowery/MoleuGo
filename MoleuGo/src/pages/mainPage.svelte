@@ -17,7 +17,7 @@
     <Header />
   </div>
 
-  <div class="main-container" style="transform: translateX({$isListVisible ? 400 : 200}px); margin-right: {$isListVisible ? 400: 200}px; "> <!--알고리즘 리스트 유무에 따른 위치,크기 조절-->
+  <div class="main-container" style="transform: translateX({$isListVisible ? 400 : 0}px); margin-right: {$isListVisible ? 400: 0}px; "> <!--알고리즘 리스트 유무에 따른 위치,크기 조절-->
     <div class="content">
 
       <div id="dailyGoal"> <!--일일 목표 -->
@@ -104,6 +104,12 @@
         </div>
       </div>
 
+      <div id="additional-content"> <!--커뮤니티 -->
+        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;">추가 컨텐츠 박스</t>
+        <div id="additional-content-box" style="margin-top: 5px;">안녕하세요</div>
+      </div>
+      
+
     </div>
   </div>
 
@@ -121,18 +127,23 @@
   }
 
   .main-container {
-    color: white;
-    transition: transform 0.5s ease, margin 0.5s ease;
+    display: flex;
     justify-content: center;
+    height: 100%;
+    transition: transform 0.5s ease, margin 0.5s ease;
+    color: white;
+    margin-top: 30px;
+    
   }
 
   .content {
     display: grid;
     grid-column: 2;
-    grid-template-columns: 115px 456px 456px 1fr auto;
-    grid-template-rows: 350px 1fr;
+    grid-template-columns: 0px 456px 456px 1fr auto;
+    grid-template-rows: 350px 415px 1fr;
     column-gap: 35px;
     row-gap: 6px;
+  
   }
 
 
@@ -161,7 +172,7 @@
     width: 450px;
     height: 310px;
     background-color: #15231c;
-    border: 3px solid #4a7744;
+    border: 1px solid #4a7744;
     border-radius: 8px;
     box-sizing: border-box;
     padding: 10px;
@@ -181,7 +192,7 @@
     width: 450px;
     height: 310px;
     background-color: #151b23;
-    border: 3px solid #3d444d;
+    border: 1px solid #3d444d;
     border-radius: 8px;
     padding: 10px;
   }
@@ -197,7 +208,7 @@
     width: 450px;
     height: 370px;
     background-color: #151b23;
-    border: 3px solid #3d444d;
+    border: 1px solid #3d444d;
     border-radius: 8px;
     padding: 10px;
     display: grid;
@@ -230,7 +241,7 @@
     width: 450px;
     height: 372px;
     background-color: #151b23;
-    border: 3px solid #3d444d;
+    border: 1px solid #3d444d;
     border-radius: 8px;
     box-sizing: border-box;
     padding: 10px;
@@ -251,7 +262,7 @@
     height: 728px;
 
     background-color: #151b23;
-    border: 3px solid #3d444d;
+    border: 1px solid #3d444d;
     border-radius: 8px;
     box-sizing: border-box;
     padding: 10px;
@@ -272,6 +283,31 @@
   #locked {
     pointer-events: none;
     user-select: none;
+  }
+  
+  @media (min-width: 2560px) {
+    #additional-content-box {
+      box-sizing: border-box;
+      width: 1184px;
+      height: 300px;
+      background-color: #151b23;
+      border: 1px solid #3d444d;
+      border-radius: 8px;
+      padding: 10px;
+      display: grid;
+      grid-template-rows: 50px 335px;
+    }
+
+    #additional-content {
+      grid-column: 2;
+      grid-row: 3;
+    }
+  }
+
+  @media (max-width: 2500px) {
+    #additional-content {
+      display: none;
+    }
   }
 
 </style>
