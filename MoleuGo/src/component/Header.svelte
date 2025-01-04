@@ -22,32 +22,31 @@
         <LoginPopup/>
     {/if}
     
-    <div id="menu-toggle-container">
+    <span id="header-left-container">
         <div id="menu-circle" on:click={setAlgorithmListVisible}>
             <img src="assets/menu.png" alt="" id="menu-toggle-icon">
         </div>
-    </div>
 
-    <div id="site-icon-container">
         <div id="site-icon"></div>
-    </div>
 
-    <div id="site-name-container">
-        <div id="site-name" on:click={() => push('/')}>MoleuGo</div>
-    </div>
+        <div id="site-name" style="padding-left: 10px;" on:click={() => push('/')}>MoleuGo</div>
+    </span>
 
-    <!-- 로그인, 비로그인 다르게 표시(백엔드) -->
-    <div id="sign-in-container">
+    <div id="header-right-container">
+        <!-- 로그인, 비로그인 다르게 표시(백엔드) -->
         <button id="sign-in-btn" class="sign-btn" on:click={openLoginPopup}>로그인</button>
-    </div>
-
-    <div id="sign-up-container">
         <button id="sign-up-btn" class="sign-btn" on:click={() => push('/signup')}>회원가입</button>
+        <!-- 로그인, 비로그인 다르게 표시(백엔드) -->
     </div>
-    <!-- 로그인, 비로그인 다르게 표시(백엔드) -->
 </main>
 
-<style>
+<style> 
+    main, #header-left-container, #header-right-container, #menu-circle {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
     main {
         height: 70px;
         display: flex;
@@ -55,14 +54,18 @@
         background-color: #000000;
     }
 
-    #menu-toggle-container {
-        padding: 11px 0px 0px 15px;
+    #header-left-container {
+        position: absolute;
+        left: 10px;
+        gap: 5px;
+    }
+
+    #header-right-container {
+        position: absolute;
+        right: 10px;
     }
 
     #menu-circle {
-        display: flex;
-        justify-content: center;
-        align-items: center;
         border-radius: 50%;
         width: 50px;
         height: 50px;
@@ -87,10 +90,6 @@
         left: 0; 
     }
 
-    #site-icon-container {
-        padding: 14px 0px 0px 15px;
-    }
-
     #site-icon {
         width: 35px;
         height: 35px;
@@ -98,10 +97,6 @@
         border: 5px solid #3d444d;
         background-color: #8d8d8d;
         cursor: pointer;
-    }
-
-    #site-name-container {
-        padding: 28px 0px 0px 10px;
     }
 
     #site-name {
@@ -126,18 +121,10 @@
         color: #cccccc;
     }
 
-    #sign-in-container {
-        padding: 15px 0px 0px 1480px;
-    }
-
     #sign-in-btn {
         padding: 12px 20px;
         background-color: transparent;
         border: none;
-    }
-
-    #sign-up-container {
-        padding: 15px 0px 0px 10px;
     }
 
     #sign-up-btn {
