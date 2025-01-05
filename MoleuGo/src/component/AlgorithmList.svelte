@@ -200,7 +200,8 @@
         width: 400px;
         background-color: #181a1e;
         border-right: 1px solid #3d444d;
-        overflow: hidden;
+        display: flex; /* Flexbox 사용 */
+        flex-direction: column; /* 세로로 정렬 */
     }
 
     #algo-list-header-container {
@@ -216,8 +217,8 @@
     }
 
     #algo-search-container {
-        margin-top: -10px;
-        height: 10px;
+        margin: 10px 0px;
+        display: flex;
         display: flex;
     }
 
@@ -250,15 +251,14 @@
     }
 
     #algorithm-list {
-        margin-top: -670px;
-        height: 680px;
-        padding-left: 25px; 
+        flex: 1; /* 남은 공간을 채우도록 설정 */
+        padding-left: 25px;
         border-radius: 5px;
         color: #333;
         font-size: 1rem;
         overflow-y: auto; 
         overflow-x: hidden; 
-        scrollbar-width: none; 
+        scrollbar-width: none;
         
     }
 
