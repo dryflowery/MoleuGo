@@ -306,7 +306,6 @@
         background-color: #FFFFFF;
         height: 78vh;
         width: 73vw;
-        margin-left: 49.5px;
         border: 5px solid #313131;
         border-radius: 20px;
         display: flex;
