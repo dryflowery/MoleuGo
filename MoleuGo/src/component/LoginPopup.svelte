@@ -62,7 +62,7 @@
         width: 400px;
         height: 500px;
         padding: 20px;
-        border: 2px solid #3d444d;
+        border: 2px solid #1e2024;
         border-radius: 10px;
         color: #FFFFFF;
         background-color: #151515;
@@ -94,7 +94,7 @@
         width: 250px;
         padding: 10px;
         margin-bottom: 10px;
-        border: 2px solid #3d444d;
+        border: 1px solid #3d444d;
         border-radius: 5px;
         color: #FFFFFF;
         background-color: #152321;
