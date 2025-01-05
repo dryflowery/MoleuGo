@@ -952,7 +952,7 @@
             </div>
  
             <div class="canvas">
-                <svg id="svg" width="1400" height="729" style="position: absolute; left: 0; top: 0; overflow: hidden"></svg>
+                <svg id="svg" width="75vw" height="82vh" style="position: absolute; left: 0; top: 0; overflow: hidden"></svg>
                 
                 <!-- canvas안에 자료구조, 알고리즘 구현 -->
                 <div class="grid">
@@ -1054,20 +1054,23 @@
 
     .main-container {
         display: grid;
-        grid-template-columns: 1500px auto;
+        grid-template-columns: 78vw auto;
         align-items: center;
     }
 
     .main-left-container {
         display: grid;
         grid-template-rows: 50px 1fr 60px;
+        justify-content: center;
+        align-items: center;
     }
 
     .main-right-container {
         display: grid;
-        grid-template-rows: 200px 649px;
-        background-color: #0d0e0f;
+        grid-template-rows: 19vh 68vh;
         font-size: 0.8rem;
+        justify-content: center;
+        align-items: center;
     }
     
     .grid {
