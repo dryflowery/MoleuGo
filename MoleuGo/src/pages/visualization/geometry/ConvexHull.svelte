@@ -366,6 +366,12 @@
     };
 
     const drawConvexHullAnimation = async (queryNum, myAsync) => {
+        const canvasElement = document.querySelector('.canvas');
+        const canvasRect = canvasElement.getBoundingClientRect();
+
+        const svgElement = document.getElementById("svg");
+        const svgRect = svgElement.getBoundingClientRect();
+
         // point 속성 변경 함수
         const changePointColor = (pointNum, border, color, opacity) => {
             pointElements[pointsInfo[pointNum].pointElementsIdx].style.border = border;
@@ -376,14 +382,13 @@
         // start에서 end로 간선 연결
         const connectEdge = (start, end) => {
             let startRect = pointElements[pointsInfo[start].pointElementsIdx].getBoundingClientRect();
-            let startX = startRect.left + (startRect.width / 2) - 54.5; 
-            let startY = startRect.top + (startRect.height / 2) - 125; 
+            let startX = startRect.left + (startRect.width / 2) - svgRect.left; 
+            let startY = startRect.top + (startRect.height / 2) - svgRect.top; 
 
             let endRect = pointElements[pointsInfo[end].pointElementsIdx].getBoundingClientRect();
-            let endX = endRect.left + (endRect.width / 2) - 54.5; 
-            let endY = endRect.top + (endRect.height / 2) - 125; 
+            let endX = endRect.left + (endRect.width / 2) - svgRect.left; 
+            let endY = endRect.top + (endRect.height / 2) - svgRect.top; 
 
-            const svg = document.getElementById("svg");
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 
             path.setAttribute('d', `M${startX},${startY} L${endX},${endY}`);
@@ -391,7 +396,7 @@
             path.setAttribute("stroke-width", "3");
             path.setAttribute("fill", "none");
             path.setAttribute("id", `path_${end}`);
-            svg.appendChild(path);
+            svgElement.appendChild(path);
 
             const pathLength = path.getTotalLength();
 
@@ -464,8 +469,6 @@
                 element.style.height = "50px";
                 element.style.backgroundColor = "#FFFFFF";
                 element.style.color = "#000000";
-                element.style.marginLeft = "75px";
-                element.style.marginTop = "-25px";
                 element.style.transform = "scale(1)";
                 element.style.border = "5px solid #000000";
                 element.style.transition = `transform ${(1 / $animationSpeed)}s ease, width ${(1 / $animationSpeed)}s ease, height ${(1 / $animationSpeed)}s ease`;
@@ -475,19 +478,19 @@
         };
 
         // 가로줄 그리는 함수
-        const drawRowLine = async (svg, canvasRect, startY, dist, queryNum) => {
+        const drawRowLine = async (startY, dist, queryNum) => {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.setAttribute('d', `M${canvasRect.left - 54.5},${canvasRect.top - 125 + dist} L${canvasRect.right - 54.5},${canvasRect.top - 125 + dist}`);
+            path.setAttribute('d', `M${canvasRect.left - svgRect.left},${canvasRect.top - svgRect.top + dist} L${canvasRect.right},${canvasRect.top - svgRect.top + dist}`);
             path.setAttribute("stroke", "black");
             path.setAttribute("stroke-width", "3");
             path.setAttribute("id", "rowLine")
-            svg.appendChild(path);
+            svgElement.appendChild(path);
 
             if($fromBtn) {
                 return;
             }
 
-            if(Math.abs(startY - (canvasRect.top - 125 + dist)) <= Math.min(10, $animationSpeed)) {
+            if(Math.abs(startY - (canvasRect.top + dist)) <= Math.min(10, $animationSpeed)) {
                 return true;
             }
 
@@ -510,20 +513,20 @@
         };
 
         // 세로줄 그리는 함수
-        const drawColLine = async (svg, canvasRect, startX, dist, queryNum) => {
+        const drawColLine = async (startX, dist, queryNum) => {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.setAttribute('d', `M${canvasRect.left - 54.5 + dist},${canvasRect.top - 125} L${canvasRect.left - 54.5 + dist},${canvasRect.bottom - 125}`);
+            path.setAttribute('d', `M${canvasRect.left - svgRect.left + dist},${canvasRect.top - svgRect.top} L${canvasRect.left - svgRect.left + dist},${canvasRect.bottom}`);
             path.setAttribute("stroke", "black");
             path.setAttribute("stroke-width", "3");
             path.setAttribute("id", "colLine")
 
-            svg.appendChild(path);
+            svgElement.appendChild(path);
 
             if($fromBtn) {
                 return;
             }
 
-            if(Math.abs(startX - (canvasRect.left - 54.5 + dist)) <= Math.min(10, $animationSpeed)) {
+            if(Math.abs(startX - (canvasRect.left + dist)) <= Math.min(10, $animationSpeed)) {
                 return true;
             }
 
@@ -567,7 +570,6 @@
 
             // 원래 위치에서 visibility만 hidden으로 바꾸고 point 그리기
             gridElements.forEach(element => {
-                element.style.margin = "50px 0px 0px 200px";
                 element.style.transform = "scale(1)";
                 element.style.visibility = "hidden";
             });
@@ -614,13 +616,9 @@
             changeCodeColor($animationQuery[queryNum].curCode); 
 
             let firstRect = pointElements[pointsInfo[0].pointElementsIdx].getBoundingClientRect();
-            let firstX = firstRect.left + (firstRect.width / 2) - 54.5; 
-            let firstY = firstRect.top + (firstRect.height / 2) - 125; 
+            let firstX = firstRect.left + (firstRect.width / 2); 
+            let firstY = firstRect.top + (firstRect.height / 2); 
             let dist = 0;
-
-            const svg = document.getElementById("svg");
-            const canvasElement = document.querySelector('.canvas');
-            const canvasRect = canvasElement.getBoundingClientRect();
 
             // 버튼을 사용해서 재생하는 경우
             if($fromBtn) { 
@@ -629,8 +627,8 @@
                 pointsNum[pointsInfo[0].pointsNumIdx] = 0;
 
                 // 0번 점에 가로줄, 세로줄 추가
-                drawRowLine(svg, canvasRect, firstY, firstY - canvasRect.top + 125);
-                drawColLine(svg, canvasRect, firstX, firstX - canvasRect.left + 54.5);
+                drawRowLine(firstY, firstY - canvasRect.top);
+                drawColLine(firstX, firstX - canvasRect.left);
 
                 $isPaused = true;
                 $fromBtn = false;
@@ -643,7 +641,7 @@
                     return;
                 }
 
-                if(((myAsync + 1) != $asyncCnt) || (await drawRowLine(svg, canvasRect, firstY, dist, queryNum) === true)) {
+                if(((myAsync + 1) != $asyncCnt) || (await drawRowLine(firstY, dist, queryNum) === true)) {
                     break;
                 }
 
@@ -658,7 +656,7 @@
                     return;
                 }
 
-                if(((myAsync + 1) != $asyncCnt) || (await drawColLine(svg, canvasRect, firstX, dist, queryNum) === true)) {
+                if(((myAsync + 1) != $asyncCnt) || (await drawColLine(firstX, dist, queryNum) === true)) {
                     break;
                 }
 
@@ -674,6 +672,8 @@
             // 반시계 방향으로 이동하는 선 그리는 함수
             const drawSemiCircleLine = async (startX, startY, queryNum) => {
                 let radian = (Math.PI / 180) * angle;
+                startX -= svgRect.left;
+                startY -= svgRect.top;
                 let endX = startX + 1200 * Math.cos(radian);
                 let endY = startY - 1200 * Math.sin(radian);
 
@@ -697,7 +697,7 @@
                     path.setAttribute("stroke-width", "3");
                     path.setAttribute("fill", "none");
                     path.setAttribute("id", "semiCircle");
-                    svg.appendChild(path);
+                    svgElement.appendChild(path);
 
                     $isPaused = true;
                     $fromBtn = false;
@@ -710,7 +710,7 @@
                 path.setAttribute("stroke-width", "3");
                 path.setAttribute("fill", "none");
                 path.setAttribute("id", "semiCircle");
-                svg.appendChild(path);
+                svgElement.appendChild(path);
 
                 angle += Math.min(0.1 * $animationSpeed, 1);
 
@@ -744,8 +744,8 @@
             // 점 중심에 선이 닿으면 해당 점의 번호를 표시하는 함수
             const isPositionOnLine = (startX, startY, endX, endY) => {
                 let rect = pointElements[pointsInfo[pointNum].pointElementsIdx].getBoundingClientRect();
-                let curX = rect.left + (rect.width / 2) - 54.5; 
-                let curY = rect.top + (rect.height / 2) - 125; 
+                let curX = rect.left + (rect.width / 2) - svgRect.left; 
+                let curY = rect.top + (rect.height / 2) - svgRect.top; 
 
                 if(Math.abs((endX - startX) * (curY - startY) - (endY - startY) * (curX - startX)) <= Math.min(10000, 1000 * $animationSpeed)) {
                     pointsNum[pointsInfo[pointNum].pointsNumIdx] = pointNum++;
@@ -758,10 +758,9 @@
             $explanation = $animationQuery[queryNum].curExplanation; 
             changeCodeColor($animationQuery[queryNum].curCode); 
 
-            const svg = document.getElementById("svg");
             let firstRect = pointElements[pointsInfo[0].pointElementsIdx].getBoundingClientRect();
-            let firstX = firstRect.left + (firstRect.width / 2) - 54.5; 
-            let firstY = firstRect.top + (firstRect.height / 2) - 125; 
+            let firstX = firstRect.left + (firstRect.width / 2); 
+            let firstY = firstRect.top + (firstRect.height / 2); 
 
             let angle = 0; // 초기 각도
             let pointNum = 1; // 번호를 부여할 점의 번호
@@ -776,11 +775,8 @@
                 drawSemiCircleLine(firstX, firstY, queryNum);
 
                 // 0번 점에 가로 줄, 세로 줄 추가
-                const canvasElement = document.querySelector('.canvas');
-                const canvasRect = canvasElement.getBoundingClientRect();
-
-                drawRowLine(svg, canvasRect, firstY, firstY - canvasRect.top + 125);
-                drawColLine(svg, canvasRect, firstX, firstX - canvasRect.left + 54.5);
+                drawRowLine(firstY, firstY - canvasRect.top);
+                drawColLine(firstX, firstX - canvasRect.left);
 
                 $fromBtn = false;
                 $isPaused = true;
@@ -952,7 +948,7 @@
             </div>
  
             <div class="canvas">
-                <svg id="svg" width="75vw" height="82vh" style="position: absolute; left: 0; top: 0; overflow: hidden"></svg>
+                <svg id="svg" style="position: absolute; left: 0; top: 0; overflow: hidden"></svg>
                 
                 <!-- canvas안에 자료구조, 알고리즘 구현 -->
                 <div class="grid">
@@ -1073,6 +1069,13 @@
         align-items: center;
     }
     
+    .canvas {
+        display: flex;
+        justify-content: center;  
+        align-items: center;     
+        position: relative;       
+    }
+
     .grid {
         display: grid;
         grid-template-rows: repeat(6, 100px); 
@@ -1082,7 +1085,6 @@
         height: 650px;
         border-left: 2px solid #000000;
         border-bottom: 2px solid #000000;
-        margin: 25px 0px 0px 250px;
         position: relative; 
     }
 
@@ -1145,8 +1147,8 @@
     #svg {
         z-index: 0; /* SVG를 가장 뒤로 이동 */
         pointer-events: none; /* 클릭 이벤트를 SVG 아래 요소로 전달 */
-        margin-left: 54.5px;
-        margin-top: 55px;
+        width: 100%;
+        height: 100%;
     }
 
     input:disabled {
