@@ -124,12 +124,13 @@
   main {
     height: 100vh;
     align-items: center;
+    overflow: hidden;
   }
 
   .main-container {
     display: flex;
     justify-content: center;
-    height: 100%;
+    height: calc(100vh - 150px);
     transition: transform 0.5s ease, margin 0.5s ease;
     color: white;
     margin-top: 30px;
@@ -138,12 +139,39 @@
 
   .content {
     display: grid;
-    grid-column: 2;
     grid-template-columns: 0px 456px 456px 1fr auto;
     grid-template-rows: 350px 415px 1fr;
     column-gap: 35px;
     row-gap: 6px;
-  
+    overflow-y: hidden; /* 기본적으로 스크롤바 숨김 */
+    overflow-x: hidden; /* 가로 스크롤 방지 */
+    height: 100%;
+    scrollbar-gutter: stable; /* 스크롤바 공간을 고정 */
+  }
+
+  /* 마우스 올렸을 때 세로 스크롤바 표시 */
+  .content:hover {
+    overflow-y: auto; /* 세로 스크롤바 활성화 */
+  }
+
+  /* 스크롤바 스타일 */
+  .content::-webkit-scrollbar {
+    width: 8px; /* 스크롤바 너비 */
+  }
+
+  .content::-webkit-scrollbar-thumb {
+    background-color: #474747; /* 스크롤바 색상 */
+    border-radius: 4px;
+  }
+
+  .content::-webkit-scrollbar-track {
+    background-color: #242424; /* 스크롤바 배경 */
+  }
+
+  /* 스크롤바 오버레이 (선택 사항, 최신 브라우저) */
+  .content {
+    scrollbar-width: thin; /* Firefox용 */
+    scrollbar-color: #474747 #242424; /* 스크롤바 및 트랙 색상 */
   }
 
 
@@ -284,9 +312,8 @@
     pointer-events: none;
     user-select: none;
   }
-  
-  @media (min-width: 2560px) {
-    #additional-content-box {
+
+  #additional-content-box {
       box-sizing: border-box;
       width: 1184px;
       height: 300px;
@@ -296,18 +323,23 @@
       padding: 10px;
       display: grid;
       grid-template-rows: 50px 335px;
-    }
-
-    #additional-content {
-      grid-column: 2;
-      grid-row: 3;
-    }
+  }
+  
+  #additional-content-box {
+    box-sizing: border-box;
+    width: 1184px;
+    height: 300px;
+    background-color: #151b23;
+    border: 1px solid #3d444d;
+    border-radius: 8px;
+    padding: 10px;
+    display: grid;
+    grid-template-rows: 50px 335px;
   }
 
-  @media (max-width: 2500px) {
-    #additional-content {
-      display: none;
-    }
+  #additional-content {
+    grid-column: 2;
+    grid-row: 3;
   }
 
 </style>

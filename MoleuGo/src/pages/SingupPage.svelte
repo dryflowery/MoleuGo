@@ -259,7 +259,6 @@
 	/* 헤더 스타일 */
 	.header {
 	  margin-bottom: 20px;
-	  margin-top: 50px;
 	}
 	.logo {
 	  font-size: 2rem;
@@ -437,6 +436,15 @@
   .toggle-password-btn:hover,   
   .toggle-password-btn2:hover {
     color: #9c9c9c;
+  }
+
+  @media (min-width: 2560px) {
+
+	.header {
+	  margin-bottom: 20px;
+	  margin-top: 130px;
+	}
+
   }
 
 </style>
