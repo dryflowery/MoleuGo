@@ -200,21 +200,29 @@
       }
     }
 
-  $: {
-    // currentHeight와 같은 동적 높이 업데이트도 고려
-    if (currentSetting === null) currentHeight = 525 * scaleFactor;
-    else if (currentSetting === "email") currentHeight = 490 * scaleFactor;
-    else if (currentSetting === "nickname") currentHeight = 580 * scaleFactor;
-    else if (currentSetting === "password") currentHeight = 720 * scaleFactor;
-  }
+    $: {
+      const isHighResolution = window.innerWidth >= 2560; // 화면 너비 체크
+      if (!isHighResolution) { // 2560 이상이면 적용하지 않음
+        if (currentSetting === null) currentHeight = 525 * scaleFactor;
+        else if (currentSetting === "email") currentHeight = 490 * scaleFactor;
+        else if (currentSetting === "nickname") currentHeight = 580 * scaleFactor;
+        else if (currentSetting === "password") currentHeight = 720 * scaleFactor;
+      } else {
+        currentHeight = 525* scaleFactor; // 고정 높이
+      }
+    }
 
-  $: {  // 컬랙션 컨테이너 높이와 애니메이션 상태 업데이트 
-    if (currentSetting === null) currentHeight_U = 224 * scaleFactor;
-    else if (currentSetting === "email") currentHeight_U = 257 * scaleFactor;
-    else if (currentSetting === "nickname") currentHeight_U = 169 * scaleFactor;
-    else if (currentSetting === "password") currentHeight_U = 27 * scaleFactor;
-
-  }
+    $: {
+      const isHighResolution = window.innerWidth >= 2560; // 화면 너비 체크
+      if (!isHighResolution) { // 2560 이상이면 적용하지 않음
+        if (currentSetting === null) currentHeight_U = 224 * scaleFactor;
+        else if (currentSetting === "email") currentHeight_U = 257 * scaleFactor;
+        else if (currentSetting === "nickname") currentHeight_U = 169 * scaleFactor;
+        else if (currentSetting === "password") currentHeight_U = 27 * scaleFactor;
+      } else {
+        currentHeight_U = 224* scaleFactor; // 고정 높이
+      }
+    }
 
   let roadMap_h = 50 * scaleFactor;
   let activity_h = 700 * scaleFactor;
@@ -270,7 +278,7 @@
                 <div id="email-setting">
                   <div id="email-title"> 이메일 </div>
                   <div id="email-icon" on:mouseover={() => (showEmailInfo = true)} on:mouseout={() => (showEmailInfo = false)}>
-                    <ion-icon name="activity-circle-outline"></ion-icon>
+                    <ion-icon name="mail-outline"></ion-icon>
                     {#if showEmailInfo}
                     <div class="tooltip">이메일 인증이 필요합니다.</div>
                     {/if}
@@ -688,9 +696,10 @@
   }
 
   #email-setting, #nickname-setting, #password-setting {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
   }
 
   #nickname-title, #password-title {
@@ -1107,6 +1116,55 @@
     #profile-box {
       width: 533px; /* 400px x 1.333 */
       height: 700px; /* 525px x 1.333 */
+      
+    }
+
+    #profile-image {
+      width: 175px;
+      height: 175px;
+      border: 1px solid #949494;
+      background-color: rgb(88, 88, 88);
+      margin: 10px 0px 0px 175px;
+    }
+
+    #nickName {
+      margin: 15px 0px 0px 200px;
+    }
+
+    #email-setting, #nickname-setting, #password-setting {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between; /* 요소 간의 간격을 유지 */
+      width: 100%; /* 부모의 너비에 맞게 확장 */
+    }
+
+    #nickname-title, #password-title {
+      flex: 0 0 105px; /* 제목 영역은 15% 크기로 설정 */
+    }
+
+    #email-title {
+      flex: 0 0 50px; /* 제목 영역은 15% 크기로 설정 */
+    }
+
+    #nickname-output, #password-output {
+      flex: 1; /* 출력 영역이 남은 공간을 차지 */
+    }
+
+    #email-btn, #nickname-btn, #password-btn {
+      flex: 0 0 70px; /* 버튼 영역은 10% 크기로 설정 */
+      margin-right: 15px;
+    }
+
+    #email-icon {
+      flex: 0 0 55px; /* 아이콘 크기 고정 */
+      position: relative;
+      cursor: pointer;
+    }
+
+    #email-output {
+      flex: 1; /* 출력 영역이 남은 공간을 차지 */
+      text-align: left; /* 텍스트 정렬 */
     }
 
     #activity-box {
@@ -1134,8 +1192,45 @@
       height: 67px; /* 50px x 1.333 */
     }
 
+    #change-userName input[type="text"] {
+      width: 470px;
+    }
+
+    #btn-container {
+      margin: 25px 0px 0px 328px;
+    }
+
+    #email-input input[type="text"] {
+      width: 470px;
+    }
+
+    #email-btn-group {
+      margin: 15px 0px 0px 328px;
+    }
+
+    .password-container input {
+      width: 470px;
+    }
+
+    .password-container_2 input, .password-container_3 input {
+      width: 470px;
+    }
+
+    #password-btn-group {
+      margin-top: 20px;
+      margin-left: 236px;
+    }
+
+    #password-search-Btn {
+      margin: 0px 0px 0px 0px;
+
+    }
+
+    
+
     
   }
+  
   
 
 </style>
