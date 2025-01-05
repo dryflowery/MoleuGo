@@ -282,27 +282,30 @@
 
     .main-container {
         display: grid;
-        grid-template-columns: 1500px auto;
+        grid-template-columns: 78vw auto;
         align-items: center;
     }
 
     .main-left-container {
         display: grid;
         grid-template-rows: 50px 1fr 60px;
+        justify-content: center;
+        align-items: center;
     }
 
     .main-right-container {
         display: grid;
-        grid-template-rows: 200px 649px;
-        background-color: #0d0e0f;
+        grid-template-rows: 19vh 68vh;
         font-size: 0.8rem;
+        justify-content: center;
+        align-items: center;
     }
 
     .canvas {
         position: relative;
         background-color: #FFFFFF;
-        height: 729px;
-        width: 1400px;
+        height: 78vh;
+        width: 73vw;
         margin-left: 49.5px;
         border: 5px solid #313131;
         border-radius: 20px;
@@ -387,6 +390,4 @@
         color: #ffffff;
         transition: background-color 0.3s ease, color 0.3s ease;
     }
-
-
 </style>

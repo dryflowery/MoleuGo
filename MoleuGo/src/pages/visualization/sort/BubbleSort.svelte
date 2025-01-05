@@ -1,5 +1,5 @@
 <script>
-    import { onDestroy } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import Header from "../../../component/Header.svelte";
     import Navigation from "../../../component/navigation/sort/BubbleSortNavigation.svelte";
     import {isListVisible} from "../../../lib/store";
@@ -10,8 +10,15 @@
     let graphLeft = [];
     let indexLeft = [];
     let isAsc = true;
+    let canvasWidth = window.innerWidth * 0.73;
 
-
+    // 해상도 바뀌어도 그래프 위치 유지
+    onMount(() => {
+        window.addEventListener('resize', () => {
+            canvasWidth = window.innerWidth * 0.73; 
+        });
+    })
+    
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
         $animationSpeed = 1;
@@ -42,7 +49,6 @@
 
     // 원소가 바뀔 때마다 위치 계산
     $: {
-        let canvasWidth = 1400; // 캔버스 길이
         let elementWidth = 65;  // 원소 하나의 길이
         let totalWidth = numArr.length * elementWidth;  // 전체 원소의 길이
         let startX = (canvasWidth - totalWidth) / 2; // 시작점
@@ -487,13 +493,15 @@
 
     .main-container {
         display: grid;
-        grid-template-columns: 1500px auto;
+        grid-template-columns: 78vw auto;
         align-items: center;
     }
 
     .main-left-container {
         display: grid;
         grid-template-rows: 50px 1fr 60px;
+        justify-content: center;
+        align-items: center;
     }
 
     table {
@@ -537,8 +545,9 @@
 
     .main-right-container {
         display: grid;
-        grid-template-rows: 200px 649px;
-        background-color: #0d0e0f;
+        grid-template-rows: 19vh 68vh;
         font-size: 0.8rem;
+        justify-content: center;
+        align-items: center;
     }
 </style>

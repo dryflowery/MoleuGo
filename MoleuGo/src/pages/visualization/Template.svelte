@@ -186,19 +186,22 @@
 
     .main-container {
         display: grid;
-        grid-template-columns: 1500px auto;
+        grid-template-columns: 78vw auto;
         align-items: center;
     }
 
     .main-left-container {
         display: grid;
         grid-template-rows: 50px 1fr 60px;
+        justify-content: center;
+        align-items: center;
     }
 
     .main-right-container {
         display: grid;
-        grid-template-rows: 200px 649px;
-        background-color: #0d0e0f;
+        grid-template-rows: 19vh 68vh;
         font-size: 0.8rem;
+        justify-content: center;
+        align-items: center;
     }
 </style>
