@@ -128,7 +128,7 @@
         <div>
             <p class="algo-list-index-text">6. 그래프 탐색</p>
                 
-            <div class="algo-list-text-div">
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/graph/Dfs');}}>
                 <span>깊이 우선 탐색(DFS)</span>
             </div>
 
