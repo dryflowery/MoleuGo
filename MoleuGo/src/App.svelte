@@ -11,8 +11,7 @@
   import Heap from './pages/visualization/tree/Heap.svelte';
   import ConvexHull from './routes/visualization/geometry/ConvexHull.svelte';
   import LinkedList from './routes/LinkedList.svelte';
-
-
+  import Dfs from './routes/visualization/graph/Dfs.svelte';
 
   const routes = {
     '/': Index,
@@ -25,9 +24,9 @@
     '/visualization/sort/InsertionSort': InsertionSort,
     '/visualization/tree/Heap': Heap,
     '/visualization/geometry/ConvexHull': ConvexHull,
-    '/visualization/LinkedList': LinkedList
+    '/visualization/LinkedList': LinkedList,
+    '/visualization/graph/Dfs': Dfs,
   };
 </script>
 
 <Router {routes}/>
-
