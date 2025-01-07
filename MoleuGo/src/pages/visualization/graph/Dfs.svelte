@@ -6,7 +6,10 @@
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
 
-    
+    let svgElement, svgRect, nodeElement, nodeRect;
+    let startX, startY, startNode, endNode;
+    let isDragging = false;
+    let edgeElement = null; 
     let nodeCnt = 0;
 
     // 페이지 바뀌면 애니메이션 종료
@@ -17,8 +20,8 @@
     
     // 슬라이더의 위치에 따른 $animationSpeed 관리
     // 50%까지는 [1, 10], 51%부터는 [11, 500]
-    const updateSpeed = (event) => {
-        const sliderValue = event.target.value;
+    const updateSpeed = (e) => {
+        const sliderValue = e.target.value;
         
         if (sliderValue <= 50) {
             $animationSpeed = Math.round(sliderValue / 5); 
@@ -87,12 +90,22 @@
         }
     };
 
-    const createNode = (event) => {
-        const rect = event.currentTarget.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+    const createNode = (e) => {
+        if(isDragging) {
+            isDragging = false;
+            return;
+        }
 
-        if(event.clientX - 60 < rect.left || event.clientX + 60 > rect.right || event.clientY - 60 < rect.top || event.clientY + 60 > rect.bottom) {
+        if(e.target.className == 'node') {
+            return;
+        }
+
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // canvas 내부에 생성
+        if(e.clientX - 60 < rect.left || e.clientX + 60 > rect.right || e.clientY - 60 < rect.top || e.clientY + 60 > rect.bottom) {
             return;
         }
 
@@ -102,8 +115,10 @@
         const centerW = (x / window.innerWidth) * 100 - radiusW;
         const centerH = (y / window.innerHeight) * 100 - radiusH;
 
+        // 노드 속성 설정
         const node = document.createElement('div');
-        node.className = `node_${nodeCnt}`;
+        node.id = `node_${nodeCnt}`;
+        node.className = 'node';
         node.style.position = 'absolute';
         node.style.left = `${centerW}vw `; 
         node.style.top = `${centerH}vh`; 
@@ -120,7 +135,110 @@
         node.style.zIndex = '1000';
         node.textContent = nodeCnt++;
 
-        event.currentTarget.appendChild(node);
+        e.currentTarget.appendChild(node);
+
+        // 우클릭하면 노드 삭제
+        node.addEventListener('contextmenu', (e) => {
+            deleteNode(e);
+        });
+
+        // 드래그하면 간선 잇기
+        node.addEventListener('pointerdown', (e) => {
+            startDrag(e);
+        });
+    };
+
+    const startDrag = (e) => {
+        if (e.button != 0) { 
+            return; 
+        }
+
+        isDragging = true;
+        startNode = e.target.id.substring(5);
+
+        svgElement = document.getElementById("svg");
+        svgRect = svgElement.getBoundingClientRect();
+        
+        nodeElement = e.target.closest(".node"); 
+        nodeRect = nodeElement.getBoundingClientRect();
+
+        // 노드의 중간 지점
+        startX = nodeRect.left - svgRect.left + 30;
+        startY = nodeRect.top - svgRect.top + 30;
+
+        // edge 생성
+        edgeElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        edgeElement.setAttribute("stroke", "black");
+        edgeElement.setAttribute("stroke-width", "3");
+        edgeElement.setAttribute("fill", "none");
+        edgeElement.setAttribute("marker-end", "url(#arrow)");
+        edgeElement.setAttribute("d", `M${startX},${startY} L${startX},${startY}`);
+        svgElement.appendChild(edgeElement);
+
+        // pointermove, pointerup 이벤트 리스너 추가
+        document.addEventListener("pointermove", onDrag);
+        document.addEventListener("pointerup", stopDrag);
+    };
+
+    const onDrag = (e) => {
+        if (!isDragging) return;
+
+        let currentX = e.clientX - svgRect.left;
+        let currentY = e.clientY - svgRect.top;
+
+        // 드래그 경로 업데이트
+        requestAnimationFrame(() => {
+            edgeElement.setAttribute("d", `M${startX},${startY} L${currentX},${currentY}`);
+        });
+    };
+
+    const stopDrag = (e) => {
+        if(e.target.className != 'node') {
+            edgeElement.remove();
+            return;
+        }
+
+        nodeElement = e.target.closest(".node"); 
+        nodeRect = nodeElement.getBoundingClientRect();
+        endNode = nodeElement.id.substring(5);
+
+        if(startNode == endNode) {
+            return;
+        }
+        
+        let endX = e.clientX - svgRect.left;
+        let endY = e.clientY - svgRect.top;
+
+        // 경로 다시 설정하기(화살표 보이게)@@@@@@@@@@@@@@@
+
+        // 경로 완성
+        edgeElement.setAttribute("d", `M${startX},${startY} L${endX},${endY}`);
+        edgeElement.setAttribute("id", `edge_${startNode}_${endNode}`)
+        
+        // pointermove, pointerup 이벤트 리스너 제거
+        document.removeEventListener("pointermove", onDrag);
+        document.removeEventListener("pointerup", stopDrag);
+    };
+
+    const deleteNode = (e) => {
+        e.preventDefault(); 
+
+        const clickedNode = e.target; 
+        const nodeNum = clickedNode.id.substring(5);
+        clickedNode.remove(); 
+
+        // 연결된 간선 삭제
+        const edgeElements = document.querySelectorAll('path');
+
+        edgeElements.forEach(element => {
+            const edgeNum = element.id.split('_');
+            startNode = edgeNum[1];
+            endNode = edgeNum[2];  
+
+            if(nodeNum == startNode || nodeNum == endNode) {
+                element.remove();
+            }
+        });
     };
 </script>
 
@@ -144,6 +262,17 @@
             </div>
 
             <div class="canvas" on:click={createNode}>
+                <svg id="svg" style="position: absolute; left: 0; top: 0; overflow: hidden">
+                    <marker 
+                        id='arrow' 
+                        orient="auto" 
+                        markerWidth='6'
+                        markerHeight='6' 
+                        refX='3' 
+                        refY='3'> 
+                        <path d='M0,0 L6,3 L0,6 L0,0 Z' fill="black" />
+                    </marker>
+                </svg>
                 <!-- canvas안에 자료구조, 알고리즘 구현 -->
             </div>
 
@@ -246,5 +375,13 @@
 
     .canvas {
         position: relative;
+        overflow: hidden;
+    }
+
+    #svg {
+        z-index: 0; /* SVG를 가장 뒤로 이동 */
+        pointer-events: none; /* 클릭 이벤트를 SVG 아래 요소로 전달 */
+        width: 100%;
+        height: 100%;
     }
 </style>
