@@ -7,7 +7,7 @@
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
 
     let svgElement, svgRect, nodeElement, nodeRect;
-    let startX, startY, startNode, endNode;
+    let startX, startY, startNodeNum, endNodeNum;
     let isDragging = false;
     let edgeElement = null; 
     let nodeCnt = 0;
@@ -96,6 +96,7 @@
             return;
         }
 
+        // 노드 위에 새로운 노드 생성 불가능
         if(e.target.className == 'node') {
             return;
         }
@@ -154,7 +155,7 @@
         }
 
         isDragging = true;
-        startNode = e.target.id.substring(5);
+        startNodeNum = e.target.id.substring(5);
 
         svgElement = document.getElementById("svg");
         svgRect = svgElement.getBoundingClientRect();
@@ -162,11 +163,11 @@
         nodeElement = e.target.closest(".node"); 
         nodeRect = nodeElement.getBoundingClientRect();
 
-        // 노드의 중간 지점
+        // 노드의 중간 지점에서 간선 시작
         startX = nodeRect.left - svgRect.left + 30;
         startY = nodeRect.top - svgRect.top + 30;
 
-        // edge 생성
+        // 간선 생성
         edgeElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
         edgeElement.setAttribute("stroke", "black");
         edgeElement.setAttribute("stroke-width", "3");
@@ -186,13 +187,45 @@
         let currentX = e.clientX - svgRect.left;
         let currentY = e.clientY - svgRect.top;
 
-        // 드래그 경로 업데이트
+        // 간선 좌표 업데이트
         requestAnimationFrame(() => {
             edgeElement.setAttribute("d", `M${startX},${startY} L${currentX},${currentY}`);
         });
     };
 
     const stopDrag = (e) => {
+        const getIntersection = (S, E, radius) => {
+            // y - y1 = m(x - x1)
+            const x1 = S.x, y1 = S.y;
+            const x2 = E.x, y2 = E.y;
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+
+            // (x - a)² + (y - b)² = r²
+            const a = E.x;
+            const b = E.y;
+            const r = radius;
+
+            // 직선의 벡터 방정식과 원의 방정식을 연립해서 At² + Bt + C = 0꼴로 표현
+            const A = (dx * dx) + (dy * dy);
+            const B = 2 * (dx * (x1 - a) + dy * (y1 - b));
+            const C = (x1 - a) * (x1 - a) + (y1 - b) * (y1 - b) - (r * r);
+
+            // 근의 공식으로 t 구하기
+            const t1 = (-B - Math.sqrt(B * B - 4 * A * C)) / (2 * A);
+            const t2 = (-B + Math.sqrt(B * B - 4 * A * C)) / (2 * A);
+
+            // 0 <= t <= 1인 값 선택
+            const t = 0 <= t1 && t1 <= 1 ? t1 : t2;
+
+            // 벡터를 이용한 교점 좌표 계산
+            const x = x1 + t * dx;
+            const y = y1 + t * dy;
+
+            return { x: x, y: y };
+        }
+
+        // 노드로 잇지 않으면 간선 삭제
         if(e.target.className != 'node') {
             edgeElement.remove();
             return;
@@ -200,20 +233,24 @@
 
         nodeElement = e.target.closest(".node"); 
         nodeRect = nodeElement.getBoundingClientRect();
-        endNode = nodeElement.id.substring(5);
+        endNodeNum = nodeElement.id.substring(5);
 
-        if(startNode == endNode) {
+         // self looop 방지
+        if(startNodeNum == endNodeNum) {
             return;
         }
         
-        let endX = e.clientX - svgRect.left;
-        let endY = e.clientY - svgRect.top;
+        // 목표 노드와 간선의 교점 좌표 구하기
+        const S = {x: startX, y: startY};
+        const E = {x: nodeRect.left - svgRect.left + 30, y: nodeRect.top - svgRect.top + 30};
+        const intersection = getIntersection(S, E, 40);
 
-        // 경로 다시 설정하기(화살표 보이게)@@@@@@@@@@@@@@@
+        let endX = intersection.x;
+        let endY = intersection.y;
 
         // 경로 완성
         edgeElement.setAttribute("d", `M${startX},${startY} L${endX},${endY}`);
-        edgeElement.setAttribute("id", `edge_${startNode}_${endNode}`)
+        edgeElement.setAttribute("id", `edge_${startNodeNum}_${endNodeNum}`)
         
         // pointermove, pointerup 이벤트 리스너 제거
         document.removeEventListener("pointermove", onDrag);
@@ -223,20 +260,37 @@
     const deleteNode = (e) => {
         e.preventDefault(); 
 
-        const clickedNode = e.target; 
-        const nodeNum = clickedNode.id.substring(5);
-        clickedNode.remove(); 
+        const delNode = e.target; 
+        const delNodeNum = parseInt(delNode.id.substring(5), 10);
+        delNode.remove(); 
+        nodeCnt--;
 
         // 연결된 간선 삭제
         const edgeElements = document.querySelectorAll('path');
 
         edgeElements.forEach(element => {
             const edgeNum = element.id.split('_');
-            startNode = edgeNum[1];
-            endNode = edgeNum[2];  
+            startNodeNum = parseInt(edgeNum[1], 10);
+            endNodeNum = parseInt(edgeNum[2], 10);  
 
-            if(nodeNum == startNode || nodeNum == endNode) {
+            if(delNodeNum == startNodeNum || delNodeNum == endNodeNum) {
                 element.remove();
+            }
+            else { // 간선 번호 하나씩 당기기
+                element.setAttribute("id", `edge_${startNodeNum > delNodeNum ? startNodeNum - 1 : startNodeNum}_
+                                                 ${endNodeNum > delNodeNum ? endNodeNum - 1 : endNodeNum}`);
+            }
+        });
+
+        // 정점 번호 하나씩 당기기
+        const nodeElements = document.querySelectorAll('.node'); 
+
+        nodeElements.forEach(element => {
+            const nodeNum = parseInt(element.id.substring(5), 10);
+
+            if(nodeNum > delNodeNum) {
+                element.id = `node_${nodeNum - 1}`;
+                element.textContent = nodeNum - 1;
             }
         });
     };
@@ -273,7 +327,6 @@
                         <path d='M0,0 L6,3 L0,6 L0,0 Z' fill="black" />
                     </marker>
                 </svg>
-                <!-- canvas안에 자료구조, 알고리즘 구현 -->
             </div>
 
             <div class="animation-control-container">
