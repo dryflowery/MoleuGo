@@ -175,6 +175,13 @@
     };
 
     const constructConvexHull = (e) => {
+        pointElements = document.querySelectorAll('.point:not(.point-invisible)');
+        
+        if(pointElements.length == 0) {
+            alert("1개 이상의 점을 생성해주세요");
+            return;
+        }
+
         InitAnimation();
 
         generateConvexHullQueries();
