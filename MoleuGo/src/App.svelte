@@ -12,6 +12,7 @@
   import ConvexHull from './routes/visualization/geometry/ConvexHull.svelte';
   import LinkedList from './routes/LinkedList.svelte';
   import Dfs from './routes/visualization/graph/Dfs.svelte';
+  import Bfs from './routes/visualization/graph/Bfs.svelte';
 
   const routes = {
     '/': Index,
@@ -26,6 +27,7 @@
     '/visualization/geometry/ConvexHull': ConvexHull,
     '/visualization/LinkedList': LinkedList,
     '/visualization/graph/Dfs': Dfs,
+    '/visualization/graph/Bfs': Bfs,
   };
 </script>
 
