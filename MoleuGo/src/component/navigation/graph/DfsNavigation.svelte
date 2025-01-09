@@ -72,6 +72,16 @@
         
         toggle = toggle.map((_, i) => i === idx ? !toggle[i] : false);
     };
+
+    const startDfs = (e) => {
+        if(!isActive) {
+            return;
+        }
+
+        toggle = Array(9).fill(false);
+        isActive = false;
+        dispatch('startDfs');
+    };
 </script>
 
 <main>
@@ -80,7 +90,9 @@
         <!-- 툴팁 표시 -->
         <div class="navigation-tooltip">
             {#if isActive}
-                <!-- 툴팁 제어 -->
+                {#if tooltip[8]}
+                    <span>DFS 시작하기</span>
+                {/if}
             {/if}
         </div>
 
@@ -138,7 +150,8 @@
             
             <!-- 8번 (알고리즘 실행) -->
             <div class="center">
-                <ion-icon name="play-outline"></ion-icon>
+                <ion-icon name="play-outline" on:click={startDfs}
+                on:mouseenter={() => tooltip[8] = true} on:mouseleave={() => tooltip[8] = false}></ion-icon>
             </div>
         </div>
     </div>
