@@ -132,7 +132,7 @@
                 <span>깊이 우선 탐색(DFS)</span>
             </div>
 
-            <div class="algo-list-text-div">
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/graph/Bfs');}}>
                 <span>너비 우선 탐색(BFS)</span>
             </div>
         </div>
