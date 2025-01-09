@@ -11,6 +11,8 @@
     let isDragging = false;
     let edgeElement = null; 
     let nodeCnt = 0;
+    let edgeCnt = 0;
+    let edgeIdx = {};
 
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
@@ -77,6 +79,23 @@
         $animationQuery = [];
         $codeColor = Array(3).fill();
         $animationStep = [0, 0]; 
+        $asyncCnt = 0;
+
+        isDragging = false;
+        edgeElement = null; 
+        nodeCnt = 0;
+        edgeCnt = 0;
+        edgeIdx = {};
+
+        const nodeElements = document.querySelectorAll('.node'); 
+        nodeElements.forEach(element => {
+            element.remove();
+        });
+
+        const edgeElements = document.querySelectorAll('path');
+        edgeElements.forEach(element => {
+            element.remove();
+        });
     };
 
     const changeCodeColor = (idx) => {
@@ -169,7 +188,7 @@
 
         // 간선 생성
         edgeElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        edgeElement.setAttribute("stroke", "black");
+        edgeElement.setAttribute("stroke", "#000000");
         edgeElement.setAttribute("stroke-width", "3");
         edgeElement.setAttribute("fill", "none");
         edgeElement.setAttribute("marker-end", "url(#arrow)");
@@ -235,8 +254,9 @@
         nodeRect = nodeElement.getBoundingClientRect();
         endNodeNum = nodeElement.id.substring(5);
 
-         // self looop 방지
-        if(startNodeNum == endNodeNum) {
+         // self loop, 중복 간선 생성 방지
+        if(startNodeNum == endNodeNum || document.querySelector(`#edge_${startNodeNum}_${endNodeNum}`) != null) {
+            edgeElement.remove();
             return;
         }
         
@@ -269,6 +289,10 @@
         const edgeElements = document.querySelectorAll('path');
 
         edgeElements.forEach(element => {
+            if(element.id == 'arrow-path') {
+                return;
+            }
+
             const edgeNum = element.id.split('_');
             startNodeNum = parseInt(edgeNum[1], 10);
             endNodeNum = parseInt(edgeNum[2], 10);  
@@ -294,11 +318,195 @@
             }
         });
     };
+
+    const startDfs = (e) => {
+        if(nodeCnt == 0) {
+            alert("1개 이상의 노드가 필요합니다.");
+            return;
+        }
+
+        generateDfsQueries();
+
+        $animationWorking = true;
+        $pausedIcon = false;
+        $isPaused = false;
+
+        executeDfsQueries($asyncCnt++);
+    };
+
+    const pushAnimationQuery = (tmpExplanation, tmpCode, tmpNodeColor, tmpEdgeColor) => {
+            $animationQuery.push({
+            curExplanation: tmpExplanation,
+            curCode: tmpCode,
+            curNodeColor: tmpNodeColor,
+            curEdgeColor: tmpEdgeColor
+        })
+    };
+
+    const generateDfsQueries = () => {
+        const makeGraph = (graph) => {
+            const edgeElements = document.querySelectorAll('path');
+
+            edgeElements.forEach((element, index) => {
+                if(element.id == 'arrow-path') {
+                    return;
+                }
+
+                const edgeNum = element.id.split('_');
+                startNodeNum = parseInt(edgeNum[1], 10);
+                endNodeNum = parseInt(edgeNum[2], 10); 
+
+                edgeIdx[element.id] = index - 1; // arrow-path 제외
+                edgeCnt++;
+                
+                addEdge(graph, startNodeNum, endNodeNum);
+            });
+        };
+
+        const addEdge = (graph, u, v) => {
+            if(!graph[u]) {
+                graph[u] = [];
+            }
+            
+            graph[u].push(v);
+        };
+
+        const sortGraph = (graph) => {
+            const sortedGraph = Object.keys(graph)
+                .sort((a, b) => a - b) 
+                .reduce((acc, key) => {
+                    acc[key] = graph[key].sort((a, b) => a - b);
+                    return acc;
+                }, {});
+            return sortedGraph;
+        };
+
+        // 그래프 자료구조 생성
+        let graph = {};
+        makeGraph(graph);
+        sortGraph(graph);
+
+        // 쿼리 구성 시작
+        $animationQuery = [];
+        let tmpExplanation = ``;
+        let tmpCode = 1000;
+        let tmpNodeColor = Array(nodeCnt).fill("#000000");
+        let tmpEdgeColor = Array(edgeCnt).fill("#000000");
+        let visited = Array(nodeCnt).fill(false);
+
+        // 0. 그래프 초기 상태
+        tmpExplanation = '그래프의 초기 상태입니다';
+        pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
+
+        // 1. dfs
+        const dfs = (cur) => {
+            // 현재 정점 방문
+            tmpCode = 0;
+            tmpExplanation = `${cur}번 노드를 방문합니다`
+            visited[cur] = true;
+            tmpNodeColor[cur] = "#50ad49";
+            pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
+
+            // 연결된 정점 순회
+            if(graph[cur] != undefined) {
+                graph[cur].forEach(nxt => {
+                    // 간선 색깔 변경
+                    tmpCode = 1;
+                    tmpExplanation = `${nxt}번 노드를 방문하지 않았다면 방문하고, 아니면 다른 노드를 탐색합니다`
+                    tmpNodeColor[nxt] = tmpNodeColor[nxt] == "#000000" ? "#e97714" : "#50ad49";
+                    tmpEdgeColor[edgeIdx[`edge_${cur}_${nxt}`]] = "#e97714"; 
+                    pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
+
+                    tmpNodeColor[nxt] = "#50ad49";
+                    tmpEdgeColor[edgeIdx[`edge_${cur}_${nxt}`]] = "#50ad49"; 
+
+                    if(!visited[nxt]) {
+                        dfs(nxt);
+                    }
+                    else {
+                        tmpCode = 1000;
+                        tmpExplanation = `${nxt}번 노드를 이미 방문했으므로, 다른 노드를 탐색합니다`
+                        pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
+                    }
+                });
+            }
+        };
+
+        for(let i = 0; i < nodeCnt; i++) {
+            if(!visited[i]) {
+                dfs(i);
+            }
+        }
+
+        // 2. 알고리즘 종료
+        tmpExplanation = '그래프의 순회를 완료했습니다';
+        tmpCode = 1000;
+        pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
+    };
+
+    const executeDfsQueries = async (myAsync) => {
+        $animationStep = [0, $animationQuery.length - 1];
+        console.log($animationQuery)
+
+        while(true) {
+            if((myAsync + 1) != $asyncCnt) {
+                break;
+            }
+
+            if($animationStep[0] == $animationStep[1]) {
+                $pausedIcon = true;
+                $isPaused = true;
+            }
+
+            await drawDfsAnimation($animationStep[0]);
+            await waitPause();
+
+            // 버튼을 통해서 제어하는 경우 $animationStep의 값을 변경하면 안됨. 정해진 $animationStep[0]의 값으로 설정해야 함.
+            if(!$fromBtn) {
+                $animationStep[0] = Math.min($animationStep[0] + 1, $animationStep[1]);
+            }
+        }
+    };
+
+    const drawDfsAnimation = async (queryNum) => {
+        $explanation = $animationQuery[queryNum].curExplanation; 
+        changeCodeColor($animationQuery[queryNum].curCode); 
+
+        const nodeElements = document.querySelectorAll('.node'); 
+        nodeElements.forEach((element, idx) => {
+            element.style.color = $animationQuery[queryNum].curNodeColor[idx];
+            element.style.border = `5px solid ${$animationQuery[queryNum].curNodeColor[idx]}`;
+        });
+
+        const edgeElements = document.querySelectorAll('path');
+        edgeElements.forEach((element, idx) => {
+            if(element.id == 'arrow-path') {
+                return;
+            }
+
+            element.setAttribute("stroke", `${$animationQuery[queryNum].curEdgeColor[idx - 1]}`)
+        });
+
+        if(!($fromBtn || $isReplay)) {            
+            await delay(2000 * (1 / $animationSpeed));
+        }
+        else {
+            $fromBtn = false;
+
+            if($isReplay) {
+                await delay(2000 * (1 / $animationSpeed));
+                $isReplay = false;
+            }
+            else {
+                $isPaused = true;
+            }
+        }
+    };
 </script>
 
 <main>
     <div class="navigation-container">
-        <Navigation/>
+        <Navigation on:startDfs={startDfs}/>
     </div>
 
     <div class="header-container">
@@ -385,8 +593,10 @@
                 <div class="code-title">의사코드</div>
 
                 <div class="code-area">
-                    <!-- 코드의 class="code"로 설정 -->
-                    <!-- 들여쓰기는 padding-left:35px -->
+                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">visited[current] = true</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">for(int next : graph[current])</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">if(visited[next] == false)</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {2 * $indentSize + 10}px">dfs(next)</div>
                 </div>
             </div>
         </div>
