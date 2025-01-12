@@ -178,6 +178,237 @@
             }
         }
     };
+
+//**************************************************삭제 애니메이션******************************************************************// 
+
+    const startLinkedListDelete = async (e) => {
+        InitAnimation();
+
+        const DeleteIndex = selectNode;
+
+        generateLinkedListDeleteQueries(DeleteIndex);
+
+        $animationWorking = true;
+        $pausedIcon = false;
+        $isPaused = false;
+
+        executeLinkedListDeleteAnimation($asyncCnt++);
+    };
+
+    // 애니메이션 단계 저장
+    const pushAnimationDeleteQuery = (index, nextIndex, explanationText, codeIndex, nodeStyles, arrowStyles, arrowHeadStyles, currentNodeArray) => {
+        $animationQuery.push({
+            index,
+            nextIndex,
+            explanation: explanationText,
+            codeIndex,
+            nodeStyles: [...nodeStyles],
+            arrowStyles: [...arrowStyles],
+            arrowHeadStyle: [...arrowHeadStyles],
+            currentNodeArray: [...currentNodeArray]
+        });
+    };
+
+    const generateLinkedListDeleteQueries = (targetIndex) => {
+        // 색상 팔레트
+        const NodeBg = { normal: "#ffffff", selected: "#ffffff", validating: "#c6ffc6", deleted: "#ff6666" };
+        const NodeBorderColor = { normal: "#000000", selected: "#28e02e", deleted: "#ff0000" };
+        const NodeTextColor = { normal: "#000000", selected: "#28e02e", deleted: "#ffffff" };
+        const ArrowColor = { normal: "#000000", hidden: "#ffffff" };
+        const ArrowHeadColor = { normal: "#000000", hidden: "#ffffff" };
+
+        $animationQuery = [];
+
+        const nodeStyles = numNode.map(() => ({
+            bgColor: NodeBg.normal,
+            borderColor: NodeBorderColor.normal,
+            textColor: NodeTextColor.normal
+        }));
+
+        const arrowStyles = numNode.map((_, idx) => ({
+            bgColor: idx < numNode.length - 1 ? ArrowColor.normal : ArrowColor.hidden 
+        }));
+
+        const arrowHeadStyle = numNode.map((_, idx) => ({
+            bgColor: idx < numNode.length - 1 ? ArrowHeadColor.normal : ArrowHeadColor.normal
+        }));
+
+        pushAnimationDeleteQuery(
+            0,
+            -1,
+            "삭제 애니메이션 시작.",
+            0,
+            [...nodeStyles],
+            [...arrowStyles],
+            [...arrowHeadStyle],
+            [...numNode]
+        );
+
+        for (let i = 0; i < numNode.length; i++) {
+            // 검증 애니메이션 단계
+            nodeStyles[i] = {
+                bgColor: NodeBg.validating,
+                borderColor: NodeBorderColor.selected,
+                textColor: NodeTextColor.selected
+            };
+
+            pushAnimationDeleteQuery(
+                i,
+                -1,
+                `노드 ${i}를 검증 중입니다.`,
+                0,
+                [...nodeStyles],
+                [...arrowStyles],
+                [...arrowHeadStyle],
+                [...numNode]
+            );
+
+            // Index가 삭제 대상이 아닌 경우 원래 상태로 복귀
+            if (i !== targetIndex) {
+                nodeStyles[i] = {
+                    bgColor: NodeBg.normal,
+                    borderColor: NodeBorderColor.normal,
+                    textColor: NodeTextColor.normal
+                };
+
+                pushAnimationDeleteQuery(
+                    i,
+                    -1,
+                    `노드 ${i}는 삭제 대상(${targetIndex})이 아닙니다.`,
+                    0,
+                    [...nodeStyles],
+                    [...arrowStyles],
+                    [...arrowHeadStyle],
+                    [...numNode]
+                );
+            } else {
+                // 삭제 대상 노드를 찾은 경우
+                nodeStyles[i] = {
+                    bgColor: NodeBg.deleted,
+                    borderColor: NodeBorderColor.deleted,
+                    textColor: NodeTextColor.deleted
+                };
+
+                pushAnimationDeleteQuery(
+                    i,
+                    -1,
+                    `노드 ${i}를 삭제합니다.`,
+                    2,
+                    [...nodeStyles],
+                    [...arrowStyles],
+                    [...arrowHeadStyle],
+                    [...numNode]
+                );
+
+                // 노드 제거 및 화살표 갱신
+                numNode.splice(targetIndex, 1);
+
+                if (targetIndex > 0) {
+                    arrowStyles[targetIndex - 1] = { bgColor: ArrowColor.hidden };
+                    arrowHeadStyle[targetIndex - 1] = { bgColor: ArrowHeadColor.hidden };
+                }
+
+                pushAnimationDeleteQuery(
+                    i,
+                    -1,
+                    `노드 ${i}를 삭제했습니다.`,
+                    3,
+                    [...nodeStyles],
+                    [...arrowStyles],
+                    [...arrowHeadStyle],
+                    [...numNode]
+                );
+                break;
+            }
+        }
+
+        $animationStep = [0, $animationQuery.length - 1];
+    };
+
+    // 애니메이션 실행
+    const executeLinkedListDeleteAnimation = async (myAsync) => {
+        $animationStep = [0, $animationQuery.length - 1];
+
+        while (true) {
+            if ((myAsync + 1) !== $asyncCnt) break;
+
+            if ($animationStep[0] === $animationStep[1]) {
+                $pausedIcon = true;
+                $isPaused = true;
+            }
+
+            await drawLinkedListDeleteAnimation($animationStep[0]);
+            await waitPause();
+
+            if (!$fromBtn) {
+                $animationStep[0] = Math.min($animationStep[0] + 1, $animationStep[1]);
+            }
+        }
+    };
+
+    // 각 단계의 애니메이션 렌더링
+    const drawLinkedListDeleteAnimation = async (i) => {
+        if (i === $animationQuery.length - 1) {
+            numNode = [...$animationQuery[i].currentNodeArray];
+            await tick();
+        }
+
+        const nodes = document.querySelectorAll(".linked-list-node");
+        const arrows = document.querySelectorAll(".node-arrow");
+        const arrowHeads = document.querySelectorAll(".node-arrow::after");
+
+        $explanation = $animationQuery[i].explanation;
+
+        // 노드 상태 복원
+        $animationQuery[i].nodeStyles.forEach((style, idx) => {
+            const nodeElement = nodes[idx];
+
+            if (!nodeElement) {
+                console.warn(`Node at index ${idx} not found.`);
+                return;
+            }
+
+            nodeElement.style.transition = "border-color 0.3s ease, background-color 0.3s ease";
+            nodeElement.style.borderColor = style.borderColor;
+            nodeElement.style.backgroundColor = style.bgColor;
+            nodeElement.style.color = style.textColor;
+        });
+
+        // 화살표 상태 복원
+        $animationQuery[i].arrowStyles.forEach((style, idx) => {
+            const arrowElement = arrows[idx];
+            if (arrowElement) {
+                arrowElement.style.transition = "background-color 0.3s ease";
+                arrowElement.style.backgroundColor = style.bgColor;
+            }
+        });
+
+        // 화살표 머리 상태 복원
+        $animationQuery[i].arrowHeadStyle.forEach((style, idx) => {
+            const arrowElement = arrows[idx]; // 부모 요소를 선택
+            if (arrowElement) {
+                arrowElement.style.setProperty("--arrow-head-color", style.bgColor);
+            }
+        });
+
+        await updateNodePositions(); // 화면 업데이트
+        numNode = [...$animationQuery[i].currentNodeArray];
+
+        // 슬라이드바 또는 전체 재생 중 처리
+        if ($fromBtn || $isReplay) {
+            $fromBtn = false;
+            if ($isReplay) {
+                await delay(2000 * (1 / $animationSpeed));
+                $isReplay = false;
+            } else {
+                $isPaused = true;
+            }
+            return;
+        }
+
+        await delay(1000 * (1 / $animationSpeed)); // 애니메이션 지연
+    };
+//**************************************************삭제 애니메이션 끝******************************************************************//
 //**************************************************삽입 애니메이션******************************************************************// 
    
     const startLinkedListInsert = async (e) => {
@@ -228,11 +459,11 @@
             textColor: NodeTextColor.normal // 텍스트 색상 기본값 추가
         }));
         const arrowStyles = numNode.map((_, idx) => ({
-            bgColor: idx < numNode.length - 1 ? ArrowColor.normal : "transparent", // 마지막 노드 화살표는 투명
+            bgColor: idx < numNode.length - 1 ? ArrowColor.normal : ArrowColor.normal, // 마지막 노드 화살표는 투명
         }));
 
         const arrowHeadStyle = numNode.map((_, idx) => ({
-            bgColor: idx < numNode.length - 1 ? ArrowHeadColor.normal : "transparent", // 마지막 노드 화살표는 투명
+            bgColor: idx < numNode.length - 1 ? ArrowHeadColor.normal : ArrowHeadColor.normal, // 마지막 노드 화살표는 투명
         }));
         
         let foundIndex = -1;
@@ -247,6 +478,7 @@
             [...arrowHeadStyle],
             [...numNode]
         );
+        
 
         for (let i = 0; i < numNode.length; i++) {
             const isLastNode = i === numNode.length - 1;
@@ -276,6 +508,7 @@
                     borderColor: NodeBorderColor.selected, 
                     textColor: NodeTextColor.selected 
                 };
+                
 
                 pushAnimationInsertQuery(
                     i,
@@ -323,14 +556,6 @@
                 );
                 
                 numNode.splice(targetIndex, 0, InsertValue); // 실제 값 삽입
-                console.log(numNode)
-
-                nodeStyles.splice(targetIndex, 0, {
-                    bgColor: NodeBg.normal,
-                    borderColor: NodeBorderColor.normal,
-                    textColor: NodeTextColor.normal,
-                });
-
 
                 nodeStyles[i] = { 
                     bgColor: NodeBg.found, 
@@ -338,15 +563,9 @@
                     textColor: NodeTextColor.found,
                 };
 
-                nodeStyles[i+1] = { 
-                    bgColor: NodeBg.normal, 
-                    borderColor: NodeBorderColor.selected, 
-                    textColor: NodeTextColor.selected,
-                };
 
                 arrowStyles[i] = { bgColor: ArrowColor.hidden };
                 arrowHeadStyle[i] = { bgColor: ArrowHeadColor.hidden };
-                
 
                 pushAnimationInsertQuery(
                     i,
@@ -358,8 +577,34 @@
                     [...arrowHeadStyle],
                     [...numNode]
                 );
-                
-                
+
+                arrowStyles[targetIndex] = { bgColor: ArrowColor.normal };
+                arrowHeadStyle[targetIndex] = { bgColor: ArrowHeadColor.normal };
+
+                pushAnimationInsertQuery(
+                    i,
+                    -1,
+                    `값 ${InsertValue}을(를) ${targetIndex} 위치에 삽입합니다.`,
+                    3,
+                    [...nodeStyles],
+                    [...arrowStyles],
+                    [...arrowHeadStyle],
+                    [...numNode]
+                );
+
+                arrowStyles[targetIndex -1] = { bgColor: ArrowColor.normal };
+                arrowHeadStyle[targetIndex-1] = { bgColor: ArrowHeadColor.normal };
+
+                pushAnimationInsertQuery(
+                    i,
+                    -1,
+                    `값 ${InsertValue}을(를) ${targetIndex} 위치에 삽입 완료.`,
+                    3,
+                    [...nodeStyles],
+                    [...arrowStyles],
+                    [...arrowHeadStyle],
+                    [...numNode]
+                );
                 break;
             }
 
@@ -405,6 +650,12 @@
 
     // 각 단계의 애니메이션 렌더링
     const drawLinkedListInsertAnimation = async (i) => {
+
+        if(i == $animationQuery.length - 1) {
+            numNode = [...$animationQuery[i].currentNodeArray];
+            await tick();
+        }
+        
         const nodes = document.querySelectorAll(".linked-list-node");
         const arrows = document.querySelectorAll(".node-arrow");
         const arrowHeads = document.querySelectorAll(".node-arrow::after");
@@ -735,6 +986,7 @@
         on:createInputtedNode={createInputtedNode} 
         on:startLinkedListSearch={startLinkedListSearch}
         on:startLinkedListInsert={startLinkedListInsert}
+        on:startLinkedListDelete={startLinkedListDelete}
         on:updateSelectNode={(e) => handleSelectNode(e.detail.selectNode)}/>
     </div>
 
@@ -765,6 +1017,8 @@
 
                         {#if index < numNode.length - 1}
                             <div class="node-arrow"></div>
+                        {:else if index === numNode.length}
+                            <div class="node-arrow"></div>
                         {:else}
                             <div class="node-arrow white-arrow"></div>
                             <div class="white-arrow white-node-arrow::after"></div>
@@ -774,8 +1028,8 @@
                         <div class="head-label">head[0]</div>
                         {/if}
 
-                        {#if index === numNode.length - 2}
-                        <div class="tail-label">tail[{numNode.length - 2}]</div>
+                        {#if index === numNode.length - 1}
+                        <div class="tail-label">tail[{numNode.length - 1}]</div>
                         {/if}
 
                     
