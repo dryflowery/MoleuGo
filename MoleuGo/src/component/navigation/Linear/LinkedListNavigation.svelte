@@ -274,6 +274,20 @@
         dispatch('startLinkedListInsert', { indexValue: selectNode, nodeValue: inputNodeValue });
     }
 
+    const startLinkedListDelete = () => {
+        if(!isActive || $animationWorking) {
+            return;
+        }
+
+        if(!validateDeleteInputs()) {
+            return;
+        }
+
+        toggle = Array(9).fill(false);
+        isActive = false;
+        dispatch('startLinkedListDelete', {indexValue: selectNode});
+    }
+
     // ************************************************************
 
     $: {
@@ -330,7 +344,7 @@
                     <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>i</span> <span class='txt'>=</span>
                         <input type="text" id="element-input" size="10" bind:value={selectNode}>
-                        <button style="white-space: nowrap;">삭제</button>
+                        <button style="white-space: nowrap;"on:click={startLinkedListDelete}>삭제</button>
                     </div>
                 {:else if toggle[2]}
                 <!-- 찾기 -->
