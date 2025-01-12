@@ -8,7 +8,8 @@
     const dispatch = createEventDispatcher();
 
     export let nodePositions = []; // LinkedList에서 전달받은 노드 위치 데이터
-    export let highlightedIndex = null; // 추가: 바인딩 가능하도록 설정
+    export let selectNode = null; 
+    export let numNode = [];
 
     let tooltip = Array(9).fill(false);
     let toggle = Array(9).fill(false);
@@ -20,8 +21,11 @@
     let arrowVisibility = { north: false, south: false }; // 화살표 표시 상태
 
     let NodeCnt = 5;
-    let inputtedNode = ''
+    let inputtedNode = '';
     let tmpNode = [];
+
+    let searchNodeValue = '';
+    let inputNodeValue = '';
 
     
 
@@ -35,31 +39,36 @@
         const navY = parseFloat(navigationPos.top); // 네비게이션의 Y 좌표
         const navX = parseFloat(navigationPos.left); // 네비게이션의 X 좌표
 
-        highlightedIndex = null; // 초기화
+        selectNode = null; // 초기화
 
         // 초기값: 모든 화살표 숨기기
         arrowVisibility = { north: false, south: false };
 
         // 네비게이션 위치를 기준으로 가시성 업데이트
         if (navCenterY < windowCenterY) {
-            // 네비게이션이 화면 중앙보다 위쪽에 있으면 남쪽 화살표 표시
             arrowVisibility.south = true;
         } else {
-            // 네비게이션이 화면 중앙보다 아래쪽에 있으면 북쪽 화살표 표시
             arrowVisibility.north = true;
         }
 
+        // 애니메이션 실행 중일 때는 업데이트하지 않음
+        if ($animationWorking) {
+            return;
+        }
+
+        // 노드 탐지 및 selectNode 업데이트
         nodePositions.forEach((node, index) => {
-            // 네비게이션 위치와 노드 위치 비교
             const dx = Math.abs(node.x - navX);
             const dy = Math.abs(node.y - navY);
 
             if (dx < 50 && dy < 200) {
-                // 가리키는 노드 탐지
-                console.log(`Arrow points to Node: Index=${node.index}, Value=${node.value}`);
-                highlightedIndex = index; // 가리키는 노드의 인덱스 저장
+                
+                selectNode = index; // 가리키는 노드의 인덱스 저장
             }
         });
+
+        // 선택된 노드 정보를 부모에 전달
+        dispatch('updateSelectNode', { selectNode });
     };
 
 
@@ -143,6 +152,49 @@
         }
     };
 
+    // searchNodeValue 의 유효함 체크
+    const vaildSerchNodeValue = () => {
+        const num = Number(searchNodeValue.trim());
+
+        if (isNaN(num)) {
+            alert("유효하지 않은 값입니다. 숫자를 입력해주세요.");
+            return false;
+        }
+
+        if (num < -99 || num > 99) {
+            alert("-99 이상, 99 이하의 숫자를 입력해주세요.");
+            return false;
+        }
+
+        return true;
+    }
+
+    const validateInsertInputs = () => {
+        // selectNode 검증
+        if (selectNode === null || selectNode <= -1 || selectNode >= numNode.length + 1) {
+            alert(`유효한 인덱스를 선택해주세요. (0 ~ ${numNode.length})`);
+            return false;
+        }
+
+        // inputNodeValue 검증
+        const value = Number(inputNodeValue.trim());
+        if (isNaN(value) || value < -99 || value > 99) {
+            alert("삽입할 값은 -99 이상, 99 이하의 숫자여야 합니다.");
+            return false;
+        }
+
+        return true;
+    };
+
+    const validateDeleteInputs = () => {
+        if (selectNode === null || selectNode < 0 || selectNode >= numNode.length) {
+            alert(`삭제할 노드의 유효한 인덱스를 선택해주세요. (0 ~ ${numNode.length - 1})`);
+            return false;
+        }
+        return true;
+    };
+
+    
     // createInputtedNode의 유효함 체크
     const validInputtedNode = (e) => {
         const elements = inputtedNode.split(',').map(num => num.trim());
@@ -183,7 +235,7 @@
             return;
         }
         dispatch('createInputtedNode', {tmpNode});
-    }
+    };
 
     const createRandomNode = (e) => {
         if(!isActive || !validNodeCntRange(e)) {
@@ -193,19 +245,39 @@
         dispatch('createRandomNode', {NodeCnt});
     };
 
-    const startLinkedList = () => {
+    // ************************************************************
+    const startLinkedListSearch = () => { // 검색
         if(!isActive || $animationWorking) {
+            return;
+        }
+
+        if (!vaildSerchNodeValue()) {
             return;
         }
 
         toggle = Array(9).fill(false);
         isActive = false;
-        dispatch('startLinkedList');
+        dispatch('startLinkedListSearch', { value: searchNodeValue });
     }
+
+    const startLinkedListInsert = () => { // 삽입
+        if(!isActive || $animationWorking) {
+            return;
+        }
+
+        if (!validateInsertInputs()) {
+            return;
+        }
+
+        toggle = Array(9).fill(false);
+        isActive = false;
+        dispatch('startLinkedListInsert', { indexValue: selectNode, nodeValue: inputNodeValue });
+    }
+
+    // ************************************************************
 
     $: {
         updateArrowVisibility();
-
     }
 
 </script>
@@ -247,23 +319,25 @@
                 {#if toggle[0]}
                     <!-- 추가 -->
                     <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
+                        <span class='txt'>i</span> <span class='txt'>=</span>
+                        <input type="text" id="element-input" size="10" bind:value={selectNode} style="width: 30px;">
                         <span class='txt'>v</span> <span class='txt'>=</span>
-                        <input type="text" id="element-input" size="10" bind:value={inputtedNode}>
-                        <button style="white-space: nowrap;">추가</button>
+                        <input type="text" id="element-input" size="10" bind:value={inputNodeValue}>
+                        <button style="white-space: nowrap;"on:click={startLinkedListInsert}>추가</button>
                     </div>
                 {:else if toggle[1]}
                 <!-- 삭제 -->
                     <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>i</span> <span class='txt'>=</span>
-                        <input type="text" id="element-input" size="10" bind:value={inputtedNode}>
+                        <input type="text" id="element-input" size="10" bind:value={selectNode}>
                         <button style="white-space: nowrap;">삭제</button>
                     </div>
                 {:else if toggle[2]}
                 <!-- 찾기 -->
                     <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>v</span> <span class='txt'>=</span>
-                        <input type="text" id="element-input" size="10" bind:value={inputtedNode}>
-                        <button style="white-space: nowrap;">찾기</button>
+                        <input type="text" id="element-input" size="10" bind:value={searchNodeValue}>
+                        <button style="white-space: nowrap;" on:click={startLinkedListSearch}>찾기</button>
                     </div>
                 {:else if toggle[5]}
                     <!-- 원소 랜덤 생성 -->
