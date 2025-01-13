@@ -1,7 +1,7 @@
 <script>
     import { onDestroy, onMount, tick   } from "svelte";
     import Header from "../../../component/Header.svelte";
-    import LinkedListNavigation from "../../../component/navigation/Linear/LinkedListNavigation.svelte";
+    import StackNavigation from "../../../component/navigation/Linear/StackNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
 
@@ -122,7 +122,7 @@
 
 <main>
     <div class="navigation-container">
-        <LinkedListNavigation
+        <StackNavigation
         on:createRandomNode={createRandomNode} 
         on:createInputtedNode={createInputtedNode} 
         />

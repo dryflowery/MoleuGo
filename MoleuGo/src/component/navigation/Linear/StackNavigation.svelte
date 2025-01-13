@@ -378,38 +378,6 @@
 
 <style>
 
-    .arrow {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        opacity: 0;
-        transition: transform 0.5s ease, opacity 0.2s ease;
-
-    }
-    .arrow.visible {
-        opacity: 1;
-    }
-
-    .north {
-        top: -40px;
-        left: 40%;
-        transform: translateX(-50%);
-    }
-    .south {
-        bottom: -25px;
-        left: 38%;
-        transform: translateX(-50%);
-    }
-
-    .arrow.active.north {
-        transform: translate(-50%, -80px); /* 북쪽 화살표 위로 이동 */
-
-    }
-
-    .arrow.active.south {
-        transform: translate(-50%, 60px); /* 남쪽 화살표 아래로 이동 */
-
-    }
 
 
 </style>
