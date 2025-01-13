@@ -18,11 +18,11 @@
     <div id="algorithm-list">
         <div>
             <p class="algo-list-index-text">1. 선형 자료구조</p>
-            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/LinkedList')}}>
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/Linear/LinkedList')}}>
                 <span>연결 리스트</span>
             </div>
 
-            <div class="algo-list-text-div">
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/Linear/Stack')}}>
                 <span on:click={()=> push('/visualization/Stack')}>스택</span>
             </div>
 

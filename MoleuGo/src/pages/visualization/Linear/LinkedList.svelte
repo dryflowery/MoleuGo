@@ -230,13 +230,15 @@
         }));
 
         const arrowHeadStyle = numNode.map((_, idx) => ({
-            bgColor: idx < numNode.length - 1 ? ArrowHeadColor.normal : ArrowHeadColor.normal
+            bgColor: idx < numNode.length - 1 ? ArrowHeadColor.normal : ArrowHeadColor.hidden
         }));
+
+        let foundIndex = -1;
 
         pushAnimationDeleteQuery(
             0,
             -1,
-            "삭제 애니메이션 시작.",
+            ``,
             0,
             [...nodeStyles],
             [...arrowStyles],
@@ -245,6 +247,9 @@
         );
 
         for (let i = 0; i < numNode.length; i++) {
+            
+            const isLastNode = i === numNode.length - 1;
+
             // 검증 애니메이션 단계
             nodeStyles[i] = {
                 bgColor: NodeBg.validating,
@@ -281,7 +286,9 @@
                     [...arrowHeadStyle],
                     [...numNode]
                 );
-            } else {
+            } 
+             
+            if (i === targetIndex) {
                 // 삭제 대상 노드를 찾은 경우
                 nodeStyles[i] = {
                     bgColor: NodeBg.deleted,
@@ -320,6 +327,21 @@
                 );
                 break;
             }
+
+            // 삽입 위치가 아닌 경우 화살표 이동
+            if (!isLastNode && foundIndex === -1) {
+                arrowStyles[i] = { bgColor: ArrowColor.selected };``
+                pushAnimationInsertQuery(
+                    i,
+                    i + 1,
+                    `노드 ${i}에서 노드 ${i + 1}로 이동합니다.`,
+                    1,
+                    [...nodeStyles],
+                    [...arrowStyles],
+                    [...arrowHeadStyle],
+                    [...numNode]
+                );
+            }
         }
 
         $animationStep = [0, $animationQuery.length - 1];
@@ -348,6 +370,7 @@
 
     // 각 단계의 애니메이션 렌더링
     const drawLinkedListDeleteAnimation = async (i) => {
+
         if (i === $animationQuery.length - 1) {
             numNode = [...$animationQuery[i].currentNodeArray];
             await tick();
@@ -390,6 +413,31 @@
                 arrowElement.style.setProperty("--arrow-head-color", style.bgColor);
             }
         });
+
+        // 화살표 애니메이션 실행 (삽입 위치 이후에는 실행하지 않음)
+        if ($animationQuery[i].codeIndex === 1 && $animationQuery[i].explanation.includes("이동합니다")) {
+            const arrowElement = arrows[$animationQuery[i].index];
+            if (!arrowElement.isAnimating) {
+                arrowElement.isAnimating = true;
+
+                arrowElement.style.backgroundImage = "linear-gradient(to right, #28e02e 0%, #000000 100%)";
+                arrowElement.style.transition = "background-image 0.5s ease";
+
+                // 점진적 애니메이션
+                let percentage = 0;
+                const interval = setInterval(() => {
+                    percentage += 10;
+                    if (percentage > 100) {
+                        clearInterval(interval);
+                        arrowElement.style.backgroundImage = "none";
+                        arrowElement.style.backgroundColor = "#28e02e";
+                        arrowElement.isAnimating = false;
+                    } else {
+                        arrowElement.style.backgroundImage = `linear-gradient(to right, #28e02e ${percentage}%, #000000 100%)`;
+                    }
+                }, 50);
+            }
+        }
 
         await updateNodePositions(); // 화면 업데이트
         numNode = [...$animationQuery[i].currentNodeArray];
