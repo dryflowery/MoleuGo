@@ -10,7 +10,8 @@
   import InsertionSort from './routes/visualization/sort/InsertionSort.svelte';
   import Heap from './pages/visualization/tree/Heap.svelte';
   import ConvexHull from './routes/visualization/geometry/ConvexHull.svelte';
-  import LinkedList from './routes/LinkedList.svelte';
+  import LinkedList from './routes/visualization/Linear/LinkedList.svelte';
+  import Stack from './routes/visualization/Linear/Stack.svelte';
   import Dfs from './routes/visualization/graph/Dfs.svelte';
   import Bfs from './routes/visualization/graph/Bfs.svelte';
 
@@ -25,7 +26,8 @@
     '/visualization/sort/InsertionSort': InsertionSort,
     '/visualization/tree/Heap': Heap,
     '/visualization/geometry/ConvexHull': ConvexHull,
-    '/visualization/LinkedList': LinkedList,
+    '/visualization/Linear/LinkedList': LinkedList,
+    '/visualization/Linear/Stack': Stack,
     '/visualization/graph/Dfs': Dfs,
     '/visualization/graph/Bfs': Bfs,
   };
