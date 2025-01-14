@@ -6,15 +6,35 @@
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
 
     let canvasWidth = window.innerWidth * 0.73;
+    let canvasHeight = window.innerHeight * 0.78;
 
-    let numNode = [15, 10, 20, 30, 7] // 실제 값 배열
+    let numArr = [15, 10, 20, 30, 7, 14] // 실제 값 배열
+
+    let nodePositions = [];
+    const nodeWidth = 50;
+    const nodeHeight = 50;
+    const arrowLength = 50;
+
+    const calculateNodePositions = () => {
+        
+        nodePositions = numArr.map((_, index) => {
+            const totalHeight = numArr.length * (nodeHeight + arrowLength);
+            const baseY = canvasHeight - totalHeight; // 캔버스의 맨 아래 기준
+            return {
+                x: canvasWidth / 2 - nodeWidth / 2,
+                y: baseY + index * (nodeHeight + arrowLength),
+            };
+        });
+    }
 
     onMount(() => {
+        calculateNodePositions()
         window.addEventListener('resize', () => {
-            canvasWidth = window.innerWidth * 0.73; 
+            canvasWidth = window.innerWidth * 0.73;
+            canvasHeight = window.innerHeight * 0.78;
+            calculateNodePositions()
         });
     });
-
 
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
@@ -96,35 +116,40 @@
     };
 
 
-    const createRandomNode = (e) => { 
+    const createRandomArr = (e) => { 
         InitAnimation();
 
-        const NodeCnt = e.detail.NodeCnt;
+        const arrCnt = e.detail.arrCnt;
 
-        numNode = [];  
+        numArr = [];  
 
-        for (let i = 0; i < NodeCnt; i++) {
-            numNode.push(Math.floor(Math.random() * 199) - 99);
+        for (let i = 0; i < arrCnt; i++) {
+            numArr.push(Math.floor(Math.random() * 199) - 99);
         }
 
+        console.log(numArr);
+        console.log(nodePositions);
+        calculateNodePositions()
     };
 
-    const createInputtedNode = (e) => {
+    const createInputtedArr = (e) => {
         InitAnimation();
 
-        const tmpNode = e.detail.tmpNode;
-        numNode = tmpNode;
+        const tmpArr = e.detail.tmpArr;
+        numArr = tmpArr;
 
-        
+        console.log(numArr);
+        console.log(nodePositions);
+        calculateNodePositions()
     };
 
 </script>
 
 <main>
     <div class="navigation-container">
-        <StackNavigation
-        on:createRandomNode={createRandomNode} 
-        on:createInputtedNode={createInputtedNode} 
+        <StackNavigation {numArr}
+        on:createRandomArr={createRandomArr} 
+        on:createInputtedArr={createInputtedArr} 
         />
     </div>
 
@@ -144,6 +169,28 @@
 
             <div class="canvas">
                 <!-- canvas안에 자료구조, 알고리즘 구현 -->
+
+                {#each nodePositions as pos, index (index)}
+                    {#if index < numArr.length}
+                        <!-- 노드 -->
+                        <div
+                            class="node"
+                            style="top: {pos.y}px; left: {pos.x}px; width: {nodeWidth}px; height: {nodeHeight}px;">
+                            {numArr[index]}
+                        </div>
+                    
+                        <!-- 화살표 -->
+                        {#if index < numArr.length - 1}
+                            <svg
+                                class="arrow"
+                                style="top: {pos.y + nodeHeight}px; left: {pos.x + nodeWidth / 2}px;"
+                                width="10" height="{arrowLength}" viewBox="0 0 10 {arrowLength}" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="5" y1="4" x2="5" y2="{arrowLength - 10}" stroke="#000" stroke-width="3" />
+                                <polygon points="0,{arrowLength - 10} 11,{arrowLength - 10} 5,{arrowLength}" fill="#000" />
+                            </svg>
+                        {/if}
+                    {/if}
+                {/each}
 
 
             </div>
@@ -258,6 +305,24 @@
         justify-content: center;
         align-items: center;
         overflow: hidden;
+    }
+
+    .node {
+        position: absolute;
+        background-color: #ffffff;
+        color: rgb(0, 0, 0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+        border: 4px solid black;
+        font-weight: bold;
+    }
+
+    .arrow {
+        position: absolute;
+        transform: translateX(-1px);
+        
     }   
 
 </style>

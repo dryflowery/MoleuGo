@@ -7,7 +7,6 @@
     
     const dispatch = createEventDispatcher();
 
-    export let selectNode = null; 
     export let numArr = [];
 
     let tooltip = Array(9).fill(false);
@@ -18,12 +17,9 @@
     let offsetY = 0; 
     let navigationPos = { top: "700px", left: "1300px" }; 
 
-    let NodeCnt = 5;
+    let arrCnt = 6;
     let inputtedNode = '';
-    let tmpNode = [];
-
-    let searchNodeValue = '';
-    let inputNodeValue = '';
+    let tmpArr = [];
 
     
 
@@ -94,76 +90,34 @@
 
     // createRandomNode의 범위 체크 (1 ~ 15)
     const validNodeCntRange = (e) => {
-        if (NodeCnt > 10) {
-            NodeCnt = 10;
-            alert("10 이하의 숫자를 입력해주세요");
+        if (arrCnt > 6) {
+            arrCnt = 6;
+            alert("6 이하의 숫자를 입력해주세요");
             return false;
-        } else if (NodeCnt < 2) {
-            NodeCnt = 2;
-            alert("2 이상의 숫자를 입력해주세요");
+        } else if (arrCnt < 1) {
+            arrCnt = 1;
+            alert("1 이상의 숫자를 입력해주세요");
             return false;
         } else {
-            NodeCnt = NodeCnt;
+            arrCnt = arrCnt;
             return true;
         }
-    };
-
-    // searchNodeValue 의 유효함 체크
-    const vaildSerchNodeValue = () => {
-        const num = Number(searchNodeValue.trim());
-
-        if (isNaN(num)) {
-            alert("유효하지 않은 값입니다. 숫자를 입력해주세요.");
-            return false;
-        }
-
-        if (num < -99 || num > 99) {
-            alert("-99 이상, 99 이하의 숫자를 입력해주세요.");
-            return false;
-        }
-
-        return true;
-    }
-
-    const validateInsertInputs = () => {
-        // selectNode 검증
-        if (selectNode === null || selectNode <= -1 || selectNode >= numArr.length + 1) {
-            alert(`유효한 인덱스를 선택해주세요. (0 ~ ${numArr.length})`);
-            return false;
-        }
-
-        // inputNodeValue 검증
-        const value = Number(inputNodeValue.trim());
-        if (isNaN(value) || value < -99 || value > 99) {
-            alert("삽입할 값은 -99 이상, 99 이하의 숫자여야 합니다.");
-            return false;
-        }
-
-        return true;
-    };
-
-    const validateDeleteInputs = () => {
-        if (selectNode === null || selectNode < 0 || selectNode >= numArr.length) {
-            alert(`삭제할 노드의 유효한 인덱스를 선택해주세요. (0 ~ ${numArr.length - 1})`);
-            return false;
-        }
-        return true;
     };
 
     
     // createInputtedNode의 유효함 체크
     const validInputtedNode = (e) => {
         const elements = inputtedNode.split(',').map(num => num.trim());
-        tmpNode = [];
+        tmpArr = [];
 
         // 입력된 원소의 개수가 20개 이하인지 확인
-        if (elements.length > 10) {
-            alert("10개 이하의 원소를 입력해주세요");
+        if (elements.length > 6) {
+            alert("6개 이하의 원소를 입력해주세요");
             return false;
         }
 
-        if(elements.length < 2) {
-            alert("2개 이상의 원소를 입력해주세요");
+        if(elements.length < 1) {
+            alert("1개 이상의 원소를 입력해주세요");
             return false;
         }
 
@@ -174,7 +128,7 @@
 
         if (isValid) {
             elements.forEach(el => {
-                tmpNode.push(Number(el));
+                tmpArr.push(Number(el));
             });
         } else if (elements.some(el => isNaN(Number(el)) || el === '')) {
             alert("유효하지 않은 문자가 있습니다");
@@ -186,65 +140,31 @@
         return true;
     };
 
-    const createInputtedNode = (e) => {
+    const createInputtedArr = (e) => {
         if(!isActive || !validInputtedNode(e)) {
             return;
         }
-        dispatch('createInputtedNode', {tmpNode});
+        dispatch('createInputtedArr', {tmpArr});
     };
 
-    const createRandomNode = (e) => {
+    const createRandomArr = (e) => {
         if(!isActive || !validNodeCntRange(e)) {
             return;
         }
 
-        dispatch('createRandomNode', {NodeCnt});
+        dispatch('createRandomArr', {arrCnt});
     };
 
-    // ************************************************************
-    const startLinkedListSearch = () => { // 검색
+    const startPush = () => { // ************************************ [Push]
         if(!isActive || $animationWorking) {
-            return;
-        }
-
-        if (!vaildSerchNodeValue()) {
             return;
         }
 
         toggle = Array(9).fill(false);
         isActive = false;
-        dispatch('startLinkedListSearch', { value: searchNodeValue });
+        dispatch('startPush');
     }
 
-    const startLinkedListInsert = () => { // 삽입
-        if(!isActive || $animationWorking) {
-            return;
-        }
-
-        if (!validateInsertInputs()) {
-            return;
-        }
-
-        toggle = Array(9).fill(false);
-        isActive = false;
-        dispatch('startLinkedListInsert', { indexValue: selectNode, nodeValue: inputNodeValue });
-    }
-
-    const startLinkedListDelete = () => {
-        if(!isActive || $animationWorking) {
-            return;
-        }
-
-        if(!validateDeleteInputs()) {
-            return;
-        }
-
-        toggle = Array(9).fill(false);
-        isActive = false;
-        dispatch('startLinkedListDelete', {indexValue: selectNode});
-    }
-
-    // ************************************************************
 
 </script>
 
@@ -256,11 +176,11 @@
         <div class="navigation-tooltip">
             {#if isActive}
                 {#if tooltip[0]}
-                    <span>추가</span>
+                    <span>Push()</span>
                 {:else if tooltip[1]}
-                    <span>삭제</span>
+                    <span>Pop()</span>
                 {:else if tooltip[2]}
-                    <span>찾기</span>      
+                    <span>Peek()</span>      
                 {:else if tooltip[8]}
                     <span></span>
                 {:else if tooltip[5]}
@@ -275,34 +195,22 @@
         <div class="navigation-container">
             {#if isActive}
                 {#if toggle[0]}
-                    <!-- 추가 -->
+                    <!-- Push() -->
                     <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
-                        <span class='txt'>i</span> <span class='txt'>=</span>
-                        <input type="text" id="element-input" size="10" bind:value={selectNode} style="width: 30px;">
                         <span class='txt'>v</span> <span class='txt'>=</span>
-                        <input type="text" id="element-input" size="10" bind:value={inputNodeValue}>
-                        <button style="white-space: nowrap;"on:click={startLinkedListInsert}>추가</button>
+                        <input type="text" id="element-input" size="10">
+                        <button style="white-space: nowrap;">추가</button>
                     </div>
                 {:else if toggle[1]}
-                <!-- 삭제 -->
-                    <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
-                        <span class='txt'>i</span> <span class='txt'>=</span>
-                        <input type="text" id="element-input" size="10" bind:value={selectNode}>
-                        <button style="white-space: nowrap;"on:click={startLinkedListDelete}>삭제</button>
-                    </div>
+                    <!-- Pop() -->
                 {:else if toggle[2]}
-                <!-- 찾기 -->
-                    <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
-                        <span class='txt'>v</span> <span class='txt'>=</span>
-                        <input type="text" id="element-input" size="10" bind:value={searchNodeValue}>
-                        <button style="white-space: nowrap;" on:click={startLinkedListSearch}>찾기</button>
-                    </div>
+                    <!-- Peek() -->
                 {:else if toggle[5]}
                     <!-- 원소 랜덤 생성 -->
                     <div class="navigation-toggle" style="margin-top:120px;" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>N</span> <span class='txt'>=</span>
-                        <input type="number" id="element-cnt-input" min="2" max="10" bind:value={NodeCnt}>
-                        <button style="white-space: nowrap;" on:click={createRandomNode}>생성</button>
+                        <input type="number" id="element-cnt-input" min="1" max="6" bind:value={arrCnt}>
+                        <button style="white-space: nowrap;" on:click={createRandomArr}>생성</button>
                     </div>
                     
                 {:else if toggle[6]}
@@ -310,7 +218,7 @@
                     <div class="navigation-toggle" style="margin-top:120px;" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>A</span> <span class='txt'>=</span>
                         <input type="text" id="element-input" size="10" bind:value={inputtedNode}>
-                        <button style="white-space: nowrap;" on:click={createInputtedNode}>생성</button>
+                        <button style="white-space: nowrap;" on:click={createInputtedArr}>생성</button>
                     </div>
                 {/if}
             {/if}
@@ -335,7 +243,7 @@
                 <!-- 2번 (찾기) -->
                 <span style="--i:2; --x:1; --y:-1" on:click={() => changeToggle(2)} 
                     on:mouseenter={() => tooltip[2] = true} on:mouseleave={() => tooltip[2] = false}>
-                    <ion-icon name="search-outline"></ion-icon>
+                    <ion-icon name="golf-outline"></ion-icon>
                 </span>
 
                 <!-- 3번 -->
