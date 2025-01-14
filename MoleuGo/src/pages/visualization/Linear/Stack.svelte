@@ -9,22 +9,31 @@
     let canvasHeight = window.innerHeight * 0.78;
 
     let numArr = [15, 10, 20, 30, 7, 14] // 실제 값 배열
-
     let nodePositions = [];
+    let nodeAnimations = [];
+
     const nodeWidth = 50;
     const nodeHeight = 50;
     const arrowLength = 50;
 
-    const calculateNodePositions = () => {
+    const calculateNodePositions = async () => {
         
         nodePositions = numArr.map((_, index) => {
             const totalHeight = numArr.length * (nodeHeight + arrowLength);
-            const baseY = canvasHeight - totalHeight; // 캔버스의 맨 아래 기준
+            const baseY = canvasHeight - totalHeight; // 캔버스의 맨 아래로 할듯 나중에 중간으로 오게 바꿀수도
             return {
                 x: canvasWidth / 2 - nodeWidth / 2,
                 y: baseY + index * (nodeHeight + arrowLength),
             };
         });
+
+        await tick();
+        nodeAnimations = Array(numArr.length).fill(true);
+
+        // 일정 시간 후 애니메이션 클래스 제거
+        setTimeout(() => {
+            nodeAnimations = Array(numArr.length).fill(false);
+        }, 300); // 애니메이션 지속 시간 (0.3초)
     }
 
     onMount(() => {
@@ -174,19 +183,27 @@
                     {#if index < numArr.length}
                         <!-- 노드 -->
                         <div
-                            class="node"
+                            class="node {nodeAnimations[index] ? 'node-animation' : ''}"
                             style="top: {pos.y}px; left: {pos.x}px; width: {nodeWidth}px; height: {nodeHeight}px;">
                             {numArr[index]}
                         </div>
-                    
+                        
                         <!-- 화살표 -->
                         {#if index < numArr.length - 1}
                             <svg
                                 class="arrow"
-                                style="top: {pos.y + nodeHeight}px; left: {pos.x + nodeWidth / 2}px;"
-                                width="10" height="{arrowLength}" viewBox="0 0 10 {arrowLength}" xmlns="http://www.w3.org/2000/svg">
-                                <line x1="5" y1="4" x2="5" y2="{arrowLength - 10}" stroke="#000" stroke-width="3" />
-                                <polygon points="0,{arrowLength - 10} 11,{arrowLength - 10} 5,{arrowLength}" fill="#000" />
+                                style="top: {pos.y + nodeHeight + 4}px; left: {pos.x + nodeWidth / 2}px;"
+                                width="10" height="{arrowLength - 3}" viewBox="0 0 10 {arrowLength}" xmlns="http://www.w3.org/2000/svg">
+                                <!-- 막대 -->
+                                <line
+                                    class="{nodeAnimations[index] ? 'arrow-line-animation' : ''}"
+                                    x1="5" y1="0" x2="5" y2="{arrowLength - 10}" 
+                                    stroke="#000" stroke-width="3" />
+                                <!-- 화살표 머리 -->
+                                <polygon
+                                    class="{nodeAnimations[index] ? 'arrow-head-animation' : ''}"
+                                    points="0,{arrowLength - 10} 11,{arrowLength - 10} 5,{arrowLength}" 
+                                    fill="#000" />
                             </svg>
                         {/if}
                     {/if}
@@ -324,5 +341,51 @@
         transform: translateX(-1px);
         
     }   
+
+    @keyframes grow {
+        0% {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .node-animation {
+        animation: grow 0.3s ease-out;
+    }
+
+    @keyframes arrow-line-grow {
+        0% {
+            transform: scaleY(0);
+            opacity: 0;
+        }
+        100% {
+            transform: scaleY(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes arrow-head-move {
+        0% {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .arrow-line-animation {
+        animation: arrow-line-grow 0.3s ease-out;
+        transform-origin: top;
+    }
+
+    .arrow-head-animation {
+        animation: arrow-head-move 0.3s ease-out;
+    }
 
 </style>
