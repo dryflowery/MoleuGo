@@ -172,7 +172,6 @@
             curNodeTextColor: tmpNodeTextColor,
             curArrowColor: tmpArrowColor,
             curCode :tmpCode
-
         });
 
     };
