@@ -17,7 +17,9 @@
     let offsetY = 0; 
     let navigationPos = { top: "700px", left: "1300px" }; 
 
-    let arrCnt = 6;
+    let pushValue = '';
+
+    let arrCnt = 7;
     let inputtedNode = '';
     let tmpArr = [];
 
@@ -90,8 +92,8 @@
 
     // createRandomNode의 범위 체크 (1 ~ 15)
     const validNodeCntRange = (e) => {
-        if (arrCnt > 6) {
-            arrCnt = 6;
+        if (arrCnt > 7) {
+            arrCnt = 7;
             alert("6 이하의 숫자를 입력해주세요");
             return false;
         } else if (arrCnt < 1) {
@@ -104,15 +106,38 @@
         }
     };
 
+    // ********************************************* 스택 푸시 값 검증 *******************************************************
+    const vaildPushValue = () => {
+        const num = Number(pushValue.trim());
+
+        if (numArr.length >= 7) {
+            alert("최대 길이 도달입니다.");
+            return false;
+        }
+
+        if (isNaN(num)) {
+            alert("유효하지 않은 값입니다. 숫자를 입력해주세요.");
+            return false;
+        }
+
+        if (num < -99 || num > 99) {
+            alert("-99 이상, 99 이하의 숫자를 입력해주세요.");
+            return false;
+        }
+
+        return true;
+    }
     
-    // createInputtedNode의 유효함 체크
+
+    
+    // ********************************************* createInputtedNode의 유효함 체크 *******************************************************
     const validInputtedNode = (e) => {
         const elements = inputtedNode.split(',').map(num => num.trim());
         tmpArr = [];
 
         // 입력된 원소의 개수가 20개 이하인지 확인
-        if (elements.length > 6) {
-            alert("6개 이하의 원소를 입력해주세요");
+        if (elements.length > 7) {
+            alert("7개 이하의 원소를 입력해주세요");
             return false;
         }
 
@@ -140,14 +165,14 @@
         return true;
     };
 
-    const createInputtedArr = (e) => {
+    const createInputtedArr = (e) => { // ************************************ [직접 배열 넣기]
         if(!isActive || !validInputtedNode(e)) {
             return;
         }
         dispatch('createInputtedArr', {tmpArr});
     };
 
-    const createRandomArr = (e) => {
+    const createRandomArr = (e) => { // ************************************ [랜덤 배열 넣기]
         if(!isActive || !validNodeCntRange(e)) {
             return;
         }
@@ -155,14 +180,20 @@
         dispatch('createRandomArr', {arrCnt});
     };
 
-    const startPush = () => { // ************************************ [Push]
+    const startPush = () => { // ******************************************* [Push]
+
         if(!isActive || $animationWorking) {
+            return;
+        }
+
+        if(!vaildPushValue()) {
             return;
         }
 
         toggle = Array(9).fill(false);
         isActive = false;
-        dispatch('startPush');
+
+        dispatch('startPush', { value: pushValue } );
     }
 
 
@@ -198,8 +229,8 @@
                     <!-- Push() -->
                     <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>v</span> <span class='txt'>=</span>
-                        <input type="text" id="element-input" size="10">
-                        <button style="white-space: nowrap;">추가</button>
+                        <input type="text" id="element-input" size="10" bind:value={pushValue} >
+                        <button style="white-space: nowrap;"on:click={startPush}>추가</button>
                     </div>
                 {:else if toggle[1]}
                     <!-- Pop() -->
@@ -209,7 +240,7 @@
                     <!-- 원소 랜덤 생성 -->
                     <div class="navigation-toggle" style="margin-top:120px;" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>N</span> <span class='txt'>=</span>
-                        <input type="number" id="element-cnt-input" min="1" max="6" bind:value={arrCnt}>
+                        <input type="number" id="element-cnt-input" min="1" max="7" bind:value={arrCnt}>
                         <button style="white-space: nowrap;" on:click={createRandomArr}>생성</button>
                     </div>
                     
