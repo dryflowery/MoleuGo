@@ -6,13 +6,16 @@
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
 
-    let elementCnt = 0;
+    let elementCnt = 0, nodeVw = 0, nodeVh = 0;
     let heap = [];
     let nodeTop = [], nodeLeft = [], idxTop = [], idxLeft = [];
-    let initialnodeTop = [], initialnodeLeft = [];
+    let initialNodeTop = [], initialNodeLeft = [];
     let isIndexVisible = Array(16).fill(true);
 
-    onMount(async () => {
+    const repositionComponents = async () => {
+        let originElementCnt = elementCnt;
+        let originHeap = [...heap];
+
         elementCnt = 15;
         heap[0] = null;
 
@@ -41,18 +44,28 @@
         }
 
         // 고정된 좌표 배열에 그래프의 초기 좌표 저장
-        initialnodeTop = [...nodeTop];
-        initialnodeLeft = [...nodeLeft];
+        initialNodeTop = [...nodeTop];
+        initialNodeLeft = [...nodeLeft];
+
+        nodeVw = (60 / window.innerWidth) * 100;
+        nodeVh = (60 / window.innerHeight) * 100;
 
         // 투명 index 이용해서 항상 index 위치 고정
-        for (let i = 1; i <= 31; i++) {
+        for (let i = 1; i <= 15; i++) {
             await tick(); 
-            let nodeRect = document.querySelector(`.transparent-idx-${i}`).getBoundingClientRect();
+            let transIdxRect = document.querySelector(`.transparent-idx-${i}`).getBoundingClientRect();
             let canvasRect = document.querySelector('.canvas').getBoundingClientRect();
 
-            idxTop[i] = ((nodeRect.bottom - canvasRect.top) / window.innerHeight) * 100;
-            idxLeft[i] = ((nodeRect.left - canvasRect.left - 3) / window.innerWidth) * 100; 
+            idxTop[i] = ((transIdxRect.top - canvasRect.top) / window.innerHeight) * 100 + (nodeVh / 2.5);
+            idxLeft[i] = ((transIdxRect.left - canvasRect.left) / window.innerWidth) * 100 - (nodeVw / 20); 
         }
+
+        elementCnt = originElementCnt;
+        heap = [...originHeap];
+    };
+
+    onMount(async () => {
+        await repositionComponents();
 
         // 랜덤 힙 구성
         // elementCnt = Math.floor(Math.random() * 15) + 1;
@@ -67,6 +80,8 @@
                 heap[i] = minRange + Math.floor(Math.random() * (heap[Math.floor(i / 2)] * 0.33)); 
             }
         }
+
+        window.addEventListener("resize", repositionComponents);
     });
 
     // 페이지 바뀌면 애니메이션 종료
@@ -161,6 +176,34 @@
             </div>
 
             <div class="canvas">
+                <svg class="lines" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden">
+                    {#each heap as element, idx}
+                        {#if element != null}
+                            <!-- 왼쪽 자식 노드에 간선 추가 (고정된 좌표 사용) -->
+                            {#if idx * 2 <= elementCnt}
+                                <line 
+                                    x1={initialNodeLeft[idx] + (nodeVw / 2)}vw 
+                                    y1={initialNodeTop[idx] + (nodeVh / 2)}vh 
+                                    x2={initialNodeLeft[idx * 2] + (nodeVw / 2)}vw 
+                                    y2={initialNodeTop[idx * 2] + (nodeVh / 2)}vh 
+                                    stroke="black" 
+                                    stroke-width="2"/>
+                            {/if}
+            
+                            <!-- 오른쪽 자식 노드에 간선 추가 (고정된 좌표 사용) -->
+                            {#if idx * 2 + 1 <= elementCnt}
+                                <line 
+                                    x1={initialNodeLeft[idx] + (nodeVw / 2)}vw 
+                                    y1={initialNodeTop[idx] + (nodeVh / 2)}vh 
+                                    x2={initialNodeLeft[idx * 2 + 1] + (nodeVw / 2)}vw
+                                    y2={initialNodeTop[idx * 2 + 1] + (nodeVh / 2)}vh 
+                                    stroke="black" 
+                                    stroke-width="2"/>
+                            {/if}
+                        {/if}
+                    {/each}
+                </svg>
+
                 {#each heap as element, idx}
                     {#if element != null}
                         <div id="node-{idx}" class="node" style="top: {nodeTop[idx]}vh; left: {nodeLeft[idx]}vw;">
@@ -281,12 +324,12 @@
         width: 50px;
         height: 50px;
         border: 5px solid black;
+        background-color: #FFFFFF;
         font-size: 1.5rem;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: top 2s ease, left 2s ease; 
     }
 
     .transparent-idx {
@@ -300,5 +343,10 @@
         position: absolute;
         font-size: 1.25rem;
         color: black;
+    }
+
+    #svg {
+        z-index: 0; /* SVG를 가장 뒤로 이동 */
+        pointer-events: none; /* 클릭 이벤트를 SVG 아래 요소로 전달 */
     }
 </style>
