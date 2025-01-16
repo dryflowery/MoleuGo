@@ -8,33 +8,50 @@
     let canvasWidth = window.innerWidth * 0.73;
     let canvasHeight = window.innerHeight * 0.78;
 
-    let numArr = [15, 10, 20, 30, 7, 14] // 실제 값 배열
+    let numArr = [15, 10, 20, 30, 7] // 실제 값 배열
+    let arrowArr = Array(numArr.length - 1).fill(1); // 화살표 배열 개시발 이거 하나떄문에?
+
     let nodePositions = [];
     let nodeAnimations = [];
+    let arrowPositions = [];
+    let arrowAnimations = [];
 
     const nodeWidth = 50;
     const nodeHeight = 50;
     const arrowLength = 50;
+    
+    const syncArrowArr = () => {
+        // Adjust arrowArr length to match numArr.length - 1
+        arrowArr = Array(numArr.length - 1).fill(1);
+    };
 
     const calculateNodePositions = async () => {
-        
+        syncArrowArr();
         nodePositions = numArr.map((_, index) => {
-            const totalHeight = numArr.length * (nodeHeight + arrowLength);
-            const baseY = canvasHeight - totalHeight; // 캔버스의 맨 아래로 할듯 나중에 중간으로 오게 바꿀수도
+            const totalHeight = (numArr.length - 1) * (nodeHeight + arrowLength);
+            const baseY = canvasHeight - totalHeight -(nodeHeight + 50);
             return {
                 x: canvasWidth / 2 - nodeWidth / 2,
                 y: baseY + index * (nodeHeight + arrowLength),
             };
         });
 
+        arrowPositions = arrowArr.map((_, index) => {
+            return {
+                x: canvasWidth / 2,
+                y: nodePositions[index]?.y + nodeHeight + 4 || 0,
+            };
+        });
+
         await tick();
         nodeAnimations = Array(numArr.length).fill(true);
+        arrowAnimations = Array(arrowArr.length).fill(true);
 
-        // 일정 시간 후 애니메이션 클래스 제거
         setTimeout(() => {
             nodeAnimations = Array(numArr.length).fill(false);
-        }, 300); // 애니메이션 지속 시간 (0.3초)
-    }
+            arrowAnimations = Array(arrowArr.length).fill(false);
+        }, 350); // Animation duration
+    };
 
     onMount(() => {
         calculateNodePositions()
@@ -124,6 +141,166 @@
         }
     };
 
+    //=================================[ Push() ]============================================
+    
+    const startPush = (e) => {
+
+        InitAnimation();
+        
+        const pushValue = e.detail.value;
+
+        generateStackPushQueries(pushValue);
+
+        $animationWorking = true;
+        $pausedIcon = false;
+        $isPaused = false;
+
+        executeStackPushQuries($asyncCnt++);
+
+    };
+
+    // 애니메이션(Push) 쿼리 저장
+    const pushStackPushAnimationQuery = (tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
+        
+        $animationQuery.push({
+            curArr: [...tmpArr],
+            curNodePositions: [...tmpNodePositions],
+            curArrowPositions: [...tmpArrowPositions],
+            curExplanation: tmpExplanation,
+            curNodeBgColor: tmpNodeBgColor,
+            curNodeBorderColor: tmpNodeBorderColor,
+            curNodeTextColor: tmpNodeTextColor,
+            curArrowColor: tmpArrowColor,
+            curCode :tmpCode
+        });
+
+    };
+    
+    // 애니메이션(Push)
+    const generateStackPushQueries = (pushValue) => {
+
+        const nodeBg = {normal: "#000000", selected: "#2a9ce8", completed: "#52bc69"};
+        const nodeBorderColor = {normal: "#000000", selected: "#2a9ce8", completed: "#52bc69"};
+        const textColor = {normal: "#000000", selected: "#ffffff"}
+        const arrowColor = {normal: "000000", connecting: "2a9ce8"};
+
+        $animationQuery = [];
+
+        let tmpArr = [...numArr];
+        let tmpNodePositions = [...nodePositions];
+        let tmpArrowPositions = [...arrowPositions];
+        let tmpExplanation = ``;
+        let tmpNodeBgColor = nodeBg.normal;
+        let tmpNodeBorderColor = nodeBorderColor.normal;
+        let tmpNodeTextColor = textColor.normal;
+        let tmpArrowColor = arrowColor.normal;
+        let tmpCode = 1000;
+
+        tmpExplanation = `배열의 초기 상태입니다`
+        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
+
+        // Step 1: 새로운 노드 추가
+        numArr.unshift(pushValue);
+        
+        tmpArr = [...numArr];
+        tmpNodePositions = [...nodePositions];
+        tmpArrowPositions = [...arrowPositions];
+        tmpNodeBgColor = nodeBg.selected;
+        tmpNodeBorderColor = nodeBorderColor.selected;
+        tmpNodeTextColor = textColor.selected;
+        tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다.`;
+
+        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
+
+        // Step 2: Connect the arrow
+        tmpNodePositions = [...nodePositions];
+        tmpArrowPositions = [...arrowPositions];
+        tmpNodeBgColor = nodeBg.completed;
+        tmpNodeBorderColor = nodeBorderColor.completed;
+        tmpNodeTextColor = textColor.normal;
+        tmpArrowColor = arrowColor.connecting;
+        tmpExplanation = `새로운 노드와 기존 노드 간의 연결을 수행 중입니다.`;
+
+        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
+
+        // Step 3: Finalize connection
+        tmpArrowColor = arrowColor.normal;
+        tmpExplanation = `연결이 완료되었습니다.`;
+
+        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
+
+        
+
+    };
+
+    // 애니메이션(Push) 실행
+    const executeStackPushQuries = async (myAsync) => {
+        $animationStep = [0, $animationQuery.length - 1];
+
+        while (true) {
+            if ((myAsync + 1) !== $asyncCnt) break;
+
+            if ($animationStep[0] === $animationStep[1]) {
+                $pausedIcon = true;
+                $isPaused = true;
+            }
+
+            await drawStackPushAnimation($animationStep[0]);
+            await waitPause();
+            if($animationSpeed <= 30) await delay(20);
+
+            if (!$fromBtn) {
+                $animationStep[0] = Math.min($animationStep[0] + 1, $animationStep[1]);
+            }
+        }
+    };
+    // 각 단계의 애니메이션(Push) 렌더링
+    const drawStackPushAnimation = async (i) => {
+
+
+        $explanation = $animationQuery[i].curExplanation; // $explanation 수정
+        changeCodeColor($animationQuery[i].curCode); // $codeColor 수정
+
+
+
+        if (i === 1) {
+            const newNode = {
+                x: canvasWidth / 2 - nodeWidth / 2,
+                y: canvasHeight - nodeHeight - 20, // 초기 위치
+            };
+
+            nodePositions.unshift(newNode);
+            nodeAnimations.unshift(true);
+
+            await tick();
+
+            // 새 노드 위치 애니메이션
+            nodePositions[0].y = (nodePositions[1]?.y || canvasHeight) - (nodeHeight + arrowLength);
+
+            setTimeout(() => {
+                nodeAnimations[0] = true;
+            }, 300);
+        }
+
+        
+        // 슬라이드바 또는 전체 재생 중 처리
+        if ($fromBtn || $isReplay) {
+            $fromBtn = false;
+
+            if ($isReplay) {
+                await delay(2000 * (1 / $animationSpeed));
+                $isReplay = false;
+            } else {
+                $isPaused = true;
+            }
+            return;
+        }
+
+        await delay(1000 * (1 / $animationSpeed)); // 애니메이션 지연
+    };
+
+
+    //=================================[ Push() 끝 ]============================================ 
 
     const createRandomArr = (e) => { 
         InitAnimation();
@@ -159,6 +336,7 @@
         <StackNavigation {numArr}
         on:createRandomArr={createRandomArr} 
         on:createInputtedArr={createInputtedArr} 
+        on:startPush={startPush}
         />
     </div>
 
@@ -181,31 +359,29 @@
 
                 {#each nodePositions as pos, index (index)}
                     {#if index < numArr.length}
-                        <!-- 노드 -->
                         <div
                             class="node {nodeAnimations[index] ? 'node-animation' : ''}"
                             style="top: {pos.y}px; left: {pos.x}px; width: {nodeWidth}px; height: {nodeHeight}px;">
                             {numArr[index]}
                         </div>
-                        
-                        <!-- 화살표 -->
-                        {#if index < numArr.length - 1}
-                            <svg
-                                class="arrow"
-                                style="top: {pos.y + nodeHeight + 4}px; left: {pos.x + nodeWidth / 2}px;"
-                                width="10" height="{arrowLength - 3}" viewBox="0 0 10 {arrowLength}" xmlns="http://www.w3.org/2000/svg">
-                                <!-- 막대 -->
-                                <line
-                                    class="{nodeAnimations[index] ? 'arrow-line-animation' : ''}"
-                                    x1="5" y1="0" x2="5" y2="{arrowLength - 10}" 
-                                    stroke="#000" stroke-width="3" />
-                                <!-- 화살표 머리 -->
-                                <polygon
-                                    class="{nodeAnimations[index] ? 'arrow-head-animation' : ''}"
-                                    points="0,{arrowLength - 10} 11,{arrowLength - 10} 5,{arrowLength}" 
-                                    fill="#000" />
-                            </svg>
-                        {/if}
+                    {/if}
+                {/each}
+
+                {#each arrowPositions as arrow, index (index)}
+                    {#if arrowArr[index] === 1 && index < arrowArr.length}
+                        <svg
+                            class="arrow"
+                            style="top: {arrow.y}px; left: {arrow.x}px;"
+                            width="10" height="{arrowLength - 3}" viewBox="0 0 10 {arrowLength}" xmlns="http://www.w3.org/2000/svg">
+                            <line
+                                class="{arrowAnimations[index] ? 'arrow-line-animation' : ''}"
+                                x1="5" y1="0" x2="5" y2="{arrowLength - 10}" 
+                                stroke="#000" stroke-width="3" />
+                            <polygon
+                                class="{arrowAnimations[index] ? 'arrow-head-animation' : ''}"
+                                points="0,{arrowLength - 10} 11,{arrowLength - 10} 5,{arrowLength}" 
+                                fill="#000" />
+                        </svg>
                     {/if}
                 {/each}
 
