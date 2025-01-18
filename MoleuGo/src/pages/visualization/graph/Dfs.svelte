@@ -446,7 +446,6 @@
 
     const executeDfsQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
-        console.log($animationQuery)
 
         while(true) {
             if((myAsync + 1) != $asyncCnt) {

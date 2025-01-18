@@ -230,7 +230,7 @@
         pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
 
         
-
+        console.log($animationQuery)
     };
 
     // 애니메이션(Push) 실행
