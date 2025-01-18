@@ -51,6 +51,7 @@
             nodeAnimations = Array(numArr.length).fill(false);
             arrowAnimations = Array(arrowArr.length).fill(false);
         }, 350); // Animation duration
+
     };
 
 
@@ -128,7 +129,17 @@
         $animationQuery = [];
         $codeColor = Array($codeColor.length).fill();
         $animationStep = [0, 0]; 
-        
+
+        const node = document.querySelectorAll('.node');
+        const line = document.querySelectorAll('.arrow line');
+        const polygon = document.querySelectorAll('.arrow polygon');
+
+        node.forEach(element => {
+            element.style.backgroundColor = "#ffffff";
+            element.style.borderColor = "#000000";
+            element.style.color = "#000000";
+        });
+
     };
 
     const changeCodeColor = (idx) => {
@@ -162,19 +173,20 @@
     };
 
     // 애니메이션(Push) 쿼리 저장
-    const pushStackPushAnimationQuery = (tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
+    const pushStackPushAnimationQuery = (tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
         
         $animationQuery.push({
             curArr: [...tmpArr],
+            curArrowArr: [...tmpArrowArr],
             curNodePositions: [...tmpNodePositions],
             curArrowPositions: [...tmpArrowPositions],
             curNodeAnimation: [...tmpNodeAnimations],
             curArrowAnimations: [...tmpArrowAnimations],
             curExplanation: tmpExplanation,
-            curNodeBgColor: tmpNodeBgColor,
-            curNodeBorderColor: tmpNodeBorderColor,
-            curNodeTextColor: tmpNodeTextColor,
-            curArrowColor: tmpArrowColor,
+            curNodeBgColor: [...tmpNodeBgColor],
+            curNodeBorderColor: [...tmpNodeBorderColor],
+            curNodeTextColor: [...tmpNodeTextColor],
+            curArrowColor: [...tmpArrowColor],
             curCode :tmpCode
         });
 
@@ -183,10 +195,10 @@
     // 애니메이션(Push)
     const generateStackPushQueries = (pushValue) => {
 
-        const nodeBg = {normal: "#000000", selected: "#2a9ce8", completed: "#52bc69"};
-        const nodeBorderColor = {normal: "#000000", selected: "#2a9ce8", completed: "#52bc69"};
+        const nodeBg = {normal: "#ffffff", selected: "#2a9ce8", completed: "#52bc69"};
+        const nodeBorderColor = {normal: "#000000", selected: "#0067a3", completed: "#13a300"};
         const textColor = {normal: "#000000", selected: "#ffffff"}
-        const arrowColor = {normal: "000000", connecting: "2a9ce8"};
+        const arrowColor = {normal: "#000000", connecting: "#0067a3"};
 
         const resetNodePositions = () => { // 갱신
             nodePositions = numArr.map((_, index) => {
@@ -214,59 +226,65 @@
         $animationQuery = [];
 
         let tmpArr = [...numArr];
-        console.log("1쿼리: ",tmpArr)
+        let tmpArrowArr = [...arrowArr];
         let tmpNodePositions = [...nodePositions];
         let tmpArrowPositions = [...arrowPositions];
         let tmpNodeAnimation = [...nodeAnimations];
         let tmpArrowAnimations = [...arrowAnimations];
         let tmpExplanation = ``;
-        let tmpNodeBgColor = nodeBg.normal;
-        let tmpNodeBorderColor = nodeBorderColor.normal;
-        let tmpNodeTextColor = textColor.normal;
-        let tmpArrowColor = arrowColor.normal;
+        let tmpNodeBgColor = Array(tmpArr.length).fill(nodeBg.normal);
+        let tmpNodeBorderColor = Array(tmpArr.length).fill(nodeBorderColor.normal);
+        let tmpNodeTextColor = Array(tmpArr.length).fill(textColor.normal);
+        let tmpArrowColor = Array(tmpArrowArr.length).fill(arrowColor.normal);
         let tmpCode = 1000;
 
 
         tmpExplanation = `배열의 초기 상태입니다`;
-        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
         
         // Step 1: 새로운 노드 추가
         numArr.unshift(pushValue); // 숫자 추가
         resetNodePositions(); // 포지션 리셋
-        
+
+        tmpNodeBgColor[0] = nodeBg.selected; // 파란색
+        tmpNodeBorderColor[0] = nodeBorderColor.selected;
+        tmpNodeTextColor[0] = textColor.selected;
+
         tmpArr = [...numArr];
-        console.log("2쿼리: ",tmpArr)
+        tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
         tmpNodeAnimation = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
-        tmpNodeBgColor = nodeBg.selected;
-        tmpNodeBorderColor = nodeBorderColor.selected;
-        tmpNodeTextColor = textColor.selected;
+    
         tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다.`;
-        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
 
         // Step 2: Connect the arrow
+        tmpArrowColor[0] = arrowColor.connecting;
         resetArrowPositions(); // 화살표 포지션 리셋
 
+        tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
         tmpNodeAnimation = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
-        tmpNodeBgColor = nodeBg.completed;
-        tmpNodeBorderColor = nodeBorderColor.completed;
-        tmpNodeTextColor = textColor.normal;
-        tmpArrowColor = arrowColor.connecting;
+
         tmpExplanation = `새로운 노드와 기존 노드 간의 연결을 수행 합니다.`;
 
-        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
-
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        
+        
         // Step 3: Finalize connection
-        tmpArrowColor = arrowColor.normal;
         tmpExplanation = `연결이 완료되었습니다.`;
 
-        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
+        tmpArrowColor[0] = arrowColor.normal;
 
+        tmpNodeBgColor[0] = nodeBg.completed;
+        tmpNodeBorderColor[0] = nodeBorderColor.completed;
+        tmpNodeTextColor[0] = textColor.selected;
+
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
     };
 
     // 애니메이션(Push) 실행
@@ -297,18 +315,40 @@
         changeCodeColor($animationQuery[i].curCode); // $codeColor 
 
         numArr = [...$animationQuery[i].curArr];
+
+        arrowArr = [...$animationQuery[i].curArrowArr];
+
         nodePositions = [...$animationQuery[i].curNodePositions];
         nodeAnimations = [...$animationQuery[i].curNodeAnimation];
         arrowPositions = [...$animationQuery[i].curArrowPositions];
         arrowAnimations = [...$animationQuery[i].curArrowAnimations];
 
+        const nodeBgColors = $animationQuery[i].curNodeBgColor;
+        const nodeBorderColors = $animationQuery[i].curNodeBorderColor;
+        const nodeTextColors = $animationQuery[i].curNodeTextColor;
+        const arrowColors = $animationQuery[i].curArrowColor;
+
+        document.querySelectorAll('.node').forEach((node, index) => {
+            if (nodeBgColors[index]) node.style.backgroundColor = nodeBgColors[index];
+            if (nodeBorderColors[index]) node.style.borderColor = nodeBorderColors[index];
+            if (nodeTextColors[index]) node.style.color = nodeTextColors[index];
+        });
+
+        // 화살표 스타일 동적으로 적용
+        document.querySelectorAll('.arrow line').forEach((line, index) => {
+            if (arrowColors[index]) line.setAttribute('stroke', arrowColors[index]);
+        });
+        document.querySelectorAll('.arrow polygon').forEach((polygon, index) => {
+            if (arrowColors[index]) polygon.setAttribute('fill', arrowColors[index]);
+        });
+
+
+
 
         // 슬라이드바 또는 전체 재생 중 처리
         if ($fromBtn || $isReplay) {
-            $fromBtn = false;
 
-            numArr = [...$animationQuery[i].curArr];
-            nodePositions = [...$animationQuery[i].curNodePositions]
+            $fromBtn = false;
 
             if ($isReplay) {
                 await delay(2000 * (1 / $animationSpeed));
@@ -388,12 +428,12 @@
                     {#if arrowArr[index] === 1 && index < arrowArr.length}
                         <svg
                             class="arrow"
-                            style="top: {arrow.y}px; left: {arrow.x}px;"
-                            width="10" height="{arrowLength - 3}" viewBox="0 0 10 {arrowLength}" xmlns="http://www.w3.org/2000/svg">
+                            style="top: {arrow.y + 4}px; left: {arrow.x}px;"
+                            width="10" height="{arrowLength - 7}" viewBox="0 0 10 {arrowLength}" xmlns="http://www.w3.org/2000/svg">
                             <line
                                 class="{arrowAnimations[index] ? 'arrow-line-animation' : ''}"
                                 x1="5" y1="0" x2="5" y2="{arrowLength - 10}" 
-                                stroke="#000" stroke-width="3" />
+                                stroke="#000" stroke-width="3.5" />
                             <polygon
                                 class="{arrowAnimations[index] ? 'arrow-head-animation' : ''}"
                                 points="0,{arrowLength - 10} 11,{arrowLength - 10} 5,{arrowLength}" 
@@ -465,6 +505,14 @@
                 <div class="code-area">
                     <!-- 코드의 class="code"로 설정 -->
                     <!-- 들여쓰기는 padding-left:35px -->
+
+                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">procedure PUSH(stack, value)</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">if stack is full then</div>
+                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {2 * $indentSize + 10}px">raise "Stack Overflow"</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">else</div>
+                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {2 * $indentSize + 10}px">increment top by 1</div>
+                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {2 * $indentSize + 10}px">stack[top] ← value</div>
+                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">end procedure</div>
                 </div>
             </div>
         </div>
@@ -527,12 +575,22 @@
         border-radius: 10px;
         border: 4px solid black;
         font-weight: bold;
+
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    .arrow line {
+        transition: stroke 0.3s ease;
+    }
+
+    .arrow polygon {
+        transition: fill 0.3s ease;
     }
 
     .arrow {
         position: absolute;
-        transform: translateX(-1px);
-        
+        transform: translateX(0px);
+
     }   
 
     @keyframes grow {
