@@ -25,7 +25,7 @@
         arrowArr = Array(numArr.length - 1).fill(1);
     };
 
-    const calculateNodePositions = async () => {
+    const calculateNumArrPositions = async () => {
         syncArrowArr();
         nodePositions = numArr.map((_, index) => {
             const totalHeight = (numArr.length - 1) * (nodeHeight + arrowLength);
@@ -53,12 +53,13 @@
         }, 350); // Animation duration
     };
 
+
     onMount(() => {
-        calculateNodePositions()
+        calculateNumArrPositions();
         window.addEventListener('resize', () => {
             canvasWidth = window.innerWidth * 0.73;
             canvasHeight = window.innerHeight * 0.78;
-            calculateNodePositions()
+            calculateNumArrPositions();
         });
     });
 
@@ -148,8 +149,9 @@
         InitAnimation();
         
         const pushValue = e.detail.value;
+        const pushNum = Number(pushValue.trim());
 
-        generateStackPushQueries(pushValue);
+        generateStackPushQueries(pushNum);
 
         $animationWorking = true;
         $pausedIcon = false;
@@ -160,12 +162,14 @@
     };
 
     // 애니메이션(Push) 쿼리 저장
-    const pushStackPushAnimationQuery = (tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
+    const pushStackPushAnimationQuery = (tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
         
         $animationQuery.push({
             curArr: [...tmpArr],
             curNodePositions: [...tmpNodePositions],
             curArrowPositions: [...tmpArrowPositions],
+            curNodeAnimation: [...tmpNodeAnimations],
+            curArrowAnimations: [...tmpArrowAnimations],
             curExplanation: tmpExplanation,
             curNodeBgColor: tmpNodeBgColor,
             curNodeBorderColor: tmpNodeBorderColor,
@@ -184,11 +188,37 @@
         const textColor = {normal: "#000000", selected: "#ffffff"}
         const arrowColor = {normal: "000000", connecting: "2a9ce8"};
 
+        const resetNodePositions = () => { // 갱신
+            nodePositions = numArr.map((_, index) => {
+                const totalHeight = (numArr.length - 1) * (nodeHeight + arrowLength);
+                const baseY = canvasHeight - totalHeight -(nodeHeight + 50);
+                return {
+                    x: canvasWidth / 2 - nodeWidth / 2,
+                    y: baseY + index * (nodeHeight + arrowLength),
+                };
+            });
+            nodeAnimations.unshift(true);
+        };
+
+        const resetArrowPositions = () => {
+            syncArrowArr();
+            arrowPositions = arrowArr.map((_, index) => {
+                return {
+                    x: canvasWidth / 2,
+                    y: nodePositions[index]?.y + nodeHeight + 4 || 0,
+                };
+            });
+            arrowAnimations.unshift(true);
+        };
+
         $animationQuery = [];
 
         let tmpArr = [...numArr];
+        console.log("1쿼리: ",tmpArr)
         let tmpNodePositions = [...nodePositions];
         let tmpArrowPositions = [...arrowPositions];
+        let tmpNodeAnimation = [...nodeAnimations];
+        let tmpArrowAnimations = [...arrowAnimations];
         let tmpExplanation = ``;
         let tmpNodeBgColor = nodeBg.normal;
         let tmpNodeBorderColor = nodeBorderColor.normal;
@@ -196,40 +226,46 @@
         let tmpArrowColor = arrowColor.normal;
         let tmpCode = 1000;
 
-        tmpExplanation = `배열의 초기 상태입니다`
-        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
 
+        tmpExplanation = `배열의 초기 상태입니다`;
+        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
+        
         // Step 1: 새로운 노드 추가
-        numArr.unshift(pushValue);
+        numArr.unshift(pushValue); // 숫자 추가
+        resetNodePositions(); // 포지션 리셋
         
         tmpArr = [...numArr];
+        console.log("2쿼리: ",tmpArr)
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
+        tmpNodeAnimation = [...nodeAnimations];
+        tmpArrowAnimations = [...arrowAnimations];
         tmpNodeBgColor = nodeBg.selected;
         tmpNodeBorderColor = nodeBorderColor.selected;
         tmpNodeTextColor = textColor.selected;
         tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다.`;
-
-        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
+        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
 
         // Step 2: Connect the arrow
+        resetArrowPositions(); // 화살표 포지션 리셋
+
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
+        tmpNodeAnimation = [...nodeAnimations];
+        tmpArrowAnimations = [...arrowAnimations];
         tmpNodeBgColor = nodeBg.completed;
         tmpNodeBorderColor = nodeBorderColor.completed;
         tmpNodeTextColor = textColor.normal;
         tmpArrowColor = arrowColor.connecting;
-        tmpExplanation = `새로운 노드와 기존 노드 간의 연결을 수행 중입니다.`;
+        tmpExplanation = `새로운 노드와 기존 노드 간의 연결을 수행 합니다.`;
 
-        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
+        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
 
         // Step 3: Finalize connection
         tmpArrowColor = arrowColor.normal;
         tmpExplanation = `연결이 완료되었습니다.`;
 
-        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
-
-        
+        pushStackPushAnimationQuery(tmpArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode)
 
     };
 
@@ -257,35 +293,22 @@
     // 각 단계의 애니메이션(Push) 렌더링
     const drawStackPushAnimation = async (i) => {
 
-
         $explanation = $animationQuery[i].curExplanation; // $explanation 수정
-        changeCodeColor($animationQuery[i].curCode); // $codeColor 수정
+        changeCodeColor($animationQuery[i].curCode); // $codeColor 
+
+        numArr = [...$animationQuery[i].curArr];
+        nodePositions = [...$animationQuery[i].curNodePositions];
+        nodeAnimations = [...$animationQuery[i].curNodeAnimation];
+        arrowPositions = [...$animationQuery[i].curArrowPositions];
+        arrowAnimations = [...$animationQuery[i].curArrowAnimations];
 
 
-
-        if (i === 1) {
-            const newNode = {
-                x: canvasWidth / 2 - nodeWidth / 2,
-                y: canvasHeight - nodeHeight - 20, // 초기 위치
-            };
-
-            nodePositions.unshift(newNode);
-            nodeAnimations.unshift(true);
-
-            await tick();
-
-            // 새 노드 위치 애니메이션
-            nodePositions[0].y = (nodePositions[1]?.y || canvasHeight) - (nodeHeight + arrowLength);
-
-            setTimeout(() => {
-                nodeAnimations[0] = true;
-            }, 300);
-        }
-
-        
         // 슬라이드바 또는 전체 재생 중 처리
         if ($fromBtn || $isReplay) {
             $fromBtn = false;
+
+            numArr = [...$animationQuery[i].curArr];
+            nodePositions = [...$animationQuery[i].curNodePositions]
 
             if ($isReplay) {
                 await delay(2000 * (1 / $animationSpeed));
@@ -312,10 +335,7 @@
         for (let i = 0; i < arrCnt; i++) {
             numArr.push(Math.floor(Math.random() * 199) - 99);
         }
-
-        console.log(numArr);
-        console.log(nodePositions);
-        calculateNodePositions()
+        calculateNumArrPositions()
     };
 
     const createInputtedArr = (e) => {
@@ -323,10 +343,7 @@
 
         const tmpArr = e.detail.tmpArr;
         numArr = tmpArr;
-
-        console.log(numArr);
-        console.log(nodePositions);
-        calculateNodePositions()
+        calculateNumArrPositions()
     };
 
 </script>
