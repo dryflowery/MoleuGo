@@ -182,7 +182,7 @@
 
     const startPush = () => { // ******************************************* [Push]
 
-        if(!isActive || $animationWorking) {
+        if(!isActive) {
             return;
         }
 
@@ -207,11 +207,11 @@
         <div class="navigation-tooltip">
             {#if isActive}
                 {#if tooltip[0]}
-                    <span>Push()</span>
+                    <span>원소 삽입</span>
                 {:else if tooltip[1]}
-                    <span>Pop()</span>
+                    <span>원소 삭제</span>
                 {:else if tooltip[2]}
-                    <span>Peek()</span>      
+                    <span>원소 끝</span>      
                 {:else if tooltip[8]}
                     <span></span>
                 {:else if tooltip[5]}
