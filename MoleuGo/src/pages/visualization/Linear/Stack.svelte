@@ -330,7 +330,6 @@
         tmpCode = 2;
 
         tmpArrowColor[0] = arrowColor.normal;
-
         tmpNodeBgColor[0] = nodeBg.completed;
         tmpNodeBorderColor[0] = nodeBorderColor.completed;
         tmpNodeTextColor[0] = textColor.selected;
