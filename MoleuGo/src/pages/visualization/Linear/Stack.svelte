@@ -112,7 +112,7 @@
 
     $: {
         const root = document.documentElement;
-        root.style.setProperty('--speed', $animationSpeed || 1);
+        root.style.setProperty('--speed', $animationSpeed || 1); // 애니메이션 속도 조절
     }
 
     // 슬라이더 색깔관리
