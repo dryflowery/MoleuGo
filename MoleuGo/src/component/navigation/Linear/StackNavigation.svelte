@@ -3,7 +3,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
-    import { animationWorking, dummyAnimationWorking } from '../../../lib/visualizationStore';
+    import { animationWorking, animationStep, isPaused } from '../../../lib/visualizationStore';
     
     const dispatch = createEventDispatcher();
 
@@ -23,7 +23,6 @@
     let inputtedNode = '';
     let tmpArr = [];
 
-    
 
 
     const toggleNavigation = (e) => {
@@ -182,12 +181,16 @@
 
     const startPush = () => { // ******************************************* [Push]
 
-        if(!isActive || $dummyAnimationWorking ) {
-            return;
+        if($animationWorking && $animationStep[0] !== $animationStep[1]) {
+            return; // 마지막 쿼리에서만 삽입 가능
+        }
+
+        if(!isActive || !$isPaused ) {
+            return; // 애니메이션 실행 도중 삽입 불가능
         }
 
         if(!vaildPushValue()) {
-            return;
+            return; // 삽입 값 검사 
         }
 
         toggle = Array(9).fill(false);
