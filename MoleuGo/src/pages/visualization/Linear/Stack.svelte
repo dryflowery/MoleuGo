@@ -3,7 +3,8 @@
     import Header from "../../../component/Header.svelte";
     import StackNavigation from "../../../component/navigation/Linear/StackNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
-    import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
+    import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, dummyAnimationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
+
 
     let canvasWidth = window.innerWidth * 0.73;
     let canvasHeight = window.innerHeight * 0.78;
@@ -20,8 +21,6 @@
     const nodeWidth = 50;
     const nodeHeight = 50;
     const arrowLength = 50;
-
-
         
     const syncArrowArr = () => {
         // Adjust arrowArr length to match numArr.length - 1
@@ -115,6 +114,8 @@
         root.style.setProperty('--speed', $animationSpeed || 1); // 애니메이션 속도 조절
     }
 
+
+
     // 슬라이더 색깔관리
     $: $gradient = ($animationStep[0] === 0 || $animationStep[1] === 0) ? 0 : ($animationStep[0] / $animationStep[1]) * 100;
     $: sliderStyle = `linear-gradient(to right, #509650 ${$gradient}%, #585858 ${$gradient}%)`;
@@ -148,6 +149,7 @@
 
     const InitAnimation = () => {
         $animationWorking = false;
+        $dummyAnimationWorking = false;
         $pausedIcon = true;
         $isPaused = true;
         $isReplay = false;
@@ -171,15 +173,6 @@
 
     };
 
-    const semiInitAnimation = () => {
-
-        $animationWorking = false;
-        $pausedIcon = true;
-        $isPaused = true;
-        $isReplay = false;
-        $fromBtn = false;
-
-    };
 
     const changeCodeColor = (idx) => {
         for(let i = 0; i < $codeColor.length; i++) {
@@ -204,6 +197,7 @@
         generateStackPushQueries(pushNum);
 
         $animationWorking = true;
+        $dummyAnimationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
 
@@ -410,8 +404,10 @@
 
         if (i === $animationQuery.length - 1) {
             calculateNumArrPositionsNA();
+            
             nodeAnimations = Array(numArr.length).fill(false);
             arrowAnimations = Array(arrowArr.length).fill(false);
+            $dummyAnimationWorking = false;
         }
 
         await delay(1000 * (1 / $animationSpeed)); // 애니메이션 지연

@@ -3,7 +3,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
-    import { animationWorking } from '../../../lib/visualizationStore';
+    import { animationWorking, dummyAnimationWorking } from '../../../lib/visualizationStore';
     
     const dispatch = createEventDispatcher();
 
@@ -182,7 +182,7 @@
 
     const startPush = () => { // ******************************************* [Push]
 
-        if(!isActive) {
+        if(!isActive || $dummyAnimationWorking ) {
             return;
         }
 
