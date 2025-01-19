@@ -8,9 +8,10 @@
     let canvasWidth = window.innerWidth * 0.73;
     let canvasHeight = window.innerHeight * 0.78;
 
-    let numArr = [15, 10, 20, 30, 7] // 실제 값 배열
-    let arrowArr = Array(numArr.length - 1).fill(1); // 화살표 배열 개시발 이거 하나떄문에?
+    let operation = '';
 
+    let numArr = [15, 10, 20, 30, 7] // 실제 값 배열
+    let arrowArr = Array(numArr.length - 1).fill(1); // 화살표 배열(1: true , 0: false)
     let nodePositions = [];
     let nodeAnimations = [];
     let arrowPositions = [];
@@ -19,7 +20,9 @@
     const nodeWidth = 50;
     const nodeHeight = 50;
     const arrowLength = 50;
-    
+
+
+        
     const syncArrowArr = () => {
         // Adjust arrowArr length to match numArr.length - 1
         arrowArr = Array(numArr.length - 1).fill(1);
@@ -50,8 +53,27 @@
         setTimeout(() => {
             nodeAnimations = Array(numArr.length).fill(false);
             arrowAnimations = Array(arrowArr.length).fill(false);
-        }, 350); // Animation duration
+        }, 500); 
 
+    };
+
+    const calculateNumArrPositionsNA = async () => {
+        syncArrowArr();
+        nodePositions = numArr.map((_, index) => {
+            const totalHeight = (numArr.length - 1) * (nodeHeight + arrowLength);
+            const baseY = canvasHeight - totalHeight -(nodeHeight + 50);
+            return {
+                x: canvasWidth / 2 - nodeWidth / 2,
+                y: baseY + index * (nodeHeight + arrowLength),
+            };
+        });
+
+        arrowPositions = arrowArr.map((_, index) => {
+            return {
+                x: canvasWidth / 2,
+                y: nodePositions[index]?.y + nodeHeight + 4 || 0,
+            };
+        });
     };
 
 
@@ -87,6 +109,11 @@
         }
         
     };
+
+    $: {
+        const root = document.documentElement;
+        root.style.setProperty('--speed', $animationSpeed || 1); // 애니메이션 속도 조절
+    }
 
     // 슬라이더 색깔관리
     $: $gradient = ($animationStep[0] === 0 || $animationStep[1] === 0) ? 0 : ($animationStep[0] / $animationStep[1]) * 100;
@@ -130,6 +157,8 @@
         $codeColor = Array($codeColor.length).fill();
         $animationStep = [0, 0]; 
 
+        numArr = [...numArr];
+
         const node = document.querySelectorAll('.node');
         const line = document.querySelectorAll('.arrow line');
         const polygon = document.querySelectorAll('.arrow polygon');
@@ -139,6 +168,16 @@
             element.style.borderColor = "#000000";
             element.style.color = "#000000";
         });
+
+    };
+
+    const semiInitAnimation = () => {
+
+        $animationWorking = false;
+        $pausedIcon = true;
+        $isPaused = true;
+        $isReplay = false;
+        $fromBtn = false;
 
     };
 
@@ -156,7 +195,7 @@
     //=================================[ Push() ]============================================
     
     const startPush = (e) => {
-
+        operation = 'push';
         InitAnimation();
         
         const pushValue = e.detail.value;
@@ -169,18 +208,19 @@
         $isPaused = false;
 
         executeStackPushQuries($asyncCnt++);
+        
 
     };
 
     // 애니메이션(Push) 쿼리 저장
-    const pushStackPushAnimationQuery = (tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
+    const pushStackPushAnimationQuery = (tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimationss, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
         
         $animationQuery.push({
             curArr: [...tmpArr],
             curArrowArr: [...tmpArrowArr],
             curNodePositions: [...tmpNodePositions],
             curArrowPositions: [...tmpArrowPositions],
-            curNodeAnimation: [...tmpNodeAnimations],
+            curNodeAnimation: [...tmpNodeAnimationss],
             curArrowAnimations: [...tmpArrowAnimations],
             curExplanation: tmpExplanation,
             curNodeBgColor: [...tmpNodeBgColor],
@@ -195,12 +235,12 @@
     // 애니메이션(Push)
     const generateStackPushQueries = (pushValue) => {
 
-        const nodeBg = {normal: "#ffffff", selected: "#2a9ce8", completed: "#52bc69"};
-        const nodeBorderColor = {normal: "#000000", selected: "#0067a3", completed: "#13a300"};
+        const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#52bc69"};
+        const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#13a300"};
         const textColor = {normal: "#000000", selected: "#ffffff"}
-        const arrowColor = {normal: "#000000", connecting: "#0067a3"};
+        const arrowColor = {normal: "#000000", connecting: "#d97511"};
 
-        const resetNodePositions = () => { // 갱신
+        const resetNodePositions = () => { // 노드 포지션 갱신
             nodePositions = numArr.map((_, index) => {
                 const totalHeight = (numArr.length - 1) * (nodeHeight + arrowLength);
                 const baseY = canvasHeight - totalHeight -(nodeHeight + 50);
@@ -209,10 +249,11 @@
                     y: baseY + index * (nodeHeight + arrowLength),
                 };
             });
+
             nodeAnimations.unshift(true);
         };
 
-        const resetArrowPositions = () => {
+        const resetArrowPositions = () => { // 화살표 포지션 갱신
             syncArrowArr();
             arrowPositions = arrowArr.map((_, index) => {
                 return {
@@ -220,6 +261,7 @@
                     y: nodePositions[index]?.y + nodeHeight + 4 || 0,
                 };
             });
+
             arrowAnimations.unshift(true);
         };
 
@@ -229,7 +271,7 @@
         let tmpArrowArr = [...arrowArr];
         let tmpNodePositions = [...nodePositions];
         let tmpArrowPositions = [...arrowPositions];
-        let tmpNodeAnimation = [...nodeAnimations];
+        let tmpNodeAnimations = [...nodeAnimations];
         let tmpArrowAnimations = [...arrowAnimations];
         let tmpExplanation = ``;
         let tmpNodeBgColor = Array(tmpArr.length).fill(nodeBg.normal);
@@ -238,9 +280,12 @@
         let tmpArrowColor = Array(tmpArrowArr.length).fill(arrowColor.normal);
         let tmpCode = 1000;
 
+        tmpExplanation = `배열의 초기 상태입니다.`;
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
 
-        tmpExplanation = `배열의 초기 상태입니다`;
-        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        
         
         // Step 1: 새로운 노드 추가
         numArr.unshift(pushValue); // 숫자 추가
@@ -249,46 +294,53 @@
         tmpNodeBgColor[0] = nodeBg.selected; // 파란색
         tmpNodeBorderColor[0] = nodeBorderColor.selected;
         tmpNodeTextColor[0] = textColor.selected;
+        
+        tmpCode = 0;
 
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
-        tmpNodeAnimation = [...nodeAnimations];
+        tmpNodeAnimations = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
     
-        tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다.`;
-        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
 
         // Step 2: Connect the arrow
         tmpArrowColor[0] = arrowColor.connecting;
         resetArrowPositions(); // 화살표 포지션 리셋
 
+        tmpCode = 1;
+
         tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
-        tmpNodeAnimation = [...nodeAnimations];
+        tmpNodeAnimations = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
 
-        tmpExplanation = `새로운 노드와 기존 노드 간의 연결을 수행 합니다.`;
+        tmpExplanation = `새로운 노드와 기존 노드 간의 연결을 수행 합니다`;
 
-        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
         
         
         // Step 3: Finalize connection
-        tmpExplanation = `연결이 완료되었습니다.`;
+        tmpExplanation = `연결이 완료되었습니다`;
+
+        tmpCode = 2;
 
         tmpArrowColor[0] = arrowColor.normal;
         tmpNodeBgColor[0] = nodeBg.completed;
         tmpNodeBorderColor[0] = nodeBorderColor.completed;
         tmpNodeTextColor[0] = textColor.selected;
 
-        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimation, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
     };
 
     // 애니메이션(Push) 실행
     const executeStackPushQuries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
+
 
         while (true) {
             if ((myAsync + 1) !== $asyncCnt) break;
@@ -307,6 +359,7 @@
             }
         }
     };
+
     // 각 단계의 애니메이션(Push) 렌더링
     const drawStackPushAnimation = async (i) => {
 
@@ -341,9 +394,6 @@
             if (arrowColors[index]) polygon.setAttribute('fill', arrowColors[index]);
         });
 
-
-
-
         // 슬라이드바 또는 전체 재생 중 처리
         if ($fromBtn || $isReplay) {
 
@@ -356,6 +406,12 @@
                 $isPaused = true;
             }
             return;
+        }
+
+        if (i === $animationQuery.length - 1) {
+            calculateNumArrPositionsNA();
+            nodeAnimations = Array(numArr.length).fill(false);
+            arrowAnimations = Array(arrowArr.length).fill(false);
         }
 
         await delay(1000 * (1 / $animationSpeed)); // 애니메이션 지연
@@ -494,7 +550,17 @@
 
         <div class="main-right-container">
             <div class="explanation-container">
-                <div class="explanation-title">단계별 알고리즘 설명</div>
+                <div class="explanation-title">
+                    {#if operation === 'push'}
+                        단계별 알고리즘 설명 - 삽입
+                    {:else if operation === 'pop'}
+                        단계별 알고리즘 설명 - 삭제
+                    {:else if operation === 'peek'}
+                        단계별 알고리즘 설명 - peek
+                    {:else}
+                        단계별 알고리즘 설명
+                    {/if}
+                </div>
                 <div class="explanation">{@html $explanation}</div>
             </div>
 
@@ -504,14 +570,32 @@
                 <div class="code-area">
                     <!-- 코드의 class="code"로 설정 -->
                     <!-- 들여쓰기는 padding-left:35px -->
+                     
+                    {#if operation === 'push'}
+                        <!-- Push 연산 의사코드 -->
+                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">Node item = new Node(value)</div>
+                        <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">item.next = head</div>
+                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">head = item</div>
 
-                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">procedure PUSH(stack, value)</div>
-                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">if stack is full then</div>
-                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {2 * $indentSize + 10}px">raise "Stack Overflow"</div>
-                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">else</div>
-                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {2 * $indentSize + 10}px">increment top by 1</div>
-                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {2 * $indentSize + 10}px">stack[top] ← value</div>
-                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">end procedure</div>
+                    {:else if operation === 'pop'}
+                        <!-- Pop 연산 의사코드 -->
+                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">if head == null then</div>
+                        <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">return null</div>
+                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">value = head.value</div>
+                        <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">head = head.next</div>
+                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {0 * $indentSize + 10}px">return value</div>
+
+                    {:else if operation === 'peek'}
+                        <!-- Peek 연산 의사코드 -->
+                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">if head == null then</div>
+                        <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">return null</div>
+                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">return head.value</div>
+
+                    {:else}
+                        <!-- Default case -->
+                        <div class="code" style="background-color: rgba(255, 255, 255, 0); padding-left: {0 * $indentSize + 10}px">연산이 선택되지 않았습니다.</div>
+                    {/if}
+                    
                 </div>
             </div>
         </div>
@@ -591,6 +675,19 @@
         transform: translateX(0px);
 
     }   
+    :global(.node) {
+        transition: background-color calc(0.5s / var(--speed, 1)) ease, 
+                    border-color calc(0.5s / var(--speed, 1)) ease, 
+                    color calc(0.5s / var(--speed, 1)) ease;
+    }
+
+    :global(.arrow line) {
+        transition: stroke calc(0.5s / var(--speed, 1)) ease;
+    }
+
+    :global(.arrow polygon) {
+        transition: fill calc(0.5s / var(--speed, 1)) ease;
+    }
 
     @keyframes grow {
         0% {
@@ -603,8 +700,8 @@
         }
     }
 
-    .node-animation {
-        animation: grow 0.3s ease-out;
+    :global(.node-animation) {
+        animation: grow calc(0.5s / var(--speed, 1)) ease-out;
     }
 
     @keyframes arrow-line-grow {
@@ -629,13 +726,13 @@
         }
     }
 
-    .arrow-line-animation {
-        animation: arrow-line-grow 0.3s ease-out;
+    :global(.arrow-line-animation) {
+        animation: arrow-line-grow calc(0.5s / var(--speed, 1)) ease-out;
         transform-origin: top;
     }
 
-    .arrow-head-animation {
-        animation: arrow-head-move 0.3s ease-out;
+    :global(.arrow-head-animation) {
+        animation: arrow-head-move calc(0.5s / var(--speed, 1)) ease-out;
     }
 
 </style>
