@@ -4,6 +4,7 @@ const codeColorCnt = 10;
 export const codeColor = writable(Array(codeColorCnt).fill());
 export const isPaused = writable(true); 
 export const animationWorking = writable(false);
+export const dummyAnimationWorking = writable(false); // 가짜 애니메이션실행 전역 변수 => 연속으로 애니메이션 실행할 경우 사용
 export const pausedIcon = writable(true);
 export const fromBtn = writable(false);
 export const isReplay = writable(false);

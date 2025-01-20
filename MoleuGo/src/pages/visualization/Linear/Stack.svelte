@@ -20,8 +20,6 @@
     const nodeWidth = 50;
     const nodeHeight = 50;
     const arrowLength = 50;
-
-
         
     const syncArrowArr = () => {
         // Adjust arrowArr length to match numArr.length - 1
@@ -57,7 +55,7 @@
 
     };
 
-    const calculateNumArrPositionsNA = async () => {
+    const calculateNumArrPositionsNA = async () => { // 애니메이션 없이 갱신하는거
         syncArrowArr();
         nodePositions = numArr.map((_, index) => {
             const totalHeight = (numArr.length - 1) * (nodeHeight + arrowLength);
@@ -115,6 +113,8 @@
         root.style.setProperty('--speed', $animationSpeed || 1); // 애니메이션 속도 조절
     }
 
+
+
     // 슬라이더 색깔관리
     $: $gradient = ($animationStep[0] === 0 || $animationStep[1] === 0) ? 0 : ($animationStep[0] / $animationStep[1]) * 100;
     $: sliderStyle = `linear-gradient(to right, #509650 ${$gradient}%, #585858 ${$gradient}%)`;
@@ -157,7 +157,8 @@
         $codeColor = Array($codeColor.length).fill();
         $animationStep = [0, 0]; 
 
-        numArr = [...numArr];
+        nodeAnimations = Array(numArr.length).fill(false);
+        arrowAnimations = Array(arrowArr.length).fill(false);
 
         const node = document.querySelectorAll('.node');
         const line = document.querySelectorAll('.arrow line');
@@ -171,15 +172,6 @@
 
     };
 
-    const semiInitAnimation = () => {
-
-        $animationWorking = false;
-        $pausedIcon = true;
-        $isPaused = true;
-        $isReplay = false;
-        $fromBtn = false;
-
-    };
 
     const changeCodeColor = (idx) => {
         for(let i = 0; i < $codeColor.length; i++) {
@@ -281,7 +273,7 @@
         let tmpCode = 1000;
 
         tmpExplanation = `배열의 초기 상태입니다.`;
-        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
         tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
         pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
@@ -334,13 +326,12 @@
         tmpNodeBorderColor[0] = nodeBorderColor.completed;
         tmpNodeTextColor[0] = textColor.selected;
 
-        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
     };
 
     // 애니메이션(Push) 실행
     const executeStackPushQuries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
-
 
         while (true) {
             if ((myAsync + 1) !== $asyncCnt) break;
@@ -408,7 +399,8 @@
             return;
         }
 
-        if (i === $animationQuery.length - 1) {
+        if (i === $animationQuery.length - 1) { // 애니메이션 종료시
+            numArr = [...numArr];
             calculateNumArrPositionsNA();
             nodeAnimations = Array(numArr.length).fill(false);
             arrowAnimations = Array(arrowArr.length).fill(false);
@@ -533,7 +525,7 @@
                     min=0
                     max={$animationStep[1]}
                     bind:value={$animationStep[0]}
-                    on:input={() => {if($animationWorking) {$isPaused = false; $pausedIcon = true; $fromBtn = true;}}}
+                    on:input={() => {if($animationWorking) {$isPaused = false; $pausedIcon = true; $fromBtn = true; }}}
                 />
 
                 <input class="speed-slider"
