@@ -17,12 +17,14 @@
     let arrowPositions = [];
     let arrowAnimations = [];
 
+    let nodePopAnimations = [];
+    let arrowPopAnimations = [];
+
     const nodeWidth = 50;
     const nodeHeight = 50;
     const arrowLength = 50;
         
     const syncArrowArr = () => {
-        // Adjust arrowArr length to match numArr.length - 1
         arrowArr = Array(numArr.length - 1).fill(1);
     };
 
@@ -159,15 +161,26 @@
 
         nodeAnimations = Array(numArr.length).fill(false);
         arrowAnimations = Array(arrowArr.length).fill(false);
+        nodePopAnimations = Array(numArr.length).fill(false);
+        arrowPopAnimations = Array(arrowArr.length).fill(false);
 
         const node = document.querySelectorAll('.node');
-        const line = document.querySelectorAll('.arrow line');
-        const polygon = document.querySelectorAll('.arrow polygon');
+        const arrowLines = document.querySelectorAll('.arrow line');
+        const arrowPolygons = document.querySelectorAll('.arrow polygon');
+   
 
-        node.forEach(element => {
+        node.forEach(element => { 
             element.style.backgroundColor = "#ffffff";
             element.style.borderColor = "#000000";
             element.style.color = "#000000";
+        });
+
+        arrowLines.forEach(line => {
+            line.setAttribute('stroke', "#000000");
+        });
+
+        arrowPolygons.forEach(polygon => {
+            polygon.setAttribute('fill', "#000000");
         });
 
     };
@@ -183,6 +196,252 @@
             }
         }
     };
+
+    //=================================[ Pop() ]============================================
+
+    const startPop = (e) => {
+        operation = 'pop';
+        InitAnimation();
+    
+        generateStackPopQueries();
+
+        $animationWorking = true;
+        $pausedIcon = false;
+        $isPaused = false;
+
+        executeStackPopQuries($asyncCnt++);
+        
+    };
+
+    const pushStackPopAnimationQuery = (tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
+        
+        $animationQuery.push({
+            curArr: [...tmpArr],
+            curArrowArr: [...tmpArrowArr],
+            curNodePositions: [...tmpNodePositions],
+            curArrowPositions: [...tmpArrowPositions],
+            curNodePopAnimation: [...tmpNodePopAnimations],
+            curArrowPopAnimations: [...tmpArrowPopAnimations],
+            curExplanation: tmpExplanation,
+            curNodeBgColor: [...tmpNodeBgColor],
+            curNodeBorderColor: [...tmpNodeBorderColor],
+            curNodeTextColor: [...tmpNodeTextColor],
+            curArrowColor: [...tmpArrowColor],
+            curCode :tmpCode
+        });
+
+    };
+
+
+    $: if (arrowPopAnimations[0]) {
+        setTimeout(() => {
+            arrowArr[0] = 0;
+        }, 450 / $animationSpeed);  // 애니메이션 속도를 반영
+    }
+
+    $: if (nodePopAnimations[0]) {
+        setTimeout(() => {
+            const nodes = document.querySelectorAll('.node');
+            if (nodes.length > 0) {
+                
+                nodes[0].style.backgroundColor = "#ffffff";
+                nodes[0].style.borderColor = "#ffffff";
+                nodes[0].style.color = "#ffffff";
+            }
+        }, (250 / $animationSpeed) + 10); // 애니메이션 지속 시간 이후에 실행
+    }
+
+
+    const generateStackPopQueries = (pushValue) => {
+
+        const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#52bc69", hidden: "#ffffff"};
+        const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#13a300", hidden: "#ffffff"};
+        const textColor = {normal: "#000000", selected: "#ffffff", hidden: "#ffffff"}
+        const arrowColor = {normal: "#000000", connecting: "#d97511"};
+
+        const resetNodePositions = () => { // 노드 포지션 갱신
+            nodePositions = numArr.map((_, index) => {
+                const totalHeight = (numArr.length - 1) * (nodeHeight + arrowLength);
+                const baseY = canvasHeight - totalHeight -(nodeHeight + 50);
+                return {
+                    x: canvasWidth / 2 - nodeWidth / 2,
+                    y: baseY + index * (nodeHeight + arrowLength),
+                };
+            });
+        };
+
+        const resetArrowPositions = () => { // 화살표 포지션 갱신
+            syncArrowArr();
+            arrowPositions = arrowArr.map((_, index) => {
+                return {
+                    x: canvasWidth / 2,
+                    y: nodePositions[index]?.y + nodeHeight + 4 || 0,
+                };
+            });
+        };
+
+        $animationQuery = [];
+
+        let tmpArr = [...numArr];
+        let tmpArrowArr = [...arrowArr];
+        let tmpNodePositions = [...nodePositions];
+        let tmpArrowPositions = [...arrowPositions];
+        let tmpNodePopAnimations = [...nodePopAnimations];
+        let tmpArrowPopAnimations = [...arrowPopAnimations];
+        let tmpExplanation = ``;
+        let tmpNodeBgColor = Array(tmpArr.length).fill(nodeBg.normal);
+        let tmpNodeBorderColor = Array(tmpArr.length).fill(nodeBorderColor.normal);
+        let tmpNodeTextColor = Array(tmpArr.length).fill(textColor.normal);
+        let tmpArrowColor = Array(tmpArrowArr.length).fill(arrowColor.normal);
+        let tmpCode = 1000;
+
+        tmpExplanation = `배열의 초기 상태입니다.`;
+        pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+        tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
+        pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+
+        // Step 1: 화살표 삭제
+
+        arrowPopAnimations[0] = true; // 화살표 삭제 애니메이션
+
+        tmpNodeBgColor[0] = nodeBg.selected; 
+        tmpNodeBorderColor[0] = nodeBorderColor.selected;
+        tmpNodeTextColor[0] = textColor.selected;
+
+        tmpCode = 0;
+
+        tmpArr = [...numArr];
+        tmpArrowArr = [...arrowArr];
+        tmpNodePositions = [...nodePositions];
+        tmpArrowPositions = [...arrowPositions];
+        tmpNodePopAnimations = [...nodePopAnimations];
+        tmpArrowPopAnimations = [...arrowPopAnimations];
+
+        tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
+
+
+        pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+        // Step 2: 노드 삭제
+        arrowArr[0] = 0; // 화살표 없는상태 유지
+        arrowPopAnimations[0] = false; 
+        nodePopAnimations[0] = true; // true 이후 반응형으로 첫 노드 하얀색으로 변경(히든)
+    
+
+        tmpCode = 1;
+        tmpArr = [...numArr];
+        tmpArrowArr = [...arrowArr];
+        tmpNodePositions = [...nodePositions];
+        tmpArrowPositions = [...arrowPositions];
+        tmpNodePopAnimations = [...nodePopAnimations];
+        tmpArrowPopAnimations = [...arrowPopAnimations];
+
+        tmpExplanation = `새로운 노드와 기존 노드 간의 연결을 수행 합니다`;
+        pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+
+        // Step 3: Finalize connection
+        tmpExplanation = `연결이 완료되었습니다`;
+
+        nodePopAnimations[0] = false;
+        numArr.shift();
+        arrowArr[0] = 1;
+        calculateNumArrPositionsNA();
+
+        tmpNodeBgColor[0] = nodeBg.completed;
+        tmpNodeBorderColor[0] = nodeBorderColor.completed;
+        tmpNodeTextColor[0] = textColor.selected;
+
+        tmpArr = [...numArr];
+        tmpArrowArr = [...arrowArr];
+        tmpNodePositions = [...nodePositions];
+        tmpArrowPositions = [...arrowPositions];
+        tmpNodePopAnimations = [...nodePopAnimations];
+
+        tmpCode = 2;
+
+        
+        pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+    };
+
+    const executeStackPopQuries = async (myAsync) => {
+        $animationStep = [0, $animationQuery.length - 1];
+
+        while (true) {
+            if ((myAsync + 1) !== $asyncCnt) break;
+
+            if ($animationStep[0] === $animationStep[1]) {
+                $pausedIcon = true;
+                $isPaused = true;
+            }
+
+            await drawStackPopAnimation($animationStep[0]);
+            await waitPause();
+            if($animationSpeed <= 30) await delay(20);
+
+            if (!$fromBtn) {
+                $animationStep[0] = Math.min($animationStep[0] + 1, $animationStep[1]);
+            }
+        }
+    };
+
+    const drawStackPopAnimation = async (i) => {
+
+        $explanation = $animationQuery[i].curExplanation; // $explanation 수정
+        changeCodeColor($animationQuery[i].curCode); // $codeColor 
+
+        numArr = [...$animationQuery[i].curArr];
+        arrowArr = [...$animationQuery[i].curArrowArr];
+
+        nodePositions = [...$animationQuery[i].curNodePositions];
+        nodePopAnimations = [...$animationQuery[i].curNodePopAnimation];
+        arrowPositions = [...$animationQuery[i].curArrowPositions];
+        arrowPopAnimations = [...$animationQuery[i].curArrowPopAnimations];
+
+        const nodeBgColors = $animationQuery[i].curNodeBgColor;
+        const nodeBorderColors = $animationQuery[i].curNodeBorderColor;
+        const nodeTextColors = $animationQuery[i].curNodeTextColor;
+        const arrowColors = $animationQuery[i].curArrowColor;
+
+        document.querySelectorAll('.node').forEach((node, index) => {
+            if (nodeBgColors[index]) node.style.backgroundColor = nodeBgColors[index];
+            if (nodeBorderColors[index]) node.style.borderColor = nodeBorderColors[index];
+            if (nodeTextColors[index]) node.style.color = nodeTextColors[index];
+        });
+
+        // 화살표 스타일 동적으로 적용
+        document.querySelectorAll('.arrow line').forEach((line, index) => {
+            if (arrowColors[index]) line.setAttribute('stroke', arrowColors[index]);
+        });
+
+        document.querySelectorAll('.arrow polygon').forEach((polygon, index) => {
+            if (arrowColors[index]) polygon.setAttribute('fill', arrowColors[index]);
+        });
+
+        // 슬라이드바 또는 전체 재생 중 처리
+        if ($fromBtn || $isReplay) {
+
+            $fromBtn = false;
+
+            if ($isReplay) {
+                await delay(2000 * (1 / $animationSpeed));
+                $isReplay = false;
+            } else {
+                $isPaused = true;
+            }
+            return;
+        }
+
+        if (i === $animationQuery.length - 1) { // 애니메이션 종료시
+            numArr = [...numArr];
+            calculateNumArrPositionsNA();
+        }
+
+        await delay(1000 * (1 / $animationSpeed)); // 애니메이션 지연
+    };
+
 
     //=================================[ Push() ]============================================
     
@@ -381,6 +640,7 @@
         document.querySelectorAll('.arrow line').forEach((line, index) => {
             if (arrowColors[index]) line.setAttribute('stroke', arrowColors[index]);
         });
+
         document.querySelectorAll('.arrow polygon').forEach((polygon, index) => {
             if (arrowColors[index]) polygon.setAttribute('fill', arrowColors[index]);
         });
@@ -422,7 +682,7 @@
         for (let i = 0; i < arrCnt; i++) {
             numArr.push(Math.floor(Math.random() * 199) - 99);
         }
-        calculateNumArrPositions()
+        calculateNumArrPositions();
     };
 
     const createInputtedArr = (e) => {
@@ -430,7 +690,7 @@
 
         const tmpArr = e.detail.tmpArr;
         numArr = tmpArr;
-        calculateNumArrPositions()
+        calculateNumArrPositions();
     };
 
 </script>
@@ -441,6 +701,7 @@
         on:createRandomArr={createRandomArr} 
         on:createInputtedArr={createInputtedArr} 
         on:startPush={startPush}
+        on:startPop={startPop}
         />
     </div>
 
@@ -464,7 +725,7 @@
                 {#each nodePositions as pos, index (index)}
                     {#if index < numArr.length}
                         <div
-                            class="node {nodeAnimations[index] ? 'node-animation' : ''}"
+                            class="node {nodeAnimations[index] ? 'node-animation' : ''} {nodePopAnimations[index] ? 'node-pop-animation' : ''}"
                             style="top: {pos.y}px; left: {pos.x}px; width: {nodeWidth}px; height: {nodeHeight}px;">
                             {numArr[index]}
                         </div>
@@ -476,20 +737,25 @@
                         <svg
                             class="arrow"
                             style="top: {arrow.y + 4}px; left: {arrow.x}px;"
-                            width="10" height="{arrowLength - 7}" viewBox="0 0 10 {arrowLength}" xmlns="http://www.w3.org/2000/svg">
+                            width="10" height="{arrowLength - 7}" viewBox="0 0 10 {arrowLength}" xmlns="http://www.w3.org/2000/svg"
+                            >
                             <line
-                                class="{arrowAnimations[index] ? 'arrow-line-animation' : ''}"
+                                class="{arrowAnimations[index] ? 'arrow-line-animation' : ''} {arrowPopAnimations[index] ? 'arrow-line-animation-pop' : ''}"
                                 x1="5" y1="0" x2="5" y2="{arrowLength - 10}" 
                                 stroke="#000" stroke-width="3.5" />
                             <polygon
-                                class="{arrowAnimations[index] ? 'arrow-head-animation' : ''}"
+                                class="{arrowAnimations[index] ? 'arrow-head-animation' : ''} {arrowPopAnimations[index] ? 'arrow-head-animation-pop' : ''}"
                                 points="0,{arrowLength - 10} 11,{arrowLength - 10} 5,{arrowLength}" 
                                 fill="#000" />
                         </svg>
                     {/if}
                 {/each}
 
-
+                <div class="max-indicator">
+                    <div class="max-line"></div>
+                    <div class="max-label">MAX</div>
+                </div>
+                
             </div>
 
             <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -726,5 +992,81 @@
     :global(.arrow-head-animation) {
         animation: arrow-head-move calc(0.5s / var(--speed, 1)) ease-out;
     }
+
+    .max-indicator {
+        display: none;
+    }
+
+    @media screen and (min-width: 2560px) {
+            .max-indicator {
+            position: absolute;
+            top: calc(100% - 7 * (50px + 50px) - 40px); /* 스택 노드 7개 기준으로 위치 조정 */
+            left: 51.7%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .max-line {
+            width: 150px; /* 선의 길이 조정 */
+            height: 3px;
+            background-color: #509650;
+        }
+
+        .max-label {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #509650;
+        }
+    }
+
+
+    @keyframes shrink { /*축소 애니메이션*/
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(0);
+            opacity: 0;
+        }
+    }
+
+    :global(.node-pop-animation) {
+        animation: shrink calc(0.5s / var(--speed, 1)) ease-out;
+    }
+
+    @keyframes arrow-line-shrink  {
+        0% {
+            transform: scaleY(1);
+            opacity: 0;
+        }
+        100% {
+            transform: scaleY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes arrow-head-move-reverse {
+        0% {
+            transform: translateY(0);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(-100%);
+            opacity: 1;
+        }
+    }
+
+    :global(.arrow-line-animation-pop) {
+        animation: arrow-line-shrink calc(0.5s / var(--speed, 1)) ease-out;
+        transform-origin: top;
+    }
+
+    :global(.arrow-head-animation-pop) {
+        animation: arrow-head-move-reverse calc(0.5s / var(--speed, 1)) ease-out;
+    }
+
 
 </style>

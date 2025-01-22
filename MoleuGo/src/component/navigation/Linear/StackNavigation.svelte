@@ -168,6 +168,7 @@
         if(!isActive || !validInputtedNode(e)) {
             return;
         }
+        
         dispatch('createInputtedArr', {tmpArr});
     };
 
@@ -181,12 +182,15 @@
 
     const startPush = () => { // ******************************************* [Push]
 
-        if($animationWorking && $animationStep[0] !== $animationStep[1]) {
-            return; // 마지막 쿼리에서만 삽입 가능
+        if(!isActive || !$isPaused ) {
+            alert("애니메이션 실행 중 입니다.");
+            return; // 애니메이션 실행 도중 삽입 불가능
         }
 
-        if(!isActive || !$isPaused ) {
-            return; // 애니메이션 실행 도중 삽입 불가능
+
+        if($animationWorking && $animationStep[0] !== $animationStep[1]) {
+            alert("마지막 단계에서만 삽입 가능합니다.");
+            return; // 마지막 쿼리에서만 삽입 가능
         }
 
         if(!vaildPushValue()) {
@@ -197,6 +201,28 @@
         isActive = false;
 
         dispatch('startPush', { value: pushValue } );
+    }
+
+    const startPop = () => { // ******************************************* [Pop]
+
+        if(!isActive || !$isPaused ) {
+            alert("애니메이션 실행 중 입니다.");
+            return; // 애니메이션 실행 도중 삭제 불가능
+        }
+
+
+        if($animationWorking && $animationStep[0] !== $animationStep[1]) {
+            alert("마지막 단계에서만 삽입 가능합니다.");
+            return; // 마지막 쿼리에서만 삭제 가능
+        }
+
+        if (numArr.length === 0) return;
+
+
+        toggle = Array(9).fill(false);
+        isActive = false;
+
+        dispatch('startPop' );
     }
 
 
@@ -270,11 +296,11 @@
 
                 <!-- 1번 (삭제) -->
                 <span style="--i:1; --x:0; --y:-1"> 
-                    <ion-icon name="remove-circle-outline" on:click={() => changeToggle(1)} 
+                    <ion-icon name="remove-circle-outline" on:click={startPop}
                         on:mouseenter={() => tooltip[1] = true} on:mouseleave={() => tooltip[1] = false}></ion-icon>
                 </span>
 
-                <!-- 2번 (찾기) -->
+                <!-- 2번 (맨위) -->
                 <span style="--i:2; --x:1; --y:-1" on:click={() => changeToggle(2)} 
                     on:mouseenter={() => tooltip[2] = true} on:mouseleave={() => tooltip[2] = false}>
                     <ion-icon name="golf-outline"></ion-icon>
