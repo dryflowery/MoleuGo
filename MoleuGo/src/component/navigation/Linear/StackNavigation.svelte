@@ -216,13 +216,31 @@
             return; // 마지막 쿼리에서만 삭제 가능
         }
 
-        if (numArr.length === 0) return;
+
+        toggle = Array(9).fill(false);
+        isActive = false;
+
+        dispatch('startPop');
+    }
+
+    const startPeek = () => { // ******************************************* [Peek]
+
+        if(!isActive || !$isPaused ) {
+            alert("애니메이션 실행 중 입니다.");
+            return; // 애니메이션 실행 도중 삭제 불가능
+        }
+
+
+        if($animationWorking && $animationStep[0] !== $animationStep[1]) {
+            alert("마지막 단계에서만 삽입 가능합니다.");
+            return; // 마지막 쿼리에서만 삭제 가능
+        }
 
 
         toggle = Array(9).fill(false);
         isActive = false;
 
-        dispatch('startPop' );
+        dispatch('startPeek');
     }
 
 
@@ -301,7 +319,7 @@
                 </span>
 
                 <!-- 2번 (맨위) -->
-                <span style="--i:2; --x:1; --y:-1" on:click={() => changeToggle(2)} 
+                <span style="--i:2; --x:1; --y:-1" on:click={startPeek} 
                     on:mouseenter={() => tooltip[2] = true} on:mouseleave={() => tooltip[2] = false}>
                     <ion-icon name="golf-outline"></ion-icon>
                 </span>

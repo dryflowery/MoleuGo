@@ -20,6 +20,8 @@
     let nodePopAnimations = [];
     let arrowPopAnimations = [];
 
+    let flagAnimation = false; 
+
     const nodeWidth = 50;
     const nodeHeight = 50;
     const arrowLength = 50;
@@ -159,6 +161,8 @@
         $codeColor = Array($codeColor.length).fill();
         $animationStep = [0, 0]; 
 
+        flagAnimation = false;
+
         nodeAnimations = Array(numArr.length).fill(false);
         arrowAnimations = Array(arrowArr.length).fill(false);
         nodePopAnimations = Array(numArr.length).fill(false);
@@ -196,6 +200,125 @@
             }
         }
     };
+
+    //=================================[ Peek() ]============================================
+
+    const startPeek = () => {
+        operation = 'peek';
+        InitAnimation();
+
+        generateStackPeekQueries();
+        
+        $animationWorking = true;
+        $pausedIcon = false;
+        $isPaused = false;
+
+        executeStackPeekQuries($asyncCnt++);
+
+    };
+
+    const pushStackPeekAnimationQuery = (tmpExplanation, tmpFlagAnimation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode) => {
+        
+        $animationQuery.push({
+            curExplanation: tmpExplanation,
+            curFlagAnimation: tmpFlagAnimation,
+            curNodeBgColor: [...tmpNodeBgColor],
+            curNodeBorderColor: [...tmpNodeBorderColor],
+            curNodeTextColor: [...tmpNodeTextColor],
+            curCode :tmpCode
+        });
+
+    };
+
+    const generateStackPeekQueries = () => {
+
+        const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#52bc69", hidden: "#ffffff"};
+        const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#13a300", hidden: "#ffffff"};
+        const textColor = {normal: "#000000", selected: "#ffffff", hidden: "#ffffff"}
+
+        $animationQuery = [];
+
+        if (numArr.length === 0) {
+            
+            pushStackPeekAnimationQuery(`스택이 비어있습니다.`, [], [], [], 0);
+
+            return;  // 비어있는 경우
+        }
+
+
+        let tmpArr = [...numArr];
+        let tmpExplanation = ``;
+        let tmpFlagAnimation = flagAnimation;
+        let tmpNodeBgColor = Array(tmpArr.length).fill(nodeBg.normal);
+        let tmpNodeBorderColor = Array(tmpArr.length).fill(nodeBorderColor.normal);
+        let tmpNodeTextColor = Array(tmpArr.length).fill(textColor.normal);
+        let tmpCode = 1000;
+
+        tmpExplanation = `배열의 초기 상태입니다.`;
+        pushStackPeekAnimationQuery(tmpExplanation, tmpFlagAnimation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
+
+        tmpFlagAnimation = true;
+        tmpExplanation = `맨 위 노드`
+        tmpCode = 1;
+        pushStackPeekAnimationQuery(tmpExplanation, tmpFlagAnimation ,tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
+
+    }
+
+    const executeStackPeekQuries = async (myAsync) => {
+        $animationStep = [0, $animationQuery.length - 1];
+
+        while (true) {
+            if ((myAsync + 1) !== $asyncCnt) break;
+
+            if ($animationStep[0] === $animationStep[1]) {
+                $pausedIcon = true;
+                $isPaused = true;
+            }
+
+            await drawStackPeekAnimation($animationStep[0]);
+            await waitPause();
+            if($animationSpeed <= 30) await delay(20);
+
+            if (!$fromBtn) {
+                $animationStep[0] = Math.min($animationStep[0] + 1, $animationStep[1]);
+            }
+        }
+    }; 
+
+    const drawStackPeekAnimation = async (i) => {
+
+        $explanation = $animationQuery[i].curExplanation; // $explanation 수정
+        changeCodeColor($animationQuery[i].curCode); // $codeColor 
+
+        flagAnimation = $animationQuery[i].curFlagAnimation; // 깃발 상태
+
+        await tick(); // UI 갱신을 위해 tick() 사용
+
+        if (flagAnimation) {
+            await delay(500);  // 깃발 애니메이션 효과
+        }
+
+        if (i === $animationQuery.length - 1) {
+            calculateNumArrPositionsNA();
+        }
+  
+        // 슬라이드바 또는 전체 재생 중 처리
+        if ($fromBtn || $isReplay) {
+
+            $fromBtn = false;
+
+            if ($isReplay) {
+                await delay(2000 * (1 / $animationSpeed));
+                $isReplay = false;
+            } else {
+                $isPaused = true;
+            }
+            return;
+        }
+
+        await delay(1000 * (1 / $animationSpeed)); // 애니메이션 지연
+    };
+
 
     //=================================[ Pop() ]============================================
 
@@ -236,7 +359,7 @@
     $: if (arrowPopAnimations[0]) {
         setTimeout(() => {
             arrowArr[0] = 0;
-        }, 450 / $animationSpeed);  // 애니메이션 속도를 반영
+        }, 450 / $animationSpeed); 
     }
 
     $: if (nodePopAnimations[0]) {
@@ -248,11 +371,11 @@
                 nodes[0].style.borderColor = "#ffffff";
                 nodes[0].style.color = "#ffffff";
             }
-        }, (250 / $animationSpeed) + 10); // 애니메이션 지속 시간 이후에 실행
+        }, (250 / $animationSpeed) + 10); 
     }
 
 
-    const generateStackPopQueries = (pushValue) => {
+    const generateStackPopQueries = () => {
 
         const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#52bc69", hidden: "#ffffff"};
         const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#13a300", hidden: "#ffffff"};
@@ -270,17 +393,15 @@
             });
         };
 
-        const resetArrowPositions = () => { // 화살표 포지션 갱신
-            syncArrowArr();
-            arrowPositions = arrowArr.map((_, index) => {
-                return {
-                    x: canvasWidth / 2,
-                    y: nodePositions[index]?.y + nodeHeight + 4 || 0,
-                };
-            });
-        };
-
         $animationQuery = [];
+
+        if (numArr.length === 0) {
+            
+            pushStackPopAnimationQuery([], [], [], [], [], [], `스택이 비어있어 삭제할 항목이 없습니다.`, [], [], [], [], 0);
+
+            return;  // 비어있는 경우
+        }
+
 
         let tmpArr = [...numArr];
         let tmpArrowArr = [...arrowArr];
@@ -310,7 +431,7 @@
         tmpNodeBorderColor[0] = nodeBorderColor.selected;
         tmpNodeTextColor[0] = textColor.selected;
 
-        tmpCode = 0;
+        tmpCode = 1;
 
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
@@ -319,7 +440,7 @@
         tmpNodePopAnimations = [...nodePopAnimations];
         tmpArrowPopAnimations = [...arrowPopAnimations];
 
-        tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
+        tmpExplanation = `연결을 삭제합니다`;
 
 
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
@@ -330,7 +451,7 @@
         nodePopAnimations[0] = true; // true 이후 반응형으로 첫 노드 하얀색으로 변경(히든)
     
 
-        tmpCode = 1;
+        tmpCode = 2;
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
@@ -338,29 +459,30 @@
         tmpNodePopAnimations = [...nodePopAnimations];
         tmpArrowPopAnimations = [...arrowPopAnimations];
 
-        tmpExplanation = `새로운 노드와 기존 노드 간의 연결을 수행 합니다`;
+        tmpExplanation = `값을 리턴 합니다`;
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
 
-        // Step 3: Finalize connection
-        tmpExplanation = `연결이 완료되었습니다`;
+        tmpExplanation = `삭제연산 완료.`;
 
         nodePopAnimations[0] = false;
         numArr.shift();
-        arrowArr[0] = 1;
-        calculateNumArrPositionsNA();
+        arrowArr[0] = 1;    
+        resetNodePositions();
 
         tmpNodeBgColor[0] = nodeBg.completed;
         tmpNodeBorderColor[0] = nodeBorderColor.completed;
         tmpNodeTextColor[0] = textColor.selected;
 
+        calculateNumArrPositionsNA();
+        
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
         tmpNodePopAnimations = [...nodePopAnimations];
 
-        tmpCode = 2;
+        tmpCode = 3;
 
         
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
@@ -702,6 +824,7 @@
         on:createInputtedArr={createInputtedArr} 
         on:startPush={startPush}
         on:startPop={startPop}
+        on:startPeek={startPeek}
         />
     </div>
 
@@ -725,9 +848,17 @@
                 {#each nodePositions as pos, index (index)}
                     {#if index < numArr.length}
                         <div
-                            class="node {nodeAnimations[index] ? 'node-animation' : ''} {nodePopAnimations[index] ? 'node-pop-animation' : ''}"
+                            class="node {nodeAnimations[index] ? 'node-animation' : ''} {nodePopAnimations[index] ? 'node-pop-animation' : ''} {index === 0 && flagAnimation ? 'flagged' : ''}"
                             style="top: {pos.y}px; left: {pos.x}px; width: {nodeWidth}px; height: {nodeHeight}px;">
                             {numArr[index]}
+
+                            {#if index === 0}
+                                <div class="flag-container {flagAnimation ? 'appear' : ''}">
+                                    <div class="flag-pole"></div>
+                                    <div class="flag-cloth"></div>
+                                </div>
+                            {/if}
+
                         </div>
                     {/if}
                 {/each}
@@ -837,17 +968,15 @@
 
                     {:else if operation === 'pop'}
                         <!-- Pop 연산 의사코드 -->
-                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">if head == null then</div>
-                        <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">return null</div>
-                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">value = head.value</div>
+                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">if head == null then return null</div>
+                        <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">value = head.value</div>
+                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 35}px">return value</div>
                         <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">head = head.next</div>
-                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {0 * $indentSize + 10}px">return value</div>
 
                     {:else if operation === 'peek'}
                         <!-- Peek 연산 의사코드 -->
-                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">if head == null then</div>
-                        <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">return null</div>
-                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">return head.value</div>
+                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">if head == null then return null</div>
+                        <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">return head.value</div>
 
                     {:else}
                         <!-- Default case -->
@@ -1067,6 +1196,72 @@
     :global(.arrow-head-animation-pop) {
         animation: arrow-head-move-reverse calc(0.5s / var(--speed, 1)) ease-out;
     }
+
+    @keyframes flagAppear {
+        0% {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.8) rotate(15deg);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1) rotate(15deg);
+        }
+    }
+
+    @keyframes flagWave {
+        0% { transform: skewX(0deg) translateX(0px) rotate(0deg); }
+        20% { transform: skewX(-5deg) translateX(2px) rotate(-3deg); }
+        40% { transform: skewX(5deg) translateX(-4px) rotate(5deg); }
+        60% { transform: skewX(-3deg) translateX(3px) rotate(-2deg); }
+        80% { transform: skewX(4deg) translateX(-2px) rotate(3deg); }
+        100% { transform: skewX(0deg) translateX(0px) rotate(0deg); }
+    }
+
+    @keyframes flagFlap {
+        0% { transform: scaleX(1) rotate(0deg); }
+        50% { transform: scaleX(0.9) rotate(2deg); }
+        100% { transform: scaleX(1) rotate(0deg); }
+    }
+
+    .flag-container {
+        position: absolute;
+        top: -42px;
+        left: 100%;
+        transform: translateX(-50%);
+        transform: rotate(15deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .flag-container.appear {
+        animation: flagAppear 0.5s ease forwards;
+    }
+
+    .flag-pole {
+        width: 5px;
+        height: 45px;
+        background-color: rgb(68, 34, 34);
+        border-radius: 3px;
+    }
+
+    .flag-cloth {
+        margin-bottom: 10px;
+        width: 30px;
+        height: 20px;
+        background: linear-gradient(to right, red, darkred);
+        border-radius: 3px 10px 10px 3px;
+        transform-origin: left center;
+        animation: 
+            flagWave 2s infinite cubic-bezier(0.36, 0.55, 0.63, 0.99),
+            flagFlap 1s infinite ease-in-out;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+
+    
 
 
 </style>
