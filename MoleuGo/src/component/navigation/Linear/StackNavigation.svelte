@@ -258,7 +258,7 @@
                 {:else if tooltip[1]}
                     <span>원소 삭제</span>
                 {:else if tooltip[2]}
-                    <span>원소 끝</span>      
+                    <span>최상단 원소 조회</span>      
                 {:else if tooltip[8]}
                     <span></span>
                 {:else if tooltip[5]}

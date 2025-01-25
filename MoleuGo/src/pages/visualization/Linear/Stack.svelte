@@ -21,10 +21,21 @@
     let arrowPopAnimations = [];
 
     let flagAnimation = false; 
+    let flagDisappearAnimation = false;
+    let hasPeekRun = false;  // peek 연산이 실행되었는지 확인하는 변수
 
     const nodeWidth = 50;
     const nodeHeight = 50;
     const arrowLength = 50;
+
+    $: {
+        if (!flagAnimation && hasPeekRun) {
+            flagDisappearAnimation = true;
+        } else {
+            flagDisappearAnimation = false;
+        }
+    }
+
         
     const syncArrowArr = () => {
         arrowArr = Array(numArr.length - 1).fill(1);
@@ -169,17 +180,8 @@
         $animationStep = [0, 0]; 
 
         resetNodeStyles();
-        
-        const flagElement = document.querySelector('.flag-container');
-        
-        if (flagElement) {
-            flagElement.classList.remove('appear');
-            flagElement.classList.add('disappear');
-        }
 
-        setTimeout(() => {
-            flagAnimation = false;  // 애니메이션이 끝난 후 상태 업데이트
-        }, 500);
+        flagAnimation = false;
 
         nodeAnimations = Array(numArr.length).fill(false);
         arrowAnimations = Array(arrowArr.length).fill(false);
@@ -313,7 +315,7 @@
         $explanation = $animationQuery[i].curExplanation; // $explanation 수정
         changeCodeColor($animationQuery[i].curCode); // $codeColor 
 
-        flagAnimation = $animationQuery[i].curFlagAnimation; // 깃발 상태
+        flagAnimation = $animationQuery[i].curFlagAnimation; // 깃발 상태 
 
         await tick(); // UI 갱신을 위해 tick() 사용
 
@@ -324,7 +326,6 @@
         const nodeBgColors = $animationQuery[i].curNodeBgColor;
         const nodeBorderColors = $animationQuery[i].curNodeBorderColor;
         const nodeTextColors = $animationQuery[i].curNodeTextColor;
-        const arrowColors = $animationQuery[i].curArrowColor;
 
         document.querySelectorAll('.node').forEach((node, index) => {
             if (nodeBgColors[index]) node.style.backgroundColor = nodeBgColors[index];
@@ -333,6 +334,7 @@
         });
 
         if (i === $animationQuery.length - 1) {
+            hasPeekRun = true;
             calculateNumArrPositionsNA();
         }
   
@@ -400,10 +402,12 @@
         setTimeout(() => {
             const nodes = document.querySelectorAll('.node');
             if (nodes.length > 0) {
-                
+
                 nodes[0].style.backgroundColor = "#ffffff";
                 nodes[0].style.borderColor = "#ffffff";
                 nodes[0].style.color = "#ffffff";
+                nodes[0].style.transition = "none";
+
             }
         }, (250 / $animationSpeed) + 10); 
     }
@@ -464,10 +468,6 @@
         tmpNodeBorderColor[0] = nodeBorderColor.selected;
         tmpNodeTextColor[0] = textColor.selected;
 
-        tmpNodeBgColor[1] = nodeBg.completed;
-        tmpNodeBorderColor[1] = nodeBorderColor.completed;
-        tmpNodeTextColor[1] = textColor.selected;
-
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
@@ -483,6 +483,10 @@
         // Step 2
         tmpCode = 2;
         arrowPopAnimations[0] = true; // 화살표 삭제 애니메이션
+
+        tmpNodeBgColor[1] = nodeBg.completed;
+        tmpNodeBorderColor[1] = nodeBorderColor.completed;
+        tmpNodeTextColor[1] = textColor.selected;
 
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
@@ -915,7 +919,7 @@
                             {numArr[index]}
 
                             {#if index === 0}
-                                <div class="flag-container {flagAnimation ? 'appear' : ''}">
+                                <div class="flag-container {flagAnimation ? 'appear' : ''} {flagDisappearAnimation ? 'disappear' : ''}">
                                     <div class="flag-pole"></div>
                                     <div class="flag-cloth"></div>
                                 </div>
@@ -1007,7 +1011,7 @@
                     {:else if operation === 'pop'}
                         단계별 알고리즘 설명 - 삭제
                     {:else if operation === 'peek'}
-                        단계별 알고리즘 설명 - peek
+                        단계별 알고리즘 설명 - 조회
                     {:else}
                         단계별 알고리즘 설명
                     {/if}
@@ -1270,6 +1274,17 @@
         }
     }
 
+    @keyframes flagDisappear {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(15deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.8) rotate(15deg);
+    }
+}
+
     @keyframes flagWave {
         0% { transform: skewX(0deg) translateX(0px) rotate(0deg); }
         20% { transform: skewX(-5deg) translateX(2px) rotate(-3deg); }
@@ -1325,9 +1340,6 @@
             flagFlap 1s infinite ease-in-out;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }
-
-
-    
-
+        
 
 </style>
