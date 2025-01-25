@@ -30,6 +30,13 @@
         arrowArr = Array(numArr.length - 1).fill(1);
     };
 
+    const resetNodeStyles = () => {
+        document.querySelectorAll('.node').forEach(node => {
+            node.classList.remove('no-transition');
+            node.style.transition = "";
+        });
+    };
+
     const calculateNumArrPositions = async () => {
         syncArrowArr();
         nodePositions = numArr.map((_, index) => {
@@ -161,7 +168,18 @@
         $codeColor = Array($codeColor.length).fill();
         $animationStep = [0, 0]; 
 
-        flagAnimation = false;
+        resetNodeStyles();
+        
+        const flagElement = document.querySelector('.flag-container');
+        
+        if (flagElement) {
+            flagElement.classList.remove('appear');
+            flagElement.classList.add('disappear');
+        }
+
+        setTimeout(() => {
+            flagAnimation = false;  // 애니메이션이 끝난 후 상태 업데이트
+        }, 500);
 
         nodeAnimations = Array(numArr.length).fill(false);
         arrowAnimations = Array(arrowArr.length).fill(false);
@@ -240,7 +258,7 @@
 
         if (numArr.length === 0) {
             
-            pushStackPeekAnimationQuery(`스택이 비어있는지 확인합니다.`, [], [], [], 0);
+            pushStackPeekAnimationQuery(`스택이 비어있는지 확인합니다`, [], [], [], 0);
 
             return;  // 비어있는 경우
         }
@@ -254,12 +272,17 @@
         let tmpNodeTextColor = Array(tmpArr.length).fill(textColor.normal);
         let tmpCode = 1000;
 
-        tmpExplanation = `배열의 초기 상태입니다.`;
+        tmpExplanation = `배열의 초기 상태입니다`;
         pushStackPeekAnimationQuery(tmpExplanation, tmpFlagAnimation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
 
         tmpFlagAnimation = true;
-        tmpExplanation = `head 노드의 값을 반환합니다.`
+        tmpExplanation = `head 노드의 값(${tmpArr[0]})을 반환합니다`
         tmpCode = 1;
+
+        tmpNodeBgColor[0] = nodeBg.completed; 
+        tmpNodeBorderColor[0] = nodeBorderColor.completed;
+        tmpNodeTextColor[0] = textColor.selected;
+
         pushStackPeekAnimationQuery(tmpExplanation, tmpFlagAnimation ,tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
 
     }
@@ -297,6 +320,17 @@
         if (flagAnimation) {
             await delay(500);  // 깃발 애니메이션 효과
         }
+
+        const nodeBgColors = $animationQuery[i].curNodeBgColor;
+        const nodeBorderColors = $animationQuery[i].curNodeBorderColor;
+        const nodeTextColors = $animationQuery[i].curNodeTextColor;
+        const arrowColors = $animationQuery[i].curArrowColor;
+
+        document.querySelectorAll('.node').forEach((node, index) => {
+            if (nodeBgColors[index]) node.style.backgroundColor = nodeBgColors[index];
+            if (nodeBorderColors[index]) node.style.borderColor = nodeBorderColors[index];
+            if (nodeTextColors[index]) node.style.color = nodeTextColors[index];
+        });
 
         if (i === $animationQuery.length - 1) {
             calculateNumArrPositionsNA();
@@ -397,7 +431,7 @@
 
         if (numArr.length === 0) {
             
-            pushStackPopAnimationQuery([], [], [], [], [], [], `스택이 비어있어 삭제할 항목이 없습니다.`, [], [], [], [], 0);
+            pushStackPopAnimationQuery([], [], [], [], [], [], `스택이 비어있어 삭제할 항목이 없습니다`, [], [], [], [], 0);
 
             return;  // 비어있는 경우
         }
@@ -416,10 +450,10 @@
         let tmpArrowColor = Array(tmpArrowArr.length).fill(arrowColor.normal);
         let tmpCode = 1000;
 
-        tmpExplanation = `배열의 초기 상태입니다.`;
+        tmpExplanation = `배열의 초기 상태입니다`;
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
-        tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
+        tmpExplanation = `배열의 초기 상태입니다`; // 애니메이션 재실행 보험용 쿼리
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
 
@@ -441,7 +475,7 @@
         tmpNodePopAnimations = [...nodePopAnimations];
         tmpArrowPopAnimations = [...arrowPopAnimations];
 
-        tmpExplanation = `head 노드의 값을 임시 변수에 저장합니다.`;
+        tmpExplanation = `head 노드의 값(${tmpArr[0]})을 임시 변수에 저장합니다`;
 
 
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
@@ -457,7 +491,7 @@
         tmpNodePopAnimations = [...nodePopAnimations];
         tmpArrowPopAnimations = [...arrowPopAnimations];
 
-        tmpExplanation = `head 포인터를 다음 노드로 변경합니다.`;
+        tmpExplanation = `head 포인터를 다음 노드(${tmpArr[1]})로 변경합니다`;
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
         // Step 3
@@ -468,7 +502,7 @@
         nodePopAnimations[0] = true; // true 이후 반응형으로 첫 노드 하얀색으로 변경(히든)
 
 
-        tmpExplanation = `저장한 값을 반환합니다.`;
+        tmpExplanation = `저장한 값(${tmpArr[0]})을 반환합니다`;
         
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
@@ -481,7 +515,7 @@
 
         // step 4
         tmpCode = 3;
-
+        tmpExplanation = `삭제연산 완료`;
         nodePopAnimations[0] = false;
 
         numArr.shift();
@@ -720,7 +754,7 @@
         tmpNodeAnimations = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
 
-        tmpExplanation = `새로운 노드와 기존 노드 간의 연결을 수행 합니다`;
+        tmpExplanation = `새로운 노드(${pushValue})와 기존 노드(${tmpArr[1]}) 간의 연결을 수행 합니다`;
 
         pushStackPushAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
         
@@ -1266,6 +1300,10 @@
 
     .flag-container.appear {
         animation: flagAppear 0.5s ease forwards;
+    }
+
+    .flag-container.disappear {
+        animation: flagDisappear 0.5s ease forwards;
     }
 
     .flag-pole {
