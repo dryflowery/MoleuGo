@@ -240,7 +240,7 @@
 
         if (numArr.length === 0) {
             
-            pushStackPeekAnimationQuery(`스택이 비어있습니다.`, [], [], [], 0);
+            pushStackPeekAnimationQuery(`스택이 비어있는지 확인합니다.`, [], [], [], 0);
 
             return;  // 비어있는 경우
         }
@@ -258,7 +258,7 @@
         pushStackPeekAnimationQuery(tmpExplanation, tmpFlagAnimation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
 
         tmpFlagAnimation = true;
-        tmpExplanation = `맨 위 노드`
+        tmpExplanation = `head 노드의 값을 반환합니다.`
         tmpCode = 1;
         pushStackPeekAnimationQuery(tmpExplanation, tmpFlagAnimation ,tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
 
@@ -423,15 +423,16 @@
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
 
-        // Step 1: 화살표 삭제
-
-        arrowPopAnimations[0] = true; // 화살표 삭제 애니메이션
+        // Step 1
+        tmpCode = 1;
 
         tmpNodeBgColor[0] = nodeBg.selected; 
         tmpNodeBorderColor[0] = nodeBorderColor.selected;
         tmpNodeTextColor[0] = textColor.selected;
 
-        tmpCode = 1;
+        tmpNodeBgColor[1] = nodeBg.completed;
+        tmpNodeBorderColor[1] = nodeBorderColor.completed;
+        tmpNodeTextColor[1] = textColor.selected;
 
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
@@ -440,51 +441,69 @@
         tmpNodePopAnimations = [...nodePopAnimations];
         tmpArrowPopAnimations = [...arrowPopAnimations];
 
-        tmpExplanation = `연결을 삭제합니다`;
+        tmpExplanation = `head 노드의 값을 임시 변수에 저장합니다.`;
 
 
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
-        // Step 2: 노드 삭제
+        // Step 2
+        tmpCode = 2;
+        arrowPopAnimations[0] = true; // 화살표 삭제 애니메이션
+
+        tmpArr = [...numArr];
+        tmpArrowArr = [...arrowArr];
+        tmpNodePositions = [...nodePositions];
+        tmpArrowPositions = [...arrowPositions];
+        tmpNodePopAnimations = [...nodePopAnimations];
+        tmpArrowPopAnimations = [...arrowPopAnimations];
+
+        tmpExplanation = `head 포인터를 다음 노드로 변경합니다.`;
+        pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+        // Step 3
+        tmpCode = 3;
+
         arrowArr[0] = 0; // 화살표 없는상태 유지
         arrowPopAnimations[0] = false; 
         nodePopAnimations[0] = true; // true 이후 반응형으로 첫 노드 하얀색으로 변경(히든)
-    
 
-        tmpCode = 2;
+
+        tmpExplanation = `저장한 값을 반환합니다.`;
+        
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
         tmpNodePopAnimations = [...nodePopAnimations];
         tmpArrowPopAnimations = [...arrowPopAnimations];
-
-        tmpExplanation = `값을 리턴 합니다`;
+        
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
-
-        tmpExplanation = `삭제연산 완료.`;
+        // step 4
+        tmpCode = 3;
 
         nodePopAnimations[0] = false;
+
         numArr.shift();
         arrowArr[0] = 1;    
         resetNodePositions();
+        calculateNumArrPositionsNA();
 
-        tmpNodeBgColor[0] = nodeBg.completed;
+        tmpNodeBgColor[0] = nodeBg.completed; 
         tmpNodeBorderColor[0] = nodeBorderColor.completed;
         tmpNodeTextColor[0] = textColor.selected;
 
-        calculateNumArrPositionsNA();
-        
+        tmpNodeBgColor[1] = nodeBg.normal;
+        tmpNodeBorderColor[1] = nodeBorderColor.normal;
+        tmpNodeTextColor[1] = textColor.normal;
+
+
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
         tmpNodePopAnimations = [...nodePopAnimations];
 
-        tmpCode = 3;
-
-        
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
     };
 
@@ -528,9 +547,18 @@
         const arrowColors = $animationQuery[i].curArrowColor;
 
         document.querySelectorAll('.node').forEach((node, index) => {
-            if (nodeBgColors[index]) node.style.backgroundColor = nodeBgColors[index];
-            if (nodeBorderColors[index]) node.style.borderColor = nodeBorderColors[index];
-            if (nodeTextColors[index]) node.style.color = nodeTextColors[index];
+            if (nodeBgColors[index]) {
+                node.style.backgroundColor = nodeBgColors[index];
+                node.style.borderColor = nodeBorderColors[index];
+                node.style.color = nodeTextColors[index];
+
+                // 마지막 쿼리에서 트랜지션 제거
+                if (i === $animationQuery.length - 1) {
+                    node.style.transition = "none";
+                } else {
+                    node.style.transition = "";
+                }
+            }
         });
 
         // 화살표 스타일 동적으로 적용
@@ -970,8 +998,8 @@
                         <!-- Pop 연산 의사코드 -->
                         <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">if head == null then return null</div>
                         <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">value = head.value</div>
-                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 35}px">return value</div>
-                        <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">head = head.next</div>
+                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">head = head.next</div>
+                        <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">return value</div>
 
                     {:else if operation === 'peek'}
                         <!-- Peek 연산 의사코드 -->
