@@ -12,6 +12,7 @@
   import ConvexHull from './routes/visualization/geometry/ConvexHull.svelte';
   import LinkedList from './routes/visualization/Linear/LinkedList.svelte';
   import Stack from './routes/visualization/Linear/Stack.svelte';
+  import Queue from './routes/visualization/Linear/Queue.svelte';
   import Dfs from './routes/visualization/graph/Dfs.svelte';
   import Bfs from './routes/visualization/graph/Bfs.svelte';
 
@@ -28,6 +29,7 @@
     '/visualization/geometry/ConvexHull': ConvexHull,
     '/visualization/Linear/LinkedList': LinkedList,
     '/visualization/Linear/Stack': Stack,
+    '/visualization/Linear/Queue': Queue,
     '/visualization/graph/Dfs': Dfs,
     '/visualization/graph/Bfs': Bfs,
   };
