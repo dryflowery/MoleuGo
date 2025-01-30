@@ -5,6 +5,7 @@
     import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
 
+
     let canvasWidth = window.innerWidth * 0.73;
     let canvasHeight = window.innerHeight * 0.78;
 
@@ -90,16 +91,13 @@
         });
     };
 
-    const resetPosition = async () => {
-        // 캔버스 중앙 좌표 계산
+    const resetPosition = async () => { // 마지막 정렬
         const startX = (canvasWidth - (numArr.length * (nodeWidth + arrowLength) - arrowLength)) / 2;
         const startY = canvasHeight / 2 - nodeHeight / 2;
 
-        // 노드와 화살표 요소 선택
         const nodes = document.querySelectorAll('.node');
         const arrows = document.querySelectorAll('.arrow');
 
-        // 현재 위치 설정 (애니메이션 시작 전에 위치 초기화)
         nodes.forEach((node, index) => {
             node.style.position = 'absolute';
             node.style.left = `${nodePositions[index].x}px`;
@@ -469,12 +467,11 @@
 
     };
 
-
     $: if (arrowDequeueAnimations[0]) {
         setTimeout(() => {
             arrowArr[0] = 0;
         }, 450 / $animationSpeed); 
-    }
+    };
 
     $: if (nodeDequeueAnimations[0]) {
         setTimeout(() => {
@@ -488,8 +485,7 @@
 
             }
         }, (250 / $animationSpeed) + 10); 
-    }
-
+    };
 
     const generateDequeueQueries = () => {
 
@@ -818,12 +814,12 @@
 
     };
     
-    // 애니메이션(Push)
+    // 애니메이션(삽입)
     const generateEnqueueQueries = (pushValue) => {
 
         const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#52bc69"};
         const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#13a300"};
-        const textColor = {normal: "#000000", selected: "#ffffff"}
+        const textColor = {normal: "#000000", selected: "#ffffff"};
         const arrowColor = {normal: "#000000", connecting: "#d97511"};
 
         const resetNodePositions = () => {
@@ -844,7 +840,6 @@
                     y: startY, // 기존 Y 좌표 유지
                 }));
             }
-
             nodeAnimations.push(true);
         };
 
@@ -862,6 +857,7 @@
             }
             arrowAnimations.push(true);
         };
+        
 
         $animationQuery = [];
 
@@ -886,14 +882,15 @@
         
         
         // Step 1: 새로운 노드 추가
+        tmpCode = 0;
+        tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
+
         numArr.push(pushValue); // 숫자 추가
         resetNodePositions(); // 포지션 리셋
 
-        tmpNodeBgColor[numArr.length - 1] = nodeBg.selected; // 파란색
+        tmpNodeBgColor[numArr.length - 1] = nodeBg.selected;
         tmpNodeBorderColor[numArr.length - 1] = nodeBorderColor.selected;
         tmpNodeTextColor[numArr.length - 1] = textColor.selected;
-        
-        tmpCode = 0;
 
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
@@ -902,14 +899,29 @@
         tmpNodeAnimations = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
     
-        tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
         pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
 
-        // Step 2: Connect the arrow
-        resetArrowPositions(); // 화살표 포지션 리셋
-        tmpArrowColor[arrowArr.length] = arrowColor.connecting;
-        
+        // Step 2: 화살표 연결
         tmpCode = 1;
+        tmpExplanation = `새로운 노드(${pushValue})와 기존 노드(${tmpArr[1]}) 간의 연결을 수행 합니다`;
+
+        resetArrowPositions(); // 화살표 포지션 리셋
+
+        tmpArrowArr = [...arrowArr];
+        tmpNodePositions = [...nodePositions];
+        tmpArrowPositions = [...arrowPositions];
+        tmpNodeAnimations = [...nodeAnimations];
+        tmpArrowAnimations = [...arrowAnimations];
+        tmpArrowColor[arrowArr.length ] = arrowColor.connecting;
+
+        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        
+        
+        // Step 3: 마지막 쿼리
+        tmpCode = 2;
+        tmpExplanation = `연결이 완료되었습니다`;
+        
+        calculateNumArrPositionsNA(); // 위치 리셋
 
         tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
@@ -917,20 +929,10 @@
         tmpNodeAnimations = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
 
-        tmpExplanation = `새로운 노드(${pushValue})와 기존 노드(${tmpArr[1]}) 간의 연결을 수행 합니다`;
-
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
-        
-        
-        // Step 3: Finalize connection
-        tmpExplanation = `연결이 완료되었습니다`;
-
-        tmpCode = 2;
-
-        tmpArrowColor[0] = arrowColor.normal;
-        tmpNodeBgColor[0] = nodeBg.completed;
-        tmpNodeBorderColor[0] = nodeBorderColor.completed;
-        tmpNodeTextColor[0] = textColor.selected;
+        tmpArrowColor[numArr.length - 1] = arrowColor.normal;
+        tmpNodeBgColor[numArr.length - 1] = nodeBg.completed;
+        tmpNodeBorderColor[numArr.length - 1] = nodeBorderColor.completed;
+        tmpNodeTextColor[numArr.length - 1] = textColor.selected;
 
         pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
     };
@@ -1008,7 +1010,7 @@
 
         if (i === $animationQuery.length - 1) { // 애니메이션 종료시
             numArr = [...numArr];
-            calculateNumArrPositionsNA();
+            resetPosition();
         }
 
         await delay(1000 * (1 / $animationSpeed)); // 애니메이션 지연
