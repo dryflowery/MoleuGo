@@ -223,7 +223,7 @@
         dispatch('startDequeue');
     }
 
-    const startPeek = () => { // ******************************************* [Peek]
+    const startPeek = (direction) => { // ******************************************* [Peek]
 
         if(!isActive || !$isPaused ) {
             alert("애니메이션 실행 중 입니다.");
@@ -240,7 +240,7 @@
         toggle = Array(9).fill(false);
         isActive = false;
 
-        dispatch('startPeek');
+        dispatch('startPeek', { direction });
     }
 
 
@@ -283,6 +283,17 @@
                     <!-- Pop() -->
                 {:else if toggle[2]}
                     <!-- Peek() -->
+                    <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
+
+                        <button style="white-space: nowrap;" on:click={() => startPeek('Front')}>
+                            Front
+                        </button>
+
+                        <button style="white-space: nowrap;" on:click={() => startPeek('Back')}>
+                            Back
+                        </button>
+
+                    </div>
                 {:else if toggle[5]}
                     <!-- 원소 랜덤 생성 -->
                     <div class="navigation-toggle" style="margin-top:120px;" transition:fly={{ x: -45, duration: 500 }}>
@@ -319,9 +330,9 @@
                 </span>
 
                 <!-- 2번 (맨위) -->
-                <span style="--i:2; --x:1; --y:-1" on:click={startPeek} 
-                    on:mouseenter={() => tooltip[2] = true} on:mouseleave={() => tooltip[2] = false}>
-                    <ion-icon name="golf-outline"></ion-icon>
+                <span style="--i:2; --x:1; --y:-1">
+                    <ion-icon name="golf-outline" on:click={() => changeToggle(2)} 
+                    on:mouseenter={() => tooltip[2] = true} on:mouseleave={() => tooltip[2] = false}></ion-icon>
                 </span>
 
                 <!-- 3번 -->

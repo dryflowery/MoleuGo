@@ -10,6 +10,10 @@
     let canvasHeight = window.innerHeight * 0.78;
 
     let operation = '';
+    let peekDirection = "Front";  // 현재 활성 peek 방향 (기본은 Front)
+
+    let oldPeekIndex = null;      // 이전에 활성화된 깃발의 노드 인덱스
+    let activePeek = false;      // 현재 피크 깃발이 활성화되었는지 여부
 
     let numArr = [15, 10, 20, 30, 7] // 실제 값 배열
     let arrowArr = Array(numArr.length - 1).fill(1); // 화살표 배열(1: true , 0: false)
@@ -22,21 +26,9 @@
     let nodeDequeueAnimations = [];
     let arrowDequeueAnimations = [];
 
-    let flagAnimation = false; 
-    let flagDisappearAnimation = false;
-    let hasPeekRun = false;  // peek 연산이 실행되었는지 확인하는 변수
-
     const nodeWidth = 50;
     const nodeHeight = 50;
     const arrowLength = 50;
-
-    $: {
-        if (!flagAnimation && hasPeekRun) {
-            flagDisappearAnimation = true;
-        } else {
-            flagDisappearAnimation = false;
-        }
-    }
 
     const calculateNumArrPositions = async () => { // 중앙 정렬되는 위치 리셋 함수
  
@@ -73,7 +65,7 @@
     const calculateNumArrPositionsNA = async () => { // 애니메이션 없이 갱신하는거
         syncArrowArr();
 
-        const startX = (canvasWidth - (numArr.length * (nodeWidth + arrowLength))) / 2;
+        const startX = (canvasWidth - (numArr.length * (nodeWidth + arrowLength)  - arrowLength )) / 2;
         const startY = canvasHeight / 2 - nodeHeight / 2;
 
         nodePositions = numArr.map((_, index) => {
@@ -257,8 +249,6 @@
 
         resetNodeStyles();
 
-        flagAnimation = false;
-
         nodeAnimations = Array(numArr.length).fill(false);
         arrowAnimations = Array(arrowArr.length).fill(false);
         nodeDequeueAnimations = Array(numArr.length).fill(false);
@@ -299,25 +289,38 @@
 
     //=================================[ Peek() ]============================================
 
-    const startPeek = () => {
+    const startPeek = (direction = "Front") => {
+
+        if (activePeek && peekDirection !== direction) {
+            // 이전 피크 깃발이 적용되어 있던 인덱스를 저장
+            oldPeekIndex = (peekDirection === "Back") ? numArr.length - 1 : 0;
+            // 이전 깃발은 현재 피크 상태에서만 활성화된 경우에만 disappear 효과가 적용됨
+            // 0.5초 후에 oldPeekIndex를 초기화하여 DOM에서 제거
+            setTimeout(() => { oldPeekIndex = null; }, 500);
+            activePeek = false;
+        }
+
         operation = 'peek';
+        peekDirection = direction;  // 선택한 방향 저장
+
         InitAnimation();
 
-        generateQueuePeekQueries();
+        generateQueuePeekQueries(direction);
         
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
 
-        executeQueuePeekQuries($asyncCnt++);
+        activePeek = true;
 
+        executeQueuePeekQuries($asyncCnt++);
+        
     };
 
-    const pushQueuePeekAnimationQuery = (tmpExplanation, tmpFlagAnimation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode) => {
+    const pushQueuePeekAnimationQuery = (tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode) => {
         
         $animationQuery.push({
             curExplanation: tmpExplanation,
-            curFlagAnimation: tmpFlagAnimation,
             curNodeBgColor: [...tmpNodeBgColor],
             curNodeBorderColor: [...tmpNodeBorderColor],
             curNodeTextColor: [...tmpNodeTextColor],
@@ -326,7 +329,7 @@
 
     };
 
-    const generateQueuePeekQueries = () => {
+    const generateQueuePeekQueries = (direction) => {
 
         const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#52bc69", hidden: "#ffffff"};
         const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#13a300", hidden: "#ffffff"};
@@ -344,24 +347,36 @@
 
         let tmpArr = [...numArr];
         let tmpExplanation = ``;
-        let tmpFlagAnimation = flagAnimation;
         let tmpNodeBgColor = Array(tmpArr.length).fill(nodeBg.normal);
         let tmpNodeBorderColor = Array(tmpArr.length).fill(nodeBorderColor.normal);
         let tmpNodeTextColor = Array(tmpArr.length).fill(textColor.normal);
         let tmpCode = 1000;
 
         tmpExplanation = `배열의 초기 상태입니다`;
-        pushQueuePeekAnimationQuery(tmpExplanation, tmpFlagAnimation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
+        pushQueuePeekAnimationQuery(tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
 
-        tmpFlagAnimation = true;
-        tmpExplanation = `head 노드의 값(${tmpArr[0]})을 반환합니다`
-        tmpCode = 1;
+        if (direction === "Back") {
 
-        tmpNodeBgColor[0] = nodeBg.completed; 
-        tmpNodeBorderColor[0] = nodeBorderColor.completed;
-        tmpNodeTextColor[0] = textColor.selected;
+            tmpExplanation = `tail 노드의 값 (${tmpArr[tmpArr.length - 1]})을 반환합니다.`;
 
-        pushQueuePeekAnimationQuery(tmpExplanation, tmpFlagAnimation ,tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
+            tmpCode = 1;
+
+            tmpNodeBgColor[tmpArr.length - 1] = nodeBg.completed;
+            tmpNodeBorderColor[tmpArr.length - 1] = nodeBorderColor.completed;
+            tmpNodeTextColor[tmpArr.length - 1] = textColor.selected;
+
+        } else {
+
+            tmpExplanation = `head 노드의 값(${tmpArr[0]})을 반환합니다`
+
+            tmpCode = 1;
+
+            tmpNodeBgColor[0] = nodeBg.completed; 
+            tmpNodeBorderColor[0] = nodeBorderColor.completed;
+            tmpNodeTextColor[0] = textColor.selected;
+        }
+
+        pushQueuePeekAnimationQuery(tmpExplanation ,tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode);
 
     }
 
@@ -391,13 +406,7 @@
         $explanation = $animationQuery[i].curExplanation; // $explanation 수정
         changeCodeColor($animationQuery[i].curCode); // $codeColor 
 
-        flagAnimation = $animationQuery[i].curFlagAnimation; // 깃발 상태 
-
         await tick(); // UI 갱신을 위해 tick() 사용
-
-        if (flagAnimation) {
-            await delay(500);  // 깃발 애니메이션 효과
-        }
 
         const nodeBgColors = $animationQuery[i].curNodeBgColor;
         const nodeBorderColors = $animationQuery[i].curNodeBorderColor;
@@ -410,7 +419,7 @@
         });
 
         if (i === $animationQuery.length - 1) {
-            hasPeekRun = true;
+            activePeek = true;
             calculateNumArrPositionsNA();
         }
   
@@ -434,7 +443,17 @@
 
     //=================================[ 삭제 ]============================================
 
-    const startDequeue = (e) => {
+    const clearActivePeekFlag = () => {
+        if (activePeek) {
+            oldPeekIndex = (peekDirection === "Back") ? numArr.length - 1 : 0;
+            setTimeout(() => { oldPeekIndex = null; }, 500);
+            activePeek = false;
+        }
+    };
+
+    const startDequeue = () => {
+        clearActivePeekFlag();
+
         operation = 'Dequeue';
         InitAnimation();
     
@@ -777,6 +796,8 @@
     //=================================[ 삽입 ]============================================
     
     const startEnqueue = (e) => {
+        clearActivePeekFlag();
+
         operation = 'push';
         InitAnimation();
         
@@ -817,10 +838,10 @@
     // 애니메이션(삽입)
     const generateEnqueueQueries = (pushValue) => {
 
-        const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#52bc69"};
-        const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#13a300"};
+        const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#259aed"};
+        const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#1178d9"};
         const textColor = {normal: "#000000", selected: "#ffffff"};
-        const arrowColor = {normal: "#000000", connecting: "#d97511"};
+        const arrowColor = {normal: "#000000", connecting: "#0067a3"};
 
         const resetNodePositions = () => {
             if (nodePositions.length === 0) {
@@ -874,23 +895,52 @@
         let tmpArrowColor = Array(tmpArrowArr.length).fill(arrowColor.normal);
         let tmpCode = 1000;
 
+        if (numArr.length === 0) { // 배열의 길이가 0인 경우
+            
+            tmpExplanation = `배열의 초기 상태입니다.`;
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+            tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
+
+            // Step 1: 새로운 노드 추가
+            tmpCode = 0;
+            tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
+
+            numArr.push(pushValue); // 숫자 추가
+            
+            resetNodePositions(); // 포지션 리셋
+
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeAnimations = [...nodeAnimations];
+            tmpArrowAnimations = [...arrowAnimations];
+        
+            tmpNodeBgColor = [...tmpNodeBgColor, nodeBg.selected]; 
+            tmpNodeBorderColor = [...tmpNodeBorderColor, nodeBorderColor.selected];
+            tmpNodeTextColor = [...tmpNodeTextColor, textColor.selected];
+            
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+
+            return;
+        }
+
         tmpExplanation = `배열의 초기 상태입니다.`;
         pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
         tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
         
-        
+
         // Step 1: 새로운 노드 추가
         tmpCode = 0;
         tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
 
         numArr.push(pushValue); // 숫자 추가
+        
         resetNodePositions(); // 포지션 리셋
-
-        tmpNodeBgColor[numArr.length - 1] = nodeBg.selected;
-        tmpNodeBorderColor[numArr.length - 1] = nodeBorderColor.selected;
-        tmpNodeTextColor[numArr.length - 1] = textColor.selected;
 
         tmpArr = [...numArr];
         tmpArrowArr = [...arrowArr];
@@ -898,29 +948,57 @@
         tmpArrowPositions = [...arrowPositions];
         tmpNodeAnimations = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
-    
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
 
+        tmpNodeBgColor[tmpArr.length - 2] = nodeBg.completed;
+        tmpNodeBorderColor[tmpArr.length - 2] = nodeBorderColor.completed;
+        tmpNodeTextColor[tmpArr.length - 2] = textColor.selected;
+    
+        tmpNodeBgColor = [...tmpNodeBgColor, nodeBg.selected]; 
+        tmpNodeBorderColor = [...tmpNodeBorderColor, nodeBorderColor.selected];
+        tmpNodeTextColor = [...tmpNodeTextColor, textColor.selected];
+        
+        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
         // Step 2: 화살표 연결
         tmpCode = 1;
-        tmpExplanation = `새로운 노드(${pushValue})와 기존 노드(${tmpArr[1]}) 간의 연결을 수행 합니다`;
-
+        tmpExplanation = `새로운 노드(${pushValue})와 기존 노드(${tmpArr[tmpArr.length - 2]}) 간의 연결을 수행 합니다`;
         resetArrowPositions(); // 화살표 포지션 리셋
+
+        tmpArr = [...numArr];
+        tmpArrowArr = [...arrowArr];
+        tmpNodePositions = [...nodePositions];
+        tmpArrowPositions = [...arrowPositions];
+        tmpNodeAnimations = [...nodeAnimations];
+        tmpArrowAnimations = [...arrowAnimations];
+
+        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+        
+        
+        // Step 3: 마무리 쿼리
+        tmpCode = 2;
+        tmpExplanation = `연결이 완료되었습니다`;
+    
 
         tmpArrowArr = [...arrowArr];
         tmpNodePositions = [...nodePositions];
         tmpArrowPositions = [...arrowPositions];
         tmpNodeAnimations = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
-        tmpArrowColor[arrowArr.length ] = arrowColor.connecting;
 
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
-        
-        
+        tmpNodeBgColor[numArr.length - 1] = nodeBg.completed;
+        tmpNodeBorderColor[numArr.length - 1] = nodeBorderColor.completed;
+        tmpNodeTextColor[numArr.length - 1] = textColor.selected;
+
+        tmpNodeBgColor[numArr.length - 2] = nodeBg.normal;
+        tmpNodeBorderColor[numArr.length - 2] = nodeBorderColor.normal;
+        tmpNodeTextColor[numArr.length - 2] = textColor.normal;
+
+        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
+
         // Step 3: 마지막 쿼리
+
         tmpCode = 2;
         tmpExplanation = `연결이 완료되었습니다`;
-        
+
         calculateNumArrPositionsNA(); // 위치 리셋
 
         tmpArrowArr = [...arrowArr];
@@ -928,12 +1006,7 @@
         tmpArrowPositions = [...arrowPositions];
         tmpNodeAnimations = [...nodeAnimations];
         tmpArrowAnimations = [...arrowAnimations];
-
-        tmpArrowColor[numArr.length - 1] = arrowColor.normal;
-        tmpNodeBgColor[numArr.length - 1] = nodeBg.completed;
-        tmpNodeBorderColor[numArr.length - 1] = nodeBorderColor.completed;
-        tmpNodeTextColor[numArr.length - 1] = textColor.selected;
-
+        
         pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
     };
 
@@ -1049,7 +1122,7 @@
         on:createInputtedArr={createInputtedArr} 
         on:startEnqueue={startEnqueue}
         on:startDequeue={startDequeue}
-        on:startPeek={startPeek}
+        on:startPeek={(e) => startPeek(e.detail.direction)}
         />
     </div>
 
@@ -1073,15 +1146,24 @@
                 {#each nodePositions as pos, index (index)}
                     {#if index < numArr.length}
                         <div
-                            class="node {nodeAnimations[index] ? 'node-animation' : ''} {nodeDequeueAnimations[index] ? 'node-Dequeue-animation' : ''} {index === 0 && flagAnimation ? 'flagged' : ''}"
+                            class="node {nodeAnimations[index] ? 'node-animation' : ''} {nodeDequeueAnimations[index] ? 'node-Dequeue-animation' : ''}"
                             style="top: {pos.y}px; left: {pos.x}px; width: {nodeWidth}px; height: {nodeHeight}px;">
                             {numArr[index]}
 
-                            {#if index === 0}
-                                <div class="flag-container {flagAnimation ? 'appear' : ''} {flagDisappearAnimation ? 'disappear' : ''}">
-                                    <div class="flag-pole"></div>
-                                    <div class="flag-cloth"></div>
-                                </div>
+                            {#if operation === 'peek'}
+                                {#if activePeek && ((peekDirection === 'Front' && index === 0) || (peekDirection === 'Back' && index === numArr.length - 1))}
+                                    <!-- 현재 활성 피크 깃발: appear 효과 -->
+                                    <div class="flag-container appear">
+                                        <div class="flag-pole"></div>
+                                        <div class="flag-cloth"></div>
+                                    </div>
+                                {:else if oldPeekIndex === index}
+                                    <!-- 이전 피크 깃발: disappear 효과 -->
+                                    <div class="flag-container disappear">
+                                        <div class="flag-pole"></div>
+                                        <div class="flag-cloth"></div>
+                                    </div>
+                                {/if}
                             {/if}
 
                         </div>
