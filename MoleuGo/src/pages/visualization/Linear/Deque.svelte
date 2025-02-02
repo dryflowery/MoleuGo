@@ -17,15 +17,19 @@
 
     let numArr = [15, 10, 20, 30, 7] // 실제 값 배열
     let arrowArr = Array(numArr.length - 1).fill(1); // 화살표 배열(1: true , 0: false)
+    let underArrowArr = Array(numArr.length - 1).fill(1); // 화살표 배열(1: true , 0: false)
 
     let nodePositions = [];
-    let arrowPositions = []; // 윗쪽 
+    let arrowPositions = []; // 윗쪽
+    let arrowUnderPositions = []; //아래쪽
 
     let nodeAnimations = [];
-    let arrowAnimations = [];
+    let arrowAnimations = []; // 윗쪽 화살표 애니메이션
+    let arrowUnderAnimations = []; // 아래쪽 화살표 애니메이션
 
-    let nodeDequeueAnimations = [];
-    let arrowDequeueAnimations = [];
+    let nodeDequeueAnimations = []; 
+    let arrowDequeueAnimations = [];  // 윗쪽 화살표 사라짐 애니메이션
+    let arrowUnderDequeueAnimations = []; // 아래쪽 화살표 사라짐 애니메이션
 
     const nodeWidth = 50;
     const nodeHeight = 50;
@@ -52,13 +56,22 @@
             };
         });
 
+        arrowUnderPositions = underArrowArr.map((_, index) => {
+            return {
+                x: nodePositions[index].x + nodeWidth,
+                y: startY + nodeHeight / 2 + 20,  // 여기서 20px은 필요에 따라 조정하세요.
+            };
+        });
+
         await tick();
         nodeAnimations = Array(numArr.length).fill(true);
         arrowAnimations = Array(arrowArr.length).fill(true);
+        arrowUnderAnimations = Array(underArrowArr.length).fill(true);
 
         setTimeout(() => {
             nodeAnimations = Array(numArr.length).fill(false);
             arrowAnimations = Array(arrowArr.length).fill(false);
+            arrowUnderAnimations = Array(underArrowArr.length).fill(false);
         }, 500); 
         
     };
@@ -82,6 +95,14 @@
                 y: startY + nodeHeight / 2,  // 화살표 중앙 정렬
             };
         });
+
+        arrowUnderPositions = underArrowArr.map((_, index) => {
+            return {
+                x: nodePositions[index].x + nodeWidth,
+                y: startY + nodeHeight / 2 + 20,  // 여기서 20px은 필요에 따라 조정하세요.
+            };
+        });
+        
     };
 
     const resetPosition = async () => { // 마지막 정렬
@@ -89,7 +110,8 @@
         const startY = canvasHeight / 2 - nodeHeight / 2;
 
         const nodes = document.querySelectorAll('.node');
-        const arrows = document.querySelectorAll('.arrow');
+        const upperArrows  = document.querySelectorAll('.arrow');
+        const lowerArrows = document.querySelectorAll('.arrow.arrow-under');
 
         nodes.forEach((node, index) => {
             node.style.position = 'absolute';
@@ -97,11 +119,19 @@
             node.style.top = `${nodePositions[index].y}px`;
         });
 
-        arrows.forEach((arrow, index) => {
+        upperArrows .forEach((arrow, index) => {
             if (arrowArr[index] === 1) {
                 arrow.style.position = 'absolute';
                 arrow.style.left = `${arrowPositions[index].x}px`;
                 arrow.style.top = `${arrowPositions[index].y}px`;
+            }
+        });
+
+        lowerArrows.forEach((arrow, index) => {
+            if (underArrowArr[index] === 1) {
+                arrow.style.position = 'absolute';
+                arrow.style.left = `${arrowUnderPositions[index].x}px`;
+                arrow.style.top = `${arrowUnderPositions[index].y}px`;
             }
         });
 
@@ -119,10 +149,22 @@
         });
 
         // 화살표 애니메이션: 현재 위치에서 목표 위치로 이동
-        arrows.forEach((arrow, index) => {
+        upperArrows .forEach((arrow, index) => {
             if (arrowArr[index] === 1) {
                 const targetX = startX + index * (nodeWidth + arrowLength) + nodeWidth;
-                const targetY = startY + nodeHeight / 2;
+                const targetY = startY + nodeHeight / 2 - 5;
+
+                arrow.style.transition = `top 0.5s ease, left 0.5s ease`;
+                arrow.style.left = `${targetX + 8}px`;
+                arrow.style.top = `${targetY}px`;
+            }
+        });
+
+        // 아래쪽 화살표 애니메이션: 목표 위치로 이동
+        lowerArrows.forEach((arrow, index) => {
+            if (underArrowArr[index] === 1) {
+                const targetX = startX + index * (nodeWidth + arrowLength) + nodeWidth;
+                const targetY = startY + nodeHeight / 2 + 5; // 20px 오프셋 (원하는 값으로 조정 가능)
 
                 arrow.style.transition = `top 0.5s ease, left 0.5s ease`;
                 arrow.style.left = `${targetX + 8}px`;
@@ -144,12 +186,21 @@
             y: startY + nodeHeight / 2,
         }));
 
+        arrowUnderPositions = underArrowArr.map((_, index) => ({
+            x: startX + index * (nodeWidth + arrowLength) + nodeWidth,
+            y: startY + nodeHeight / 2 + 20,
+        }));
+
         // 애니메이션 속성 초기화
         nodes.forEach((node) => {
             node.style.transition = '';
         });
 
-        arrows.forEach((arrow) => {
+        upperArrows .forEach((arrow) => {
+            arrow.style.transition = '';
+        });
+
+        lowerArrows.forEach((arrow) => {
             arrow.style.transition = '';
         });
     };
@@ -172,6 +223,7 @@
 
     const syncArrowArr = () => {
         arrowArr = Array(numArr.length - 1).fill(1);
+        underArrowArr = Array(numArr.length - 1).fill(1);
     };
 
     const resetNodeStyles = () => {
@@ -252,8 +304,12 @@
 
         nodeAnimations = Array(numArr.length).fill(false);
         arrowAnimations = Array(arrowArr.length).fill(false);
+        
         nodeDequeueAnimations = Array(numArr.length).fill(false);
         arrowDequeueAnimations = Array(arrowArr.length).fill(false);
+
+        arrowUnderAnimations = Array(underArrowArr.length).fill(false);
+        arrowUnderDequeueAnimations = Array(underArrowArr.length).fill(false);
 
         const node = document.querySelectorAll('.node');
         const arrowLines = document.querySelectorAll('.arrow line');
@@ -452,13 +508,13 @@
         }
     };
 
-    const startDequeue = () => {
+    const startDequeue = (direction) => {
         clearActivePeekFlag();
 
         operation = 'Dequeue';
         InitAnimation();
     
-        generateDequeueQueries();
+        generateDequeueQueries(direction);
 
         $animationWorking = true;
         $pausedIcon = false;
@@ -468,7 +524,7 @@
         
     };
 
-    const pushDequeueAnimationQuery = (tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
+    const pushDequeueAnimationQuery = (tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode) => {
         
         $animationQuery.push({
             curArr: [...tmpArr],
@@ -482,6 +538,9 @@
             curNodeBorderColor: [...tmpNodeBorderColor],
             curNodeTextColor: [...tmpNodeTextColor],
             curArrowColor: [...tmpArrowColor],
+            curUnderArrowArr: [...tmpUnderArrowArr],
+            curArrowUnderPositions: [...tmpArrowUnderPositions],
+            curArrowUnderDequeueAnimations: [...tmpArrowUnderDequeueAnimations],
             curCode :tmpCode
         });
 
@@ -490,6 +549,12 @@
     $: if (arrowDequeueAnimations[0]) {
         setTimeout(() => {
             arrowArr[0] = 0;
+        }, 450 / $animationSpeed); 
+    };
+
+    $: if (arrowUnderDequeueAnimations[0]) {
+        setTimeout(() => {
+            underArrowArr[0] = 0;
         }, 450 / $animationSpeed); 
     };
 
@@ -507,8 +572,36 @@
         }, (250 / $animationSpeed) + 10); 
     };
 
-    const generateDequeueQueries = () => {
+    // ====================================================================
 
+    $: if (arrowDequeueAnimations[arrowArr.length - 1]) {
+        setTimeout(() => {
+            arrowArr[arrowArr.length - 1] = 0;
+        }, 450 / $animationSpeed); 
+    };
+
+    $: if (arrowUnderDequeueAnimations[underArrowArr.length - 1]) {
+        setTimeout(() => {
+            underArrowArr[underArrowArr.length - 1] = 0;
+        }, 450 / $animationSpeed); 
+    };
+
+    $: if (nodeDequeueAnimations[numArr.length - 1]) {
+        setTimeout(() => {
+            const nodes = document.querySelectorAll('.node');
+            if (nodes.length > 0) {
+
+                nodes[numArr.length - 1].style.backgroundColor = "#ffffff";
+                nodes[numArr.length - 1].style.borderColor = "#ffffff";
+                nodes[numArr.length - 1].style.color = "#ffffff";
+                nodes[numArr.length - 1].style.transition = "none";
+
+            }
+        }, (250 / $animationSpeed) + 10); 
+    };
+
+    const generateDequeueQueries = (direction) => {
+        
         const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#52bc69", hidden: "#ffffff"};
         const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#13a300", hidden: "#ffffff"};
         const textColor = {normal: "#000000", selected: "#ffffff", hidden: "#ffffff"}
@@ -535,7 +628,47 @@
                 };
             });
 
+            arrowUnderPositions = underArrowArr.map((_, index) => {
+                return {
+                    x: nodePositions[index]?.x + nodeWidth || 0,
+                    y: nodePositions[index]?.y + nodeHeight / 2 + 20 || 0, // 오프셋 값은 필요에 따라 조정하세요.
+                };
+            });
+
         };
+
+        const resetNodePositionsFromFirst = () => {
+            // 화살표 배열 동기화
+            syncArrowArr();
+            
+            // 첫 번째 노드의 기존 위치가 있으면 그 위치를 기준으로 사용,
+            // 없으면 캔버스 중앙 기준 위치로 계산합니다.
+            const startX = nodePositions.length > 0 
+                ? nodePositions[0].x 
+                : (canvasWidth - (numArr.length * (nodeWidth + arrowLength) - arrowLength)) / 2;
+            const startY = nodePositions.length > 0 
+                ? nodePositions[0].y 
+                : canvasHeight / 2 - nodeHeight / 2;
+            
+            // 각 노드의 위치를 첫 번째 노드를 기준으로 재정렬합니다.
+            nodePositions = numArr.map((_, index) => ({
+                x: startX + index * (nodeWidth + arrowLength),
+                y: startY,
+            }));
+
+            // 노드에 연결된 화살표 위치도 재계산합니다.
+            arrowPositions = arrowArr.map((_, index) => ({
+                x: nodePositions[index].x + nodeWidth,
+                y: nodePositions[index].y + nodeHeight / 2,
+            }));
+
+            arrowUnderPositions = underArrowArr.map((_, index) => ({
+                x: nodePositions[index].x + nodeWidth,
+                y: nodePositions[index].y + nodeHeight / 2 + 20,
+            }));
+        };
+
+
 
 
         $animationQuery = [];
@@ -559,14 +692,19 @@
         let tmpNodeBorderColor = Array(tmpArr.length).fill(nodeBorderColor.normal);
         let tmpNodeTextColor = Array(tmpArr.length).fill(textColor.normal);
         let tmpArrowColor = Array(tmpArrowArr.length).fill(arrowColor.normal);
+
+        let tmpUnderArrowArr = [...underArrowArr];
+        let tmpArrowUnderPositions = [...arrowUnderPositions];
+        let tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+
         let tmpCode = 1000;
 
         if (numArr.length === 1) { // 배열의 길이가 1인 경우
             
             tmpExplanation = `배열의 초기 상태입니다`;
-            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
             tmpExplanation = `배열의 초기 상태입니다`;// 애니메이션 재실행 보험용 쿼리
-            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
 
             // Step 1
             tmpCode = 1;
@@ -582,7 +720,7 @@
             tmpArrowPositions = [...arrowPositions];
             tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
 
-            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
 
             // Step 2
             tmpCode = 3;
@@ -597,7 +735,7 @@
             tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
             tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
 
-            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
 
             // Step 3
 
@@ -606,106 +744,253 @@
 
             numArr.shift();
             tmpArr = [...numArr];
-            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
 
             return;
-        }
+        };
 
-        tmpExplanation = `배열의 초기 상태입니다`;
-        pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+        if(direction === 'Front') {
+            tmpExplanation = `배열의 초기 상태입니다`;
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
 
-        tmpExplanation = `배열의 초기 상태입니다`; // 애니메이션 재실행 보험용 쿼리
-        pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
-
-
-        // Step 1
-        tmpCode = 1;
-
-        tmpNodeBgColor[0] = nodeBg.selected; 
-        tmpNodeBorderColor[0] = nodeBorderColor.selected;
-        tmpNodeTextColor[0] = textColor.selected;
-
-        tmpArr = [...numArr];
-        tmpArrowArr = [...arrowArr];
-        tmpNodePositions = [...nodePositions];
-        tmpArrowPositions = [...arrowPositions];
-        tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
-        tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
-
-        tmpExplanation = `head 노드의 값(${tmpArr[0]})을 임시 변수에 저장합니다`;
+            tmpExplanation = `배열의 초기 상태입니다`; // 애니메이션 재실행 보험용 쿼리
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
 
 
-        pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            // Step 1
+            tmpCode = 1;
 
-        // Step 2
-        tmpCode = 2;
-        arrowDequeueAnimations[0] = true; // 화살표 삭제 애니메이션
+            tmpNodeBgColor[0] = nodeBg.selected; 
+            tmpNodeBorderColor[0] = nodeBorderColor.selected;
+            tmpNodeTextColor[0] = textColor.selected;
 
-        tmpNodeBgColor[1] = nodeBg.completed;
-        tmpNodeBorderColor[1] = nodeBorderColor.completed;
-        tmpNodeTextColor[1] = textColor.selected;
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
+            tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
 
-        tmpArr = [...numArr];
-        tmpArrowArr = [...arrowArr];
-        tmpNodePositions = [...nodePositions];
-        tmpArrowPositions = [...arrowPositions];
-        tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
-        tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
 
-        tmpExplanation = `head 포인터를 다음 노드(${tmpArr[1]})로 변경합니다`;
-        pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
-
-        // Step 3
-        tmpCode = 3;
-
-        arrowArr[0] = 0; // 화살표 없는상태 유지
-        arrowDequeueAnimations[0] = false; 
-        nodeDequeueAnimations[0] = true; // true 이후 반응형으로 첫 노드 하얀색으로 변경(히든)
+            tmpExplanation = `head 노드의 값(${tmpArr[0]})을 임시 변수에 저장합니다`;
 
 
-        tmpExplanation = `저장한 값(${tmpArr[0]})을 반환합니다`;
-        
-        tmpArr = [...numArr];
-        tmpArrowArr = [...arrowArr];
-        tmpNodePositions = [...nodePositions];
-        tmpArrowPositions = [...arrowPositions];
-        tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
-        tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
-        
-        pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
 
-        // step 4
-        tmpCode = 3;
-        tmpExplanation = `삭제연산 완료`;
-        nodeDequeueAnimations[0] = false;
-        
-        numArr.shift();
-        arrowArr[0] = 1;    
+            // Step 2
+            tmpCode = 2;
+            arrowDequeueAnimations[0] = true; // 화살표 삭제 애니메이션
+            arrowUnderDequeueAnimations[0] = true; // 아래 화살표 삭제 애니메이션
 
-        resetNodePositions();
+            tmpNodeBgColor[1] = nodeBg.completed;
+            tmpNodeBorderColor[1] = nodeBorderColor.completed;
+            tmpNodeTextColor[1] = textColor.selected;
 
-        tmpNodeBgColor[0] = nodeBg.completed; 
-        tmpNodeBorderColor[0] = nodeBorderColor.completed;
-        tmpNodeTextColor[0] = textColor.selected;
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
+            tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
 
-        tmpNodeBgColor[1] = nodeBg.normal;
-        tmpNodeBorderColor[1] = nodeBorderColor.normal;
-        tmpNodeTextColor[1] = textColor.normal;
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+
+            tmpExplanation = `head 포인터를 다음 노드(${tmpArr[1]})로 변경합니다`;
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+
+            // Step 3
+            tmpCode = 3;
+
+            arrowArr[0] = 0; // 화살표 없는상태 유지
+            underArrowArr[0] = 0;
+
+            arrowDequeueAnimations[0] = false; 
+            arrowUnderDequeueAnimations[0] = false;
+
+            nodeDequeueAnimations[0] = true; // true 이후 반응형으로 첫 노드 하얀색으로 변경(히든)
 
 
-        tmpArr = [...numArr];
-        tmpArrowArr = [...arrowArr];
-        tmpNodePositions = [...nodePositions];
-        tmpArrowPositions = [...arrowPositions];
-        tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
+            tmpExplanation = `저장한 값(${tmpArr[0]})을 반환합니다`;
+            
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
+            tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
 
-        pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
-        
-        calculateNumArrPositionsNA();
-        tmpNodePositions = [...nodePositions];
-        tmpArrowPositions = [...arrowPositions];
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+            
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
 
-        pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            // step 4
+            tmpCode = 3;
+            tmpExplanation = `삭제연산 완료`;
+            nodeDequeueAnimations[0] = false;
+            
+            numArr.shift();
+            arrowArr[0] = 1;    
+
+            resetNodePositions();
+
+            tmpNodeBgColor[0] = nodeBg.completed; 
+            tmpNodeBorderColor[0] = nodeBorderColor.completed;
+            tmpNodeTextColor[0] = textColor.selected;
+
+            tmpNodeBgColor[1] = nodeBg.normal;
+            tmpNodeBorderColor[1] = nodeBorderColor.normal;
+            tmpNodeTextColor[1] = textColor.normal;
+
+
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+            
+            calculateNumArrPositionsNA();
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+            
+            return;
+        };
+
+        if(direction === 'Back') {
+            tmpExplanation = `배열의 초기 상태입니다`;
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+
+            tmpExplanation = `배열의 초기 상태입니다`; // 애니메이션 재실행 보험용 쿼리
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+
+
+            // Step 1
+            tmpCode = 1;
+
+            tmpNodeBgColor[numArr.length - 1] = nodeBg.selected; 
+            tmpNodeBorderColor[numArr.length - 1] = nodeBorderColor.selected;
+            tmpNodeTextColor[numArr.length - 1] = textColor.selected;
+
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
+            tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+
+            tmpExplanation = `head 노드의 값(${tmpArr[0]})을 임시 변수에 저장합니다`;
+
+
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+
+            // Step 2
+            tmpCode = 2;
+            arrowDequeueAnimations[arrowArr.length - 1] = true; // 화살표 삭제 애니메이션
+            arrowUnderDequeueAnimations[underArrowArr.length - 1] = true; // 아래 화살표 삭제 애니메이션
+
+            tmpNodeBgColor[numArr.length - 2] = nodeBg.completed;
+            tmpNodeBorderColor[numArr.length - 2] = nodeBorderColor.completed;
+            tmpNodeTextColor[numArr.length - 2] = textColor.selected;
+
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
+            tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+
+            tmpExplanation = `head 포인터를 다음 노드(${tmpArr[1]})로 변경합니다`;
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+
+            // Step 3
+            tmpCode = 3;
+
+            arrowArr[arrowArr.length - 1] = 0; // 화살표 없는상태 유지
+            underArrowArr[underArrowArr.length - 1] = 0;
+
+            arrowDequeueAnimations[arrowArr.length - 1] = false; 
+            arrowUnderDequeueAnimations[underArrowArr.length - 1] = false;
+
+            nodeDequeueAnimations[numArr.length - 1] = true; // true 이후 반응형으로 첫 노드 하얀색으로 변경(히든)
+
+
+            tmpExplanation = `저장한 값(${tmpArr[0]})을 반환합니다`;
+            
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
+            tmpArrowDequeueAnimations = [...arrowDequeueAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+            
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+
+            // step 4
+            tmpCode = 3;
+            tmpExplanation = `삭제연산 완료`;
+            nodeDequeueAnimations[numArr.length - 1] = false;
+            
+            numArr.pop();
+            
+            arrowArr[arrowArr.length - 1] = 1; // 화살표 없는상태 유지
+            underArrowArr[underArrowArr.length - 1] = 1;
+
+            resetNodePositionsFromFirst();
+
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeDequeueAnimations = [...nodeDequeueAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+            
+            // step 5
+            calculateNumArrPositionsNA();
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+
+            tmpUnderArrowArr = [...underArrowArr];
+            tmpArrowUnderPositions = [...arrowUnderPositions];
+            tmpArrowUnderDequeueAnimations = [...arrowUnderDequeueAnimations];
+
+            pushDequeueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpUnderArrowArr, tmpArrowUnderPositions, tmpArrowUnderDequeueAnimations, tmpCode);
+
+        };
     };
 
     const executeDequeueQuries = async (myAsync) => {
@@ -735,12 +1020,19 @@
         changeCodeColor($animationQuery[i].curCode); // $codeColor 
 
         numArr = [...$animationQuery[i].curArr];
+
         arrowArr = [...$animationQuery[i].curArrowArr];
+
+        underArrowArr = [...$animationQuery[i].curUnderArrowArr];
 
         nodePositions = [...$animationQuery[i].curNodePositions];
         nodeDequeueAnimations = [...$animationQuery[i].curNodeDequeueAnimation];
+
         arrowPositions = [...$animationQuery[i].curArrowPositions];
         arrowDequeueAnimations = [...$animationQuery[i].curArrowDequeueAnimations];
+
+        arrowUnderPositions = [...$animationQuery[i].curArrowUnderPositions];
+        arrowUnderDequeueAnimations = [...$animationQuery[i].curArrowUnderDequeueAnimations];
 
         const nodeBgColors = $animationQuery[i].curNodeBgColor;
         const nodeBorderColors = $animationQuery[i].curNodeBorderColor;
@@ -802,10 +1094,11 @@
         operation = 'push';
         InitAnimation();
         
-        const pushValue = e.detail.value;
-        const pushNum = Number(pushValue.trim());
+        const { value, direction } = e.detail;
 
-        generateEnqueueQueries(pushNum);
+        const pushNum = Number(value.trim());
+
+        generateEnqueueQueries(pushNum, direction);
 
         $animationWorking = true;
         $pausedIcon = false;
@@ -817,15 +1110,18 @@
     };
 
     // 애니메이션(Push) 쿼리 저장
-    const pushEnqueueAnimationQuery = (tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimationss, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
+    const pushEnqueueAnimationQuery = (tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
         
         $animationQuery.push({
             curArr: [...tmpArr],
             curArrowArr: [...tmpArrowArr],
+            curUnderArrowArr: [...tmpUnderArrowArr], // 아래 화살표 배열
             curNodePositions: [...tmpNodePositions],
             curArrowPositions: [...tmpArrowPositions],
-            curNodeAnimation: [...tmpNodeAnimationss],
+            curUnderArrowPositions: [...tmpUnderArrowPositions],
+            curNodeAnimation: [...tmpNodeAnimations],
             curArrowAnimations: [...tmpArrowAnimations],
+            curArrowUnderAnimations: [...tmpArrowUnderAnimations],
             curExplanation: tmpExplanation,
             curNodeBgColor: [...tmpNodeBgColor],
             curNodeBorderColor: [...tmpNodeBorderColor],
@@ -837,7 +1133,7 @@
     };
     
     // 애니메이션(삽입)
-    const generateEnqueueQueries = (pushValue) => {
+    const generateEnqueueQueries = (pushValue , direction) => {
 
         const nodeBg = {normal: "#ffffff", selected: "#ed8925", completed: "#259aed"};
         const nodeBorderColor = {normal: "#000000", selected: "#d97511", completed: "#1178d9"};
@@ -862,7 +1158,30 @@
                     y: startY, // 기존 Y 좌표 유지
                 }));
             }
-            nodeAnimations.push(true);
+        };
+
+        const RresetNodePositions = () => {
+            if (nodePositions.length === 0) {
+                // 초기 상태인 경우, 예를 들어 캔버스의 오른쪽을 기준으로 마지막 노드가 위치하도록 설정
+                // (여기서는 캔버스 오른쪽에서 노드 너비와 화살표 길이만큼 여유를 둔다)
+                const lastX = canvasWidth - nodeWidth - arrowLength;
+                const startY = canvasHeight / 2 - nodeHeight / 2;
+                nodePositions = numArr.map((_, index) => ({
+                    // 마지막 노드(index = numArr.length - 1)가 lastX에 위치하도록 하고,
+                    // 앞의 노드들은 왼쪽으로 (nodeWidth + arrowLength)씩 배치
+                    x: lastX - (numArr.length - 1 - index) * (nodeWidth + arrowLength),
+                    y: startY,
+                }));
+            } else {
+                // 기존에 위치 정보가 있다면, 마지막 노드의 위치를 기준으로 계산
+                const lastIndex = nodePositions.length - 1;
+                const lastX = nodePositions[lastIndex].x;
+                const lastY = nodePositions[lastIndex].y;
+                nodePositions = numArr.map((_, index) => ({
+                    x: lastX - (numArr.length - 1 - index) * (nodeWidth + arrowLength),
+                    y: lastY,
+                }));
+            }
         };
 
         const resetArrowPositions = () => {
@@ -870,14 +1189,18 @@
             if (nodePositions.length === 0 || numArr.length <= 1) {
                 // 화살표가 없는 상태 (노드가 하나이거나 없는 경우)
                 arrowPositions = [];
+                arrowUnderPositions = [];
             } else {
                 // 기존 노드 위치를 기준으로 화살표 위치 계산
                 arrowPositions = arrowArr.map((_, index) => ({
                     x: nodePositions[index].x + nodeWidth, // 화살표는 노드의 끝 부분에서 시작
                     y: nodePositions[index].y + nodeHeight / 2, // 노드의 중앙 높이에 위치
                 }));
+                arrowUnderPositions = underArrowArr.map((_, index) => ({
+                    x: nodePositions[index].x + nodeWidth,
+                    y: nodePositions[index].y + nodeHeight / 2 + 20, // 오프셋 값은 필요에 따라 조정하세요.
+                }));
             }
-            arrowAnimations.push(true);
         };
         
 
@@ -885,10 +1208,13 @@
 
         let tmpArr = [...numArr];
         let tmpArrowArr = [...arrowArr];
+        let tmpUnderArrowArr = [...underArrowArr];
         let tmpNodePositions = [...nodePositions];
         let tmpArrowPositions = [...arrowPositions];
+        let tmpUnderArrowPositions = [...arrowUnderPositions];
         let tmpNodeAnimations = [...nodeAnimations];
         let tmpArrowAnimations = [...arrowAnimations];
+        let tmpArrowUnderAnimations = [...arrowUnderAnimations];
         let tmpExplanation = ``;
         let tmpNodeBgColor = Array(tmpArr.length).fill(nodeBg.normal);
         let tmpNodeBorderColor = Array(tmpArr.length).fill(nodeBorderColor.normal);
@@ -899,18 +1225,18 @@
         if (numArr.length === 0) { // 배열의 길이가 0인 경우
             
             tmpExplanation = `배열의 초기 상태입니다.`;
-            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
             tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
-            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
             // Step 1: 새로운 노드 추가
             tmpCode = 0;
             tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
 
             numArr.push(pushValue); // 숫자 추가
-            
-            resetNodePositions(); // 포지션 리셋
+            calculateNumArrPositionsNA(); // 포지션 리셋
+            nodeAnimations.push(true);
 
             tmpArr = [...numArr];
             tmpArrowArr = [...arrowArr];
@@ -923,92 +1249,222 @@
             tmpNodeBorderColor = [...tmpNodeBorderColor, nodeBorderColor.selected];
             tmpNodeTextColor = [...tmpNodeTextColor, textColor.selected];
             
-            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            return;
+        };
+
+        if(direction === 'Back') {
+
+            tmpExplanation = `배열의 초기 상태입니다.`;
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+            tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+            // Step 1: 새로운 노드 추가
+            tmpCode = 0;
+            tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
+
+            numArr.push(pushValue); // 숫자 추가
+    
+            resetNodePositions(); // 포지션 리셋
+            nodeAnimations.push(true);
+
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpUnderArrowArr = [...underArrowArr]; // 아래
+            tmpUnderArrowPositions = [...arrowUnderPositions];// 아래
+            tmpNodeAnimations = [...nodeAnimations];
+            tmpArrowAnimations = [...arrowAnimations];
+
+            tmpNodeBgColor[tmpArr.length - 2] = nodeBg.completed;
+            tmpNodeBorderColor[tmpArr.length - 2] = nodeBorderColor.completed;
+            tmpNodeTextColor[tmpArr.length - 2] = textColor.selected;
+        
+            tmpNodeBgColor = [...tmpNodeBgColor, nodeBg.selected]; 
+            tmpNodeBorderColor = [...tmpNodeBorderColor, nodeBorderColor.selected];
+            tmpNodeTextColor = [...tmpNodeTextColor, textColor.selected];
+            
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            
+            // Step 2: 화살표 연결
+            tmpCode = 1;
+            tmpExplanation = `새로운 노드(${pushValue})와 기존 노드(${tmpArr[tmpArr.length - 2]}) 간의 연결을 수행 합니다`;
+
+            resetArrowPositions(); // 화살표 포지션 리셋
+            arrowAnimations.push(true);
+            arrowUnderAnimations.push(true);
+
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeAnimations = [...nodeAnimations];
+            tmpArrowAnimations = [...arrowAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr]; // 아래
+            tmpUnderArrowPositions = [...arrowUnderPositions]; // 아래
+            tmpArrowUnderAnimations = [...arrowUnderAnimations];
+
+
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            
+            
+            // Step 3: 마무리 쿼리
+            tmpCode = 2;
+            tmpExplanation = `연결이 완료되었습니다`;
+        
+
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeAnimations = [...nodeAnimations];
+            tmpArrowAnimations = [...arrowAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr]; // 아래
+            tmpUnderArrowPositions = [...arrowUnderPositions]; // 아래
+
+
+            tmpNodeBgColor[numArr.length - 1] = nodeBg.completed;
+            tmpNodeBorderColor[numArr.length - 1] = nodeBorderColor.completed;
+            tmpNodeTextColor[numArr.length - 1] = textColor.selected;
+
+            tmpNodeBgColor[numArr.length - 2] = nodeBg.normal;
+            tmpNodeBorderColor[numArr.length - 2] = nodeBorderColor.normal;
+            tmpNodeTextColor[numArr.length - 2] = textColor.normal;
+
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+            // Step 3: 마지막 쿼리
+
+            tmpCode = 2;
+            tmpExplanation = `연결이 완료되었습니다`;
+
+            calculateNumArrPositionsNA(); // 위치 리셋
+
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeAnimations = [...nodeAnimations];
+            tmpArrowAnimations = [...arrowAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr]; // 아래
+            tmpUnderArrowPositions = [...arrowUnderPositions]; // 아래
+
+            
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+            
+            return;
+        };
+
+        if(direction === 'Front') {
+
+            tmpExplanation = `배열의 초기 상태입니다.`;
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+            tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+            // Step 1: 새로운 노드 추가
+            tmpCode = 0;
+            tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
+
+            numArr.unshift(pushValue); // 숫자 추가
+
+            RresetNodePositions(); // 포지션 리셋
+
+            nodeAnimations.unshift(true);
+
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpUnderArrowArr = [...underArrowArr]; // 아래
+            tmpUnderArrowPositions = [...arrowUnderPositions];// 아래
+            tmpNodeAnimations = [...nodeAnimations];
+            tmpArrowAnimations = [...arrowAnimations];
+
+            tmpNodeBgColor[1] = nodeBg.completed;
+            tmpNodeBorderColor[1] = nodeBorderColor.completed;
+            tmpNodeTextColor[1] = textColor.selected;
+
+            tmpNodeBgColor[0] = nodeBg.selected;
+            tmpNodeBorderColor[0] = nodeBorderColor.selected;
+            tmpNodeTextColor[0] = textColor.selected;
+
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+            // Step 2: 화살표 연결
+            tmpCode = 1;
+            tmpExplanation = `새로운 노드(${pushValue})와 기존 노드(${tmpArr[tmpArr.length - 2]}) 간의 연결을 수행 합니다`;
+
+            resetArrowPositions(); // 화살표 포지션 리셋
+            arrowAnimations.unshift(true);
+            arrowUnderAnimations.unshift(true);
+            
+            tmpArr = [...numArr];
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeAnimations = [...nodeAnimations];
+            tmpArrowAnimations = [...arrowAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr]; // 아래
+            tmpUnderArrowPositions = [...arrowUnderPositions]; // 아래
+            tmpArrowUnderAnimations = [...arrowUnderAnimations];
+
+
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+
+            // Step 3: 마무리 쿼리
+            tmpCode = 2;
+            tmpExplanation = `연결이 완료되었습니다`;
+
+
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeAnimations = [...nodeAnimations];
+            tmpArrowAnimations = [...arrowAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr]; // 아래
+            tmpUnderArrowPositions = [...arrowUnderPositions]; // 아래
+
+
+            tmpNodeBgColor[1] = nodeBg.normal;
+            tmpNodeBorderColor[1] = nodeBorderColor.normal;
+            tmpNodeTextColor[1] = textColor.normal;
+
+            tmpNodeBgColor[0] = nodeBg.completed;
+            tmpNodeBorderColor[0] = nodeBorderColor.completed;
+            tmpNodeTextColor[0] = textColor.selected;
+
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
+
+            // Step 3: 마지막 쿼리
+
+            tmpCode = 2;
+            tmpExplanation = `연결이 완료되었습니다`;
+
+            calculateNumArrPositionsNA(); // 위치 리셋
+
+            tmpArrowArr = [...arrowArr];
+            tmpNodePositions = [...nodePositions];
+            tmpArrowPositions = [...arrowPositions];
+            tmpNodeAnimations = [...nodeAnimations];
+            tmpArrowAnimations = [...arrowAnimations];
+
+            tmpUnderArrowArr = [...underArrowArr]; // 아래
+            tmpUnderArrowPositions = [...arrowUnderPositions]; // 아래
+
+
+            pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpUnderArrowArr, tmpNodePositions, tmpArrowPositions, tmpUnderArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpArrowUnderAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
 
             return;
-        }
-
-        tmpExplanation = `배열의 초기 상태입니다.`;
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
-
-        tmpExplanation = `배열의 초기 상태입니다.`; // 애니메이션 재실행 보험용 쿼리
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
-        
-
-        // Step 1: 새로운 노드 추가
-        tmpCode = 0;
-        tmpExplanation = `새로운 노드(${pushValue})가 추가되었습니다`;
-
-        numArr.push(pushValue); // 숫자 추가
-        
-        resetNodePositions(); // 포지션 리셋
-
-        tmpArr = [...numArr];
-        tmpArrowArr = [...arrowArr];
-        tmpNodePositions = [...nodePositions];
-        tmpArrowPositions = [...arrowPositions];
-        tmpNodeAnimations = [...nodeAnimations];
-        tmpArrowAnimations = [...arrowAnimations];
-
-        tmpNodeBgColor[tmpArr.length - 2] = nodeBg.completed;
-        tmpNodeBorderColor[tmpArr.length - 2] = nodeBorderColor.completed;
-        tmpNodeTextColor[tmpArr.length - 2] = textColor.selected;
-    
-        tmpNodeBgColor = [...tmpNodeBgColor, nodeBg.selected]; 
-        tmpNodeBorderColor = [...tmpNodeBorderColor, nodeBorderColor.selected];
-        tmpNodeTextColor = [...tmpNodeTextColor, textColor.selected];
-        
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
-        // Step 2: 화살표 연결
-        tmpCode = 1;
-        tmpExplanation = `새로운 노드(${pushValue})와 기존 노드(${tmpArr[tmpArr.length - 2]}) 간의 연결을 수행 합니다`;
-        resetArrowPositions(); // 화살표 포지션 리셋
-
-        tmpArr = [...numArr];
-        tmpArrowArr = [...arrowArr];
-        tmpNodePositions = [...nodePositions];
-        tmpArrowPositions = [...arrowPositions];
-        tmpNodeAnimations = [...nodeAnimations];
-        tmpArrowAnimations = [...arrowAnimations];
-
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation,tmpNodeBgColor,tmpNodeBorderColor,tmpNodeTextColor,tmpArrowColor,tmpCode);
-        
-        
-        // Step 3: 마무리 쿼리
-        tmpCode = 2;
-        tmpExplanation = `연결이 완료되었습니다`;
-    
-
-        tmpArrowArr = [...arrowArr];
-        tmpNodePositions = [...nodePositions];
-        tmpArrowPositions = [...arrowPositions];
-        tmpNodeAnimations = [...nodeAnimations];
-        tmpArrowAnimations = [...arrowAnimations];
-
-        tmpNodeBgColor[numArr.length - 1] = nodeBg.completed;
-        tmpNodeBorderColor[numArr.length - 1] = nodeBorderColor.completed;
-        tmpNodeTextColor[numArr.length - 1] = textColor.selected;
-
-        tmpNodeBgColor[numArr.length - 2] = nodeBg.normal;
-        tmpNodeBorderColor[numArr.length - 2] = nodeBorderColor.normal;
-        tmpNodeTextColor[numArr.length - 2] = textColor.normal;
-
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
-
-        // Step 3: 마지막 쿼리
-
-        tmpCode = 2;
-        tmpExplanation = `연결이 완료되었습니다`;
-
-        calculateNumArrPositionsNA(); // 위치 리셋
-
-        tmpArrowArr = [...arrowArr];
-        tmpNodePositions = [...nodePositions];
-        tmpArrowPositions = [...arrowPositions];
-        tmpNodeAnimations = [...nodeAnimations];
-        tmpArrowAnimations = [...arrowAnimations];
-        
-        pushEnqueueAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeAnimations, tmpArrowAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor, tmpCode);
+            };
     };
 
     // 애니메이션(Push) 실행
@@ -1043,10 +1499,16 @@
 
         arrowArr = [...$animationQuery[i].curArrowArr];
 
+        underArrowArr = [...$animationQuery[i].curUnderArrowArr];
+
         nodePositions = [...$animationQuery[i].curNodePositions];
         nodeAnimations = [...$animationQuery[i].curNodeAnimation];
+
         arrowPositions = [...$animationQuery[i].curArrowPositions];
         arrowAnimations = [...$animationQuery[i].curArrowAnimations];
+
+        arrowUnderPositions = [...$animationQuery[i].curUnderArrowPositions];
+        arrowUnderAnimations = [...$animationQuery[i].curArrowUnderAnimations];
 
         const nodeBgColors = $animationQuery[i].curNodeBgColor;
         const nodeBorderColors = $animationQuery[i].curNodeBorderColor;
@@ -1122,7 +1584,7 @@
         on:createRandomArr={createRandomArr} 
         on:createInputtedArr={createInputtedArr} 
         on:startEnqueue={startEnqueue}
-        on:startDequeue={startDequeue}
+        on:startDequeue={(e) => startDequeue(e.detail.direction)}
         on:startPeek={(e) => startPeek(e.detail.direction)}
         />
     </div>
@@ -1175,7 +1637,7 @@
                     {#if arrowArr[index] === 1 && index < arrowArr.length}
                         <svg
                             class="arrow"
-                            style="top: {arrow.y}px; left: {arrow.x + 8}px;"
+                            style="top: {arrow.y - 5}px; left: {arrow.x + 8}px;"
                             width="{arrowLength - 8}" height="10" viewBox="0 0 {arrowLength} 10" xmlns="http://www.w3.org/2000/svg"
                         >
                             <line
@@ -1185,6 +1647,27 @@
                             />
                             <polygon
                                 class="{arrowAnimations[index] ? 'queue-arrow-head-animation' : ''} {arrowDequeueAnimations[index] ? 'queue-arrow-head-animation-Dequeue' : ''}"
+                                points="{arrowLength - 10},0 {arrowLength - 10},10 {arrowLength},5" 
+                                fill="#000" 
+                            />
+                        </svg>
+                    {/if}
+                {/each}
+
+                {#each arrowUnderPositions as arrow, index (index)}
+                    {#if underArrowArr[index] === 1 && index < arrowUnderPositions.length}
+                        <svg
+                            class="arrow arrow-under"
+                            style="top: {arrow.y - 15}px; left: {arrow.x + 8}px;"
+                            width="{arrowLength - 8}" height="10" viewBox="0 0 {arrowLength} 10" xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <line
+                                class="{arrowUnderAnimations[index] ? 'queue-arrow-line-animation' : ''} {arrowUnderDequeueAnimations[index] ? 'queue-arrow-line-animation-Dequeue' : ''}"
+                                x1="0" y1="5" x2="{arrowLength - 10}" y2="5" 
+                                stroke="#000" stroke-width="3.5" 
+                            />
+                            <polygon
+                                class="{arrowUnderAnimations[index] ? 'queue-arrow-head-animation' : ''} {arrowUnderDequeueAnimations[index] ? 'queue-arrow-head-animation-Dequeue' : ''}"
                                 points="{arrowLength - 10},0 {arrowLength - 10},10 {arrowLength},5" 
                                 fill="#000" 
                             />
@@ -1366,6 +1849,10 @@
         transform: translateX(0px);
 
     }   
+
+    .arrow-under {
+        transform: rotate(180deg);
+    }
 
     @keyframes grow {
         0% {

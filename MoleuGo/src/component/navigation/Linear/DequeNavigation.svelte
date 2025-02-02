@@ -180,7 +180,7 @@
         dispatch('createRandomArr', {arrCnt});
     };
 
-    const startEnqueue = () => { // ******************************************* [Enqueue]
+    const startEnqueue = (direction) => { // ******************************************* [Enqueue]
 
         if(!isActive || !$isPaused ) {
             alert("애니메이션 실행 중 입니다.");
@@ -200,10 +200,10 @@
         toggle = Array(9).fill(false);
         isActive = false;
 
-        dispatch('startEnqueue', { value: pushValue } );
+        dispatch('startEnqueue', { value: pushValue, direction });
     }
 
-    const startDequeue = () => { // ******************************************* [Dequeue]
+    const startDequeue = (direction) => { // ******************************************* [Dequeue]
 
         if(!isActive || !$isPaused ) {
             alert("애니메이션 실행 중 입니다.");
@@ -220,7 +220,7 @@
         toggle = Array(9).fill(false);
         isActive = false;
 
-        dispatch('startDequeue');
+        dispatch('startDequeue', { direction } );
     }
 
     const startPeek = (direction) => { // ******************************************* [Peek]
@@ -277,10 +277,23 @@
                     <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>v</span> <span class='txt'>=</span>
                         <input type="text" id="element-input" size="10" bind:value={pushValue} >
-                        <button style="white-space: nowrap;"on:click={startEnqueue}>추가</button>
+                        <button style="white-space: nowrap;"on:click={() => startEnqueue('Front')}>Front</button>
+                        <button style="white-space: nowrap;"on:click={() => startEnqueue('Back')}>Back</button>
                     </div>
                 {:else if toggle[1]}
                     <!-- Pop() -->
+                    <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
+
+                        <button style="white-space: nowrap;" on:click={() => startDequeue('Front')}>
+                            Front
+                        </button>
+
+                        <button style="white-space: nowrap;" on:click={() => startDequeue('Back')}>
+                            Back
+                        </button>
+
+                    </div>
+                     
                 {:else if toggle[2]}
                     <!-- Peek() -->
                     <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
@@ -325,7 +338,7 @@
 
                 <!-- 1번 (삭제) -->
                 <span style="--i:1; --x:0; --y:-1"> 
-                    <ion-icon name="remove-circle-outline" on:click={startDequeue}
+                    <ion-icon name="remove-circle-outline" on:click={() => changeToggle(1)} 
                         on:mouseenter={() => tooltip[1] = true} on:mouseleave={() => tooltip[1] = false}></ion-icon>
                 </span>
 
