@@ -30,7 +30,7 @@
                 <span on:click={()=> push('/visualization/Queue')}>큐</span>
             </div>
 
-            <div class="algo-list-text-div">
+            <div class="algo-list-text-div" on:click={()=> {$isListVisible = false; push('/visualization/Linear/Deque')}}>
                 <span>덱</span>
             </div>
         </div> 
