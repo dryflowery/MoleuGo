@@ -203,9 +203,9 @@
                 {:else if tooltip[1]}
                     <span>힙 랜덤 생성</span>
                 {:else if tooltip[2]}
-                    <span>최댓값 반환</span>
-                {:else if tooltip[7]}
                     <span>원소 삽입</span>
+                {:else if tooltip[7]}
+                    <span>최댓값 반환</span>
                 {/if}
             {/if}
         </div>
@@ -227,7 +227,7 @@
                         <input type="number" id="element-cnt-input" min="1" max="15" bind:value={elementCnt}>
                         <button style="white-space: nowrap;" on:click={createRandomElement}>생성</button>
                     </div>
-                {:else if toggle[7]}
+                {:else if toggle[2]}
                     <!-- 원소 삽입 -->
                     <div class="navigation-toggle" transition:fly={{ x: -45, duration: 500 }}>
                         <span class='txt'>num</span> <span class='txt'>=</span>
@@ -254,9 +254,9 @@
                     on:mouseenter={() => tooltip[1] = true} on:mouseleave={() => tooltip[1] = false}></ion-icon>
                 </span>
 
-                <!-- 2번 (최댓값 반환)-->
+                <!-- 2번 (원소 삽입)-->
                 <span style="--i:2; --x:1; --y:-1">
-                    <ion-icon name="reload-outline" on:click={extractMax} 
+                    <ion-icon name="add-outline" on:click={() => changeToggle(2)} 
                     on:mouseenter={() => tooltip[2] = true} on:mouseleave={() => tooltip[2] = false}></ion-icon>
                 </span>
 
@@ -279,10 +279,10 @@
                 <span style="--i:6; --x:-1; --y:1">
               
                 </span>
-                
-                <!-- 7번 (원소 삽입)-->
+
+                <!-- 7번 (최댓값 반환)-->
                 <span style="--i:7; --x:-1; --y:0">
-                    <ion-icon name="add-outline" on:click={() => changeToggle(7)} 
+                    <ion-icon name="reload-outline" on:click={extractMax} 
                     on:mouseenter={() => tooltip[7] = true} on:mouseleave={() => tooltip[7] = false}></ion-icon>
                 </span>           
             </div>
