@@ -1,0 +1,357 @@
+:root {
+  font-family: "Pretendard Variable", sans-serif;
+  font-size: 100%;
+}
+
+button, input, select, textarea, div, p {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000; 
+}
+
+main {
+  /* 특별한 경우가 아니면 화면은 항상 Header, Content, Footer로 분리 */
+  /* 이 양식이 아닌 페이지의 경우 해당 svelte 파일에서 main css 작성 */
+  display: grid;
+  height: 100vh;
+  grid-template-rows: 70px 1fr 40px;
+}
+
+.header-container {
+  z-index: 1;
+  top: 0;
+}
+
+.footer-container {
+  z-index: 1;
+  bottom: 0;
+}
+
+.index-list-visible {
+  transform: scale(0.79) translateX(250px);
+  transform-origin: center; 
+  transition: transform 0.5s ease;
+}
+
+.index-list-invisible {
+  transform: scale(1.0) translateX(0px);
+  transform-origin: center; 
+  transition: transform 0.5s ease; 
+}
+
+.main-list-visible {
+  transform: translateX(220px); 
+  transition: transform 0.5s ease;
+}
+
+.main-list-invisible {
+  transform: translateX(0px);  
+  transition: transform 0.5s ease; 
+}
+
+/* visualization css */
+.visualization-list-visible {
+  transform: translateX(400px); 
+  transition: transform 0.5s ease;
+}
+
+.visualization-list-invisible {
+  transform: translateX(0px);  
+  transition: transform 0.5s ease;   
+}
+
+.visualization-vertical-line {
+  position: absolute;
+  top: 0;
+  left: 78vw;
+  height: calc(100vh - 70px); 
+  width: 1px; 
+  background-color: #414852; 
+}
+
+.algorithm-title-container {
+  color: #FFFFFF;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.canvas {
+  background-color: #FFFFFF;
+  height: 78vh;
+  width: 73vw;
+  border: 5px solid #313131;
+  border-radius: 20px;
+}
+
+.animation-control-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+}
+
+.animation-control-btn {
+  color: #909090;
+  font-size: 1.5rem;
+  padding-right: 5px;
+  cursor: pointer;
+}
+
+.animation-control-btn:hover {
+  transform: scale(1.1);
+}
+
+.animation-slider {
+  width: 500px;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  height: 10px;
+  cursor: pointer;
+  margin-left: 10px;
+  background: linear-gradient(to right, #509650 0%, #585858 0%);
+}
+  
+.animation-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 15px; 
+  width: 10px; 
+  background: #d9d9d9;
+  cursor: pointer; 
+}
+
+.speed-slider {
+  width: 200px;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  height: 10px;
+  cursor: pointer;
+  background: #585858;
+  margin-left: 100px;
+}
+  
+.speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 15px; 
+  width: 10px; 
+  background: #d9d9d9;
+  cursor: pointer; 
+}
+
+.speed-label {
+  color: #FFFFFF;
+  font-size: 1.2rem;
+  width: 75px;
+  padding-left: 10px;
+}
+
+.explanation-container {
+  height: 19vh;
+  width: 20vw;
+  display: grid;
+  grid-template-rows: 40px 140px;
+  background-color: #509650;
+  border-radius: 0 0 5px 5px; 
+}
+
+.explanation-title {
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 8px 0px 0px 10px;
+  border-bottom: 10px solid #0d0e0f; 
+}
+
+.explanation {
+  color: #FFFFFF;
+  font-size: 1.1rem;
+  padding: 6px 0px 0px 10px;
+}
+
+.code-container {
+  height: 64vh;
+  width: 20vw;
+  display: grid;
+  grid-template-rows: 40px 569px;
+  background-color: #3b3f3b;
+  border-radius: 0 0 5px 5px; 
+}
+
+.code-title {
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 8px 0px 0px 10px;
+  border-bottom: 10px solid #0d0e0f; 
+}
+
+.code-area {
+  color: #FFFFFF;
+  font-size: 1.1rem;
+  padding: 6px 0px 0px 0px;
+}
+
+.code-area .code {
+  height: 32.5px;
+  line-height: 32.5px; 
+}
+
+.navigation-container {
+  position: absolute;
+  z-index: 1000;
+}
+/* visualization css */
+
+/* navigation css */
+.navigation-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #161a23;
+  border-radius: 10px;
+}
+
+.navigation-menu { 
+  /* 9개 사각형 둘러싸고 있는 부분 */
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navigation-menu .navigation { 
+  /* 9개 사각형 부분 */
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.5s;
+}
+
+.navigation-menu .navigation span {
+   /* 각각의 사각형(비활성화): 가운데 사각형 제외 */
+  position: absolute;
+  width: 3.5px;
+  height: 3.5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  transform: translate(calc(10px * var(--x)), calc(10px * var(--y)));
+  transition: transform 0.5s, width 0.5s, height 0.5s;
+  transition-delay: calc(0.1s * var(--i));
+}
+
+.navigation-menu .navigation span ion-icon {
+  /* 각각의 사각형의 아이콘(비활성화): 가운데 사각형 제외 */
+  color: #FFFFFF;
+  font-size: 0.25rem;
+  transition: 0.5s;
+}
+
+.navigation-menu .navigation.active span ion-icon { 
+  /* 각각의 사각형의 아이콘(활성화): 가운데 사각형 제외 */
+  font-size: 1.75rem;
+}
+
+.navigation-menu .navigation.active span:hover ion-icon { 
+  /* 각각의 사각형의 아이콘에 커서 올렸을 때: 가운데 사각형 제외 */
+  color: #50C878;
+}
+
+.navigation-menu .navigation.active span { 
+  /* 각각의 사각형(활성화): 가운데 사각형 제외 */
+  width: 45px;
+  height: 45px;
+  background: #1f2536;
+  transform: translate(calc(60px * var(--x)), calc(60px * var(--y)));
+  border-radius: 5px;
+}
+
+.navigation-menu .center { 
+  /* 가운데 사각형(비활성화) */
+  position: absolute;
+  width: 3.5px;
+  height: 3.5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #FFFFFF;
+  transition: 0.5s;
+}
+
+.navigation-menu .navigation.active ~ .center {
+  /* 가운데 사각형(활성화) */
+  width: 40px; 
+  height: 40px;
+  pointer-events: initial;
+  background-color: transparent;
+  color: #FFFFFF;
+  border-radius: 5px;
+}
+
+.navigation-menu .navigation ~ .center ion-icon { 
+  /* 가운데 사각형의 아이콘(비활성화) */
+  color: #FFFFFF;
+  font-size: 2.5rem;
+  scale: 0;
+  transition: 0.5s;
+}
+
+.navigation-menu .navigation.active ~ .center ion-icon { 
+  /* 가운데 사각형의 아이콘(활성화) */
+  scale: 1;
+}  
+
+.navigation-menu .navigation.active ~ .center:hover ion-icon { 
+  /* 각각의 사각형의 아이콘에 커서 올렸을 때: 가운데 사각형 제외 */
+  color: #50C878;
+}
+
+.navigation-tooltip {
+  background-color: transparent;
+  color: #161a23;
+  position: absolute;
+  top: -90px;
+  font-size: 1.2rem;
+  font-weight: bolder;
+  white-space: nowrap; 
+}
+
+.navigation-toggle {
+  display: flex;
+  position: absolute;
+  left: 100px;
+  top: -81.5px;
+  width: fit-content;
+  background-color: #161a23;
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 10px 10px;
+  border-radius: 5px;
+  gap: 10px;
+}
+
+.navigation-toggle input, button {
+  border-radius: 2.5px;
+  border: none;
+}
+
+.navigation-toggle button {
+  background-color: #FFFFFF;
+  cursor: pointer;
+}
+
+.navigation-toggle button:hover {
+  background-color: #CCCCCC;
+}
+/* navigation css */
