@@ -3,8 +3,28 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 export default defineConfig({
   plugins: [svelte()],
-  base: '/', // 기본 경로 설정
+  base: '/',
   server: {
-    historyApiFallback: true, // history API fallback 추가
+    historyApiFallback: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: `[name]-[hash].js`,
+        chunkFileNames: `[name]-[hash].js`,
+
+        assetFileNames: assetInfo => {
+          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+            return `[name]-[hash][extname]`;
+          }
+          else if (assetInfo.name && /\.(png|jpe?g|gif|svg|webp|mp3|mp4)$/.test(assetInfo.name)) {
+            return 'assets/[name]-[hash][extname]';
+          }
+          else {
+            return 'other/[name]-[hash][extname]';
+          }
+        }
+      }
+    }
   }
 });
