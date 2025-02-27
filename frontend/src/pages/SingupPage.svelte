@@ -1,7 +1,10 @@
 <script>
 
+	import {OK, CONFLICT, BAD_REQUEST} from "../lib/httpStatusStore.js";
+
+	let httpStatusCode;
+
 	let inputEmail = ""; // 이메일 입력값
-	let emailFocused = false; // 이메일 입력 필드 포커스 여부
 	let emailErrorMessage = ""; // 이메일 에러 메시지
 
 	let inputNewPassword = ""; // 새 비밀번호 입력값
@@ -11,13 +14,8 @@
 	let condition2Met = false; // 8자 이상 32자 이하 입력 (공백 제외)
 	let condition3Met = false; // 연속 3자 이상 동일한 문자/숫자 제외
 
-	let inputNewPasswordFocused = false; // 비밀번호 입력 필드 포커스 여부
-	let inputNewPasswordVerifyFocused = false; // 비밀번호 확인 필드 포커스 여부
-
 	let verifyPasswordMessage = "확인을 위해 새 비밀번호를 다시 입력하세요"; // 비밀번호 확인 메시지
 	let verifyPasswordMessageStyle = ""; // 메시지 스타일
-
-	let isFormValid = false; // 전체 폼 유효성 검사 결과
 
 	let isNewPasswordVisible = false; // 새 비밀번호 보이기 상태
 	let isNewPasswordVerifyVisible = false; // 새 비밀번호 확인용 보이기 상태
@@ -70,25 +68,7 @@
 			verifyPasswordMessage = "비밀번호가 일치하지 않습니다";
 			verifyPasswordMessageStyle = "color: rgb(173, 44, 44);"; // 빨간색
 		}
-
-		validateForm();
   	}
-
-	  // 전체 폼 유효성 검사
-	  function validateForm() {
-		isFormValid =
-		emailErrorMessage === "" &&
-		condition1Met &&
-		condition2Met &&
-		condition3Met &&
-		inputNewPasswordVerify === inputNewPassword &&
-		inputNewPassword !== "" &&
-		inputEmail !== "";
-	}
-
-	function showAlert() {
-		alert("회원가입 완료");
-	}
 
 	// 비밀번호 보이기 버튼 토글
 	function toggleNewPasswordVisibility() {
@@ -99,6 +79,59 @@
 		isNewPasswordVerifyVisible = !isNewPasswordVerifyVisible;
 	}
 
+	// 폼 유효성 검사 후 백엔드로 회원가입 요청 전송
+	const signUp = () => {
+		if (!isFormValid()) {
+			return;
+		}
+
+		sendSignUpRequest()
+			.then(noArgs => {
+				if (httpStatusCode === OK) {
+					alert("회원가입이 완료되었습니다.");
+				}
+				else if (httpStatusCode === BAD_REQUEST) {
+					alert("올바르지 않은 형식의 입력입니다.\n이메일 혹은 비밀번호를 다시 입력해주세요.");
+				}
+				else if (httpStatusCode === CONFLICT) {
+					alert("이미 등록된 이메일입니다.\n다른 이메일을 사용해주세요.");
+				}
+			});
+	};
+
+	// 전체 폼 유효성 검사
+	const isFormValid = () => {
+		return isValidEmail() && isValidPassword() && isValidVerifyPassword();
+	}
+
+	const isValidEmail = () => {
+		return inputEmail !== "" && emailErrorMessage === "";
+	}
+
+	const isValidPassword = () => {
+		return inputNewPassword !== "" && condition1Met && condition2Met && condition3Met;
+	}
+
+	const isValidVerifyPassword = () => {
+		return inputNewPasswordVerify === inputNewPassword;
+	}
+
+	const sendSignUpRequest = () => {
+		return fetch('/signup', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				email: inputEmail,
+				password: inputNewPassword,
+				verifyPassword: inputNewPasswordVerify
+			})
+		})
+		.then(response => {
+			httpStatusCode = response.status;
+		});
+	}
 </script>
 
 
@@ -117,7 +150,7 @@
 	  <h1>회원가입</h1>
 	  <p> 알고리즘 시각화 사이트 '모르고'</p>
   
-	  <form on:submit|preventDefault={showAlert}>
+	  <form on:submit|preventDefault={signUp}>
 		<!-- 이메일 입력 -->
 		<div class="input-field">
 		  <label for="email">이메일</label>
@@ -215,7 +248,7 @@
 		  </div>
   
 		<!-- 가입 버튼 -->
-		<button type="submit" class="submit-button" disabled={!isFormValid}>
+		<button type="submit" class="submit-button">
 			가입하기
 		</button>
 
