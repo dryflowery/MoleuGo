@@ -17,7 +17,17 @@ public class MemoryMemberRepository implements MemberRepository {
     }
 
     @Override
-    public Member findByEmail(String email) {
-        return repository.get(email);
+    public Member findByEmail(Member member) {
+        return repository.get(member.getEmail());
+    }
+
+    @Override
+    public boolean hasEmail(Member member) {
+        return repository.containsKey(member.getEmail());
+    }
+
+    @Override
+    public boolean isCorrectPassword(Member member) {
+        return member.getPassword().equals(repository.get(member.getEmail()).getPassword());
     }
 }

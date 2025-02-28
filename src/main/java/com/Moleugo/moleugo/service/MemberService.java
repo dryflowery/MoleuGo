@@ -2,8 +2,10 @@ package com.Moleugo.moleugo.service;
 
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.repository.MemberRepository;
+import com.Moleugo.moleugo.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final ApplicationContext ac;
 
     public HttpStatus signUp(Member member) {
 
@@ -34,7 +37,7 @@ public class MemberService {
 
             // 중복 이메일 체크
             boolean isDuplicatedEmail() {
-                return memberRepository.findByEmail(member.getEmail()) != null;
+                return memberRepository.findByEmail(member) != null;
             }
 
             // 이메일 유효성 검사
@@ -87,5 +90,39 @@ public class MemberService {
         }
 
         return status;
+    }
+
+    public HttpStatus login(Member member) {
+
+        // 로그인 정보 유효성 검사
+        class LoginValidator {
+            final LoginResponse loginResponse = ac.getBean("loginResponse", LoginResponse.class);
+
+            HttpStatus isValidLogin() {
+                if(!isValidEmail()) {
+                    loginResponse.setLoginMessage("등록되지 않은 이메일 주소입니다.");
+                    return HttpStatus.UNAUTHORIZED;
+                }
+
+                if(!isValidPassword()) {
+                    loginResponse.setLoginMessage("잘못된 비밀번호입니다.");
+                    return HttpStatus.UNAUTHORIZED;
+                }
+
+                loginResponse.setLoginMessage("로그인 성공");
+                return HttpStatus.OK;
+            }
+
+            private boolean isValidEmail() {
+                return memberRepository.hasEmail(member);
+            }
+
+            private boolean isValidPassword() {
+                return memberRepository.isCorrectPassword(member);
+            }
+        }
+
+        LoginValidator loginValidator = new LoginValidator();
+        return loginValidator.isValidLogin();
     }
 }

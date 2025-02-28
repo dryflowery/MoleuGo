@@ -155,7 +155,7 @@
 		  <label for="email">이메일</label>
 
 			<input
-				id="email"
+				id="sign-up-email-input"
 				type="email"
 				placeholder="example@moleugo.com"
 				bind:value={inputEmail}
@@ -176,6 +176,7 @@
 
 			{#if isNewPasswordVisible}
 			<input
+				id="sign-up-password-input"
 				type="text"
 				placeholder="비밀번호를 입력하세요"
 				bind:value={inputPassword}
@@ -183,7 +184,7 @@
 			/>
 			{:else}
 				<input
-					id="password"
+					id="sign-up-password-input"
 					type="password"
 					placeholder="비밀번호를 입력하세요"
 					bind:value={inputPassword}
@@ -219,14 +220,14 @@
 			<div class="password-wrapper">
 			  {#if isNewPasswordVerifyVisible}
 			  <input
-				id="confirm-password"
+				id="sign-up-verify-password-input"
 				type="text"
 				placeholder="비밀번호를 다시 입력하세요"
 				bind:value={inputVerifyPassword}
 			  />
 			  {:else}
 			  <input
-				id="confirm-password"
+				id="sign-up-verify-password-input"
 				type="password"
 				placeholder="비밀번호를 다시 입력하세요"
 				bind:value={inputVerifyPassword}
