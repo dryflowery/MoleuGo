@@ -1,6 +1,13 @@
 <script>
     import { isLoginVisible } from "../lib/store";
+    import {OK, UNAUTHORIZED} from "../lib/httpStatusStore.js";
     import { push } from "svelte-spa-router";
+
+    let loginHttpStatusCode;
+    let loginMessage;
+
+    let inputEmail = "";
+    let inputPassword = "";
 
     const closeLoginPopup = (event) => {
         const popupContent = document.getElementById("popup-content");
@@ -13,6 +20,75 @@
     const closePopup = () => {
         $isLoginVisible = false;
     };
+
+    const login = () => {
+        if (!isValidLoginInput()) {
+            return;
+        }
+
+        sendLoginRequest()
+        .then(noArgs => {
+            if (loginHttpStatusCode === OK) {
+                closePopup();
+                push("/main/myPage")
+            }
+            else if (loginHttpStatusCode === UNAUTHORIZED) {
+                alert(loginMessage);
+            }
+        });
+    }
+
+    // 이메일, 비밀번호가 전부 입력되었나 확인
+    const isValidLoginInput = () => {
+        let isValid = true;
+
+        if(isEmailEntered()) {
+            document.getElementById("login-email-input").style.border = "1px solid #c0392b";
+            isValid = false;
+        }
+
+        if(isPasswordEntered()) {
+            document.getElementById("login-password-input").style.border = "1px solid #c0392b";
+            isValid = false;
+        }
+
+        if(isValid) {
+            document.getElementById("login-email-input").style.border = "1px solid #3d444d";
+            document.getElementById("login-password-input").style.border = "1px solid #3d444d";
+        }
+
+        return isValid;
+    }
+
+    const isEmailEntered = () => {
+        let checkEmail = inputEmail.replace(/\s+/g, '');
+        return checkEmail === "";
+    }
+
+    const isPasswordEntered = () => {
+        let checkPassword = inputPassword.replace(/\s+/g, '');
+        return checkPassword === "";
+    }
+
+    const sendLoginRequest = () => {
+        return fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: inputEmail,
+                password: inputPassword,
+            })
+        })
+        .then(response => {
+            loginHttpStatusCode = response.status;
+            return response.json();
+        })
+        .then(data => {
+            loginMessage = data.loginMessage;
+        });
+    }
 </script>
 
 
@@ -24,10 +100,20 @@
             <h1>Moleugo</h1>
             
             <!-- 로그인 추가(백엔드) -->
-            <input type="text" class="input-field" placeholder="아이디(이메일) 입력 ...." />
-            <input type="password" class="input-field" placeholder="비밀번호 입력 ...." />
+            <input type="text"
+                   class="input-field"
+                   id="login-email-input"
+                   placeholder="아이디(이메일) 입력 ...."
+                   bind:value={inputEmail}
+            />
+            <input type="password"
+                   class="input-field"
+                   id="login-password-input"
+                   placeholder="비밀번호 입력 ...."
+                   bind:value={inputPassword}
+            />
             
-            <button id="login-btn">로그인</button>
+            <button id="login-btn" on:click={login}>로그인</button>
             
             <div id="link-container">
                 <span on:click={()=> push('/findpassword')}>비밀번호 찾기</span> | <span on:click={()=> push('/signup')}>회원가입</span>
