@@ -1,14 +1,13 @@
 <script>
-
 	import {OK, CONFLICT, BAD_REQUEST} from "../lib/httpStatusStore.js";
 
-	let httpStatusCode;
+	let signUpHttpStatusCode;
 
 	let inputEmail = ""; // 이메일 입력값
 	let emailErrorMessage = ""; // 이메일 에러 메시지
 
-	let inputNewPassword = ""; // 새 비밀번호 입력값
-	let inputNewPasswordVerify = ""; // 새 비밀번호 확인값
+	let inputPassword = ""; // 새 비밀번호 입력값
+	let inputVerifyPassword = ""; // 새 비밀번호 확인값
 
 	let condition1Met = false; // 영문/숫자/특수문자 중 2가지 이상 포함
 	let condition2Met = false; // 8자 이상 32자 이하 입력 (공백 제외)
@@ -58,10 +57,10 @@
 
   	// 비밀번호 확인 일치 여부 검사
   	$: {
-		if (inputNewPasswordVerify === "") {
+		if (inputVerifyPassword === "") {
 			verifyPasswordMessage = "";
 			verifyPasswordMessageStyle = ""; // 기본 스타일
-		} else if (inputNewPasswordVerify === inputNewPassword) {
+		} else if (inputVerifyPassword === inputPassword) {
 			verifyPasswordMessage = "비밀번호가 일치합니다";
 			verifyPasswordMessageStyle = "color: #238636;"; // 초록색
 		} else {
@@ -87,13 +86,13 @@
 
 		sendSignUpRequest()
 			.then(noArgs => {
-				if (httpStatusCode === OK) {
+				if (signUpHttpStatusCode === OK) {
 					alert("회원가입이 완료되었습니다.");
 				}
-				else if (httpStatusCode === BAD_REQUEST) {
+				else if (signUpHttpStatusCode === BAD_REQUEST) {
 					alert("올바르지 않은 형식의 입력입니다.\n이메일 혹은 비밀번호를 다시 입력해주세요.");
 				}
-				else if (httpStatusCode === CONFLICT) {
+				else if (signUpHttpStatusCode === CONFLICT) {
 					alert("이미 등록된 이메일입니다.\n다른 이메일을 사용해주세요.");
 				}
 			});
@@ -109,11 +108,11 @@
 	}
 
 	const isValidPassword = () => {
-		return inputNewPassword !== "" && condition1Met && condition2Met && condition3Met;
+		return inputPassword !== "" && condition1Met && condition2Met && condition3Met;
 	}
 
 	const isValidVerifyPassword = () => {
-		return inputNewPasswordVerify === inputNewPassword;
+		return inputVerifyPassword === inputPassword;
 	}
 
 	const sendSignUpRequest = () => {
@@ -124,12 +123,12 @@
 			},
 			body: JSON.stringify({
 				email: inputEmail,
-				password: inputNewPassword,
-				verifyPassword: inputNewPasswordVerify
+				password: inputPassword,
+				verifyPassword: inputVerifyPassword
 			})
 		})
 		.then(response => {
-			httpStatusCode = response.status;
+			signUpHttpStatusCode = response.status;
 		});
 	}
 </script>
@@ -179,16 +178,16 @@
 			<input
 				type="text"
 				placeholder="비밀번호를 입력하세요"
-				bind:value={inputNewPassword}
-				on:input={() => validateNewPassword(inputNewPassword)}
+				bind:value={inputPassword}
+				on:input={() => validateNewPassword(inputPassword)}
 			/>
 			{:else}
 				<input
 					id="password"
 					type="password"
 					placeholder="비밀번호를 입력하세요"
-					bind:value={inputNewPassword}
-					on:input={() => validateNewPassword(inputNewPassword)}
+					bind:value={inputPassword}
+					on:input={() => validateNewPassword(inputPassword)}
 				/>
 			{/if}
 
@@ -223,14 +222,14 @@
 				id="confirm-password"
 				type="text"
 				placeholder="비밀번호를 다시 입력하세요"
-				bind:value={inputNewPasswordVerify}
+				bind:value={inputVerifyPassword}
 			  />
 			  {:else}
 			  <input
 				id="confirm-password"
 				type="password"
 				placeholder="비밀번호를 다시 입력하세요"
-				bind:value={inputNewPasswordVerify}
+				bind:value={inputVerifyPassword}
 			  />
 			  {/if}
 		  
