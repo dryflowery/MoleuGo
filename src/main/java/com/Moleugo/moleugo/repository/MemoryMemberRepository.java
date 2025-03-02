@@ -22,7 +22,7 @@ public class MemoryMemberRepository implements MemberRepository {
     }
 
     @Override
-    public boolean hasEmail(Member member) {
+    public boolean isRegisteredEmail(Member member) {
         return repository.containsKey(member.getEmail());
     }
 

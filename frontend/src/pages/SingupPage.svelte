@@ -80,7 +80,7 @@
 
 	// 폼 유효성 검사 후 백엔드로 회원가입 요청 전송
 	const signUp = () => {
-		if (!isFormValid()) {
+		if (!isValidForm()) {
 			return;
 		}
 
@@ -99,7 +99,7 @@
 	};
 
 	// 전체 폼 유효성 검사
-	const isFormValid = () => {
+	const isValidForm = () => {
 		return isValidEmail() && isValidPassword() && isValidVerifyPassword();
 	}
 
