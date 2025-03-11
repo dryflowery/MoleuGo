@@ -19,15 +19,18 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final ApplicationContext ac;
 
-    public HttpStatus signUp(Member member) {
+    public HttpStatus isValidForm(Member member) {
         SignUpValidator signUpValidator = ac.getBean(SignUpValidator.class);
-        HttpStatus status = signUpValidator.isFormValid(member);
+        return signUpValidator.isFormValid(member);
+    }
 
-        if(status == HttpStatus.OK) {
-            memberRepository.registerMember(member);
-        }
-
-        return status;
+    public HttpStatus signUp(Member member) {
+        /*
+        1. smtp로 member.getEmail()에 인증 메일 보내기
+        2. 인증 링크 클릭하면 HttpStatus.OK return
+        3. 일정 시간이 지나면 BadRequest(확실하지 않음) return
+         */
+        return HttpStatus.OK;
     }
 
     public HttpStatus login(Member member) {

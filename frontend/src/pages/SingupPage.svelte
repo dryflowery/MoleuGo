@@ -1,5 +1,6 @@
 <script>
 	import {OK, CONFLICT, BAD_REQUEST} from "../lib/httpStatusStore.js";
+	import { push } from "svelte-spa-router";
 
 	let signUpHttpStatusCode;
 
@@ -18,6 +19,8 @@
 
 	let isNewPasswordVisible = false; // 새 비밀번호 보이기 상태
 	let isNewPasswordVerifyVisible = false; // 새 비밀번호 확인용 보이기 상태
+
+	let changeToVerifyEmailPage = false; // true면 이메일 인증 페이지로 넘어감
 
 	  // 이메일 유효성 검사
 	function validateEmail(email) {
@@ -84,10 +87,10 @@
 			return;
 		}
 
-		sendSignUpRequest()
+		sendGetRequest()
 			.then(noArgs => {
 				if (signUpHttpStatusCode === OK) {
-					alert("회원가입이 완료되었습니다.");
+					changeToVerifyEmailPage = true;
 				}
 				else if (signUpHttpStatusCode === BAD_REQUEST) {
 					alert("올바르지 않은 형식의 입력입니다.\n이메일 혹은 비밀번호를 다시 입력해주세요.");
@@ -96,6 +99,18 @@
 					alert("이미 등록된 이메일입니다.\n다른 이메일을 사용해주세요.");
 				}
 			});
+
+		if(signUpHttpStatusCode === OK) {
+			sendPostRequest()
+				.then(noArgs => {
+					if (signUpHttpStatusCode === OK) {
+						push('/main/myPage');
+					}
+					else {
+					// verify email x
+					}
+				});
+		}
 	};
 
 	// 전체 폼 유효성 검사
@@ -115,9 +130,9 @@
 		return inputVerifyPassword === inputPassword;
 	}
 
-	const sendSignUpRequest = () => {
+	const sendGetRequest = () => {
 		return fetch('/signup', {
-			method: 'POST',
+			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -131,147 +146,168 @@
 			signUpHttpStatusCode = response.status;
 		});
 	}
+
+	const sendPostRequest = () => {
+		return fetch('/signup', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				email: inputEmail,
+				password: inputPassword,
+			})
+		})
+		.then(response => {
+			signUpHttpStatusCode = response.status;
+		});
+	}
 </script>
 
-
 <main>
-  
   <div class="app-container">
-	<!-- 헤더 -->
-	<div class="header">
-	  <div class="logo">
-		<h1>Moleugo</h1>
-	  </div>
-	</div>
-  
-	<!-- 회원가입 폼 -->
-	<div class="form-container">
-	  <h1>회원가입</h1>
-	  <p> 알고리즘 시각화 사이트 '모르고'</p>
-  
-	  <form on:submit|preventDefault={signUp}>
-		<!-- 이메일 입력 -->
-		<div class="input-field">
-		  <label for="email">이메일</label>
-
-			<input
-				id="sign-up-email-input"
-				type="email"
-				placeholder="example@moleugo.com"
-				bind:value={inputEmail}
-				on:input={() => validateEmail(inputEmail)}          	
-			/>
-
-			{#if emailErrorMessage}
-			  <p class="error-message">{emailErrorMessage}</p>
-			{/if}
-
-		</div>
-  
-		<!-- 비밀번호 입력 -->
-		<div class="input-field">
-		  <label for="password">비밀번호</label>
-
-		  <div class="password-wrapper">
-
-			{#if isNewPasswordVisible}
-			<input
-				id="sign-up-password-input"
-				type="text"
-				placeholder="비밀번호를 입력하세요"
-				bind:value={inputPassword}
-				on:input={() => validateNewPassword(inputPassword)}
-			/>
-			{:else}
-				<input
-					id="sign-up-password-input"
-					type="password"
-					placeholder="비밀번호를 입력하세요"
-					bind:value={inputPassword}
-					on:input={() => validateNewPassword(inputPassword)}
-				/>
-			{/if}
-
-			<button 
-				type="button" 
-				class="toggle-password-btn" 
-				on:click={toggleNewPasswordVisibility}>
-				<ion-icon name={isNewPasswordVisible ? "eye-off-outline" : "eye-outline"}></ion-icon>
-			</button>
+	  <!-- 헤더 -->
+	  <div class="header">
+		  <div class="logo">
+			  <h1>Moleugo</h1>
+			  <p> 알고리즘 시각화 사이트 '모르고'</p>
 		  </div>
+	  </div>
 
-		  <ul class="requirements">
-            <li style="color: {condition1Met ? '#238636' : '#9198a1'};">
-               영문/숫자/특수문자 중, 2가지 이상 포함
-            </li>
-            <li style="color: {condition2Met ? '#238636' : '#9198a1'};">
-               8자 이상 32자 이하 입력 (공백 제외)
-            </li>
-            <li style="color: {condition3Met ? '#238636' : '#9198a1'};">
-               연속 3자 이상 동일한 문자/숫자 제외
-            </li>
-          </ul>
-		</div>
-  
-		<!-- 비밀번호 확인 입력 -->
-		<div class="input-field">
-			<label for="confirm-password">비밀번호 확인</label>
-		  
-			<div class="password-wrapper">
-			  {#if isNewPasswordVerifyVisible}
-			  <input
-				id="sign-up-verify-password-input"
-				type="text"
-				placeholder="비밀번호를 다시 입력하세요"
-				bind:value={inputVerifyPassword}
-			  />
-			  {:else}
-			  <input
-				id="sign-up-verify-password-input"
-				type="password"
-				placeholder="비밀번호를 다시 입력하세요"
-				bind:value={inputVerifyPassword}
-			  />
-			  {/if}
-		  
-			  <button 
-				type="button" 
-				class="toggle-password-btn2" 
-				on:click={toggleNewPasswordVerifyVisibility}>
-				<ion-icon name={isNewPasswordVerifyVisible ? "eye-off-outline" : "eye-outline"}></ion-icon>
+	  <!-- 회원가입 폼 -->
+	  <div class="form-container">
+		  {#if changeToVerifyEmailPage === false}
+			  <h1>회원가입</h1>
+
+			  <form on:submit|preventDefault={signUp}>
+				  <!-- 이메일 입력 -->
+				  <div class="input-field">
+					  <label for="email">이메일</label>
+
+					  <input
+							  id="sign-up-email-input"
+							  type="email"
+							  placeholder="example@moleugo.com"
+							  bind:value={inputEmail}
+							  on:input={() => validateEmail(inputEmail)}
+					  />
+
+					  {#if emailErrorMessage}
+						  <p class="error-message">{emailErrorMessage}</p>
+					  {/if}
+				  </div>
+
+				  <!-- 비밀번호 입력 -->
+				  <div class="input-field">
+					  <label for="password">비밀번호</label>
+
+					  <div class="password-wrapper">
+
+						  {#if isNewPasswordVisible}
+							  <input
+									  id="sign-up-password-input"
+									  type="text"
+									  placeholder="비밀번호를 입력하세요"
+									  bind:value={inputPassword}
+									  on:input={() => validateNewPassword(inputPassword)}
+							  />
+						  {:else}
+							  <input
+									  id="sign-up-password-input"
+									  type="password"
+									  placeholder="비밀번호를 입력하세요"
+									  bind:value={inputPassword}
+									  on:input={() => validateNewPassword(inputPassword)}
+							  />
+						  {/if}
+
+						  <button
+								  type="button"
+								  class="toggle-password-btn"
+								  on:click={toggleNewPasswordVisibility}>
+							  <ion-icon name={isNewPasswordVisible ? "eye-off-outline" : "eye-outline"}></ion-icon>
+						  </button>
+					  </div>
+
+					  <ul class="requirements">
+						  <li style="color: {condition1Met ? '#238636' : '#9198a1'};">
+							  영문/숫자/특수문자 중, 2가지 이상 포함
+						  </li>
+						  <li style="color: {condition2Met ? '#238636' : '#9198a1'};">
+							  8자 이상 32자 이하 입력 (공백 제외)
+						  </li>
+						  <li style="color: {condition3Met ? '#238636' : '#9198a1'};">
+							  연속 3자 이상 동일한 문자/숫자 제외
+						  </li>
+					  </ul>
+				  </div>
+
+				  <!-- 비밀번호 확인 입력 -->
+				  <div class="input-field">
+					  <label for="confirm-password">비밀번호 확인</label>
+
+					  <div class="password-wrapper">
+						  {#if isNewPasswordVerifyVisible}
+							  <input
+									  id="sign-up-verify-password-input"
+									  type="text"
+									  placeholder="비밀번호를 다시 입력하세요"
+									  bind:value={inputVerifyPassword}
+							  />
+						  {:else}
+							  <input
+									  id="sign-up-verify-password-input"
+									  type="password"
+									  placeholder="비밀번호를 다시 입력하세요"
+									  bind:value={inputVerifyPassword}
+							  />
+						  {/if}
+
+						  <button
+								  type="button"
+								  class="toggle-password-btn2"
+								  on:click={toggleNewPasswordVerifyVisibility}>
+							  <ion-icon name={isNewPasswordVerifyVisible ? "eye-off-outline" : "eye-outline"}></ion-icon>
+						  </button>
+					  </div>
+
+					  <p class="hint" style={verifyPasswordMessageStyle}>
+						  {verifyPasswordMessage}
+					  </p>
+				  </div>
+
+				  <!-- 가입 버튼 -->
+				  <button type="submit" class="submit-button">
+					  가입하기
+				  </button>
+
+			  </form>
+
+			  <!-- 약관 -->
+			  <p class="terms">
+				  해당 계정을 통한 이용은 ... 제공됩니다. <br />
+				  개인 정보 제공 및 처리에 동의합니다.
+			  </p>
+
+			  <div class="divider"></div>
+
+			  <div id="google-login" on:click={() => changeToVerifyEmailPage = true}>
+				  <img src="https://img.icons8.com/color/200/google-logo.png" alt="Google Login" />
+			  </div>
+		  {:else}
+			  <h1>인증 메일을 보내드렸어요.</h1>
+			  <img src="assets/mail.gif" width="120px" height="120px" alt="">
+
+			  <br>
+			  <p style="color: white; padding-top: 7.5px;">메일함을 확인해주세요.</p>
+			  <p style="color: white; padding-top: 7.5px;">가입하신 이메일을 인증해주시면,</p>
+			  <p style="color: white; padding-top: 7.5px;">모르고의 서비스를 마음껏 이용하실 수 있어요.</p>
+
+			  <button class="return-to-main-button" on:click={() => push('/')}>
+				  메인화면으로 돌아가기
 			  </button>
-			</div>
-		  
-			<p class="hint" style={verifyPasswordMessageStyle}>
-			  {verifyPasswordMessage}
-			</p>
-		  </div>
-  
-		<!-- 가입 버튼 -->
-		<button type="submit" class="submit-button">
-			가입하기
-		</button>
-
-	  </form>
-  
-	  <!-- 약관 -->
-	  <p class="terms">
-		해당 계정을 통한 이용은 ... 제공됩니다. <br />
-		개인 정보 제공 및 처리에 동의합니다.
-	  </p>
-
-	  <div class="divider"></div>
-
-	  <div id="google-login">
-		<img src="https://img.icons8.com/color/200/google-logo.png" alt="Google Login" />
+		  {/if}
 	  </div>
-
-	</div>
-  
-	<!-- 하단 소셜 로그인 -->
-	<div class="footer">
-	</div>
-
   </div>
 </main>
 
@@ -294,7 +330,7 @@
 	  margin-bottom: 20px;
 	}
 	.logo {
-	  font-size: 2rem;
+		text-align: center;
 	}
   
 	/* 폼 컨테이너 스타일 */
@@ -385,7 +421,24 @@
 	.submit-button:hover {
 	  background-color: #007d00;
 	}
-  
+
+	.return-to-main-button {
+		padding: 12px;
+		background-color: #00a000;
+		color: #fff;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 1rem;
+		font-weight: bold;
+		width: 270px;
+		margin-top: 30px;
+	}
+
+	.return-to-main-button:hover {
+		background-color: #007d00;
+	}
+
 	.terms {
 	  font-size: 0.9rem;
 	  color: #555;
@@ -409,13 +462,6 @@
         background-color: #151515;
         padding: 0 10px;
     }
-  
-	/* 하단 소셜 로그인 스타일 */
-	.footer {
-	  display: flex;
-	  gap: 8px;
-	}
-  
 
 	#google-login {
         display: flex;
