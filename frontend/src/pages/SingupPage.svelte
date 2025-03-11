@@ -19,6 +19,8 @@
 	let isNewPasswordVisible = false; // 새 비밀번호 보이기 상태
 	let isNewPasswordVerifyVisible = false; // 새 비밀번호 확인용 보이기 상태
 
+	let changeToVerifyEmailPage = false;
+
 	  // 이메일 유효성 검사
 	function validateEmail(email) {
 
