@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,16 +20,25 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final ApplicationContext ac;
+    private final JavaMailSender mailSender;
 
-    public HttpStatus signUp(Member member) {
+    public HttpStatus isValidForm(Member member) {
         SignUpValidator signUpValidator = ac.getBean(SignUpValidator.class);
-        HttpStatus status = signUpValidator.isFormValid(member);
+        return signUpValidator.isFormValid(member);
+    }
 
-        if(status == HttpStatus.OK) {
-            memberRepository.registerMember(member);
-        }
+    public HttpStatus verifyEmail(Member member) {
+        /*
+        1. smtp로 member.getEmail()에 인증 메일 보내기
+        2. 인증 링크 클릭하면 HttpStatus.OK return
+        3. 일정 시간이 지나면 BadRequest(확실하지 않음) return
+         */
 
-        return status;
+        return HttpStatus.OK;
+    }
+
+    public void signUp(Member member) {
+        memberRepository.registerMember(member);
     }
 
     public HttpStatus login(Member member) {
