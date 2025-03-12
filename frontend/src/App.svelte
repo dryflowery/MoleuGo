@@ -16,24 +16,26 @@
   import Deque from './routes/visualization/Linear/Deque.svelte';
   import Dfs from './routes/visualization/graph/Dfs.svelte';
   import Bfs from './routes/visualization/graph/Bfs.svelte';
+  import SignupSuccessPage from "./routes/SignupSuccessPage.svelte";
 
   const routes = {
-    '/': Index,
-    '/main' : MainPage,
-    '/signup': SignupPage,
-    '/findpassword' : FindPassword,
-    '/main/myPage' : MyPage,
-    '/visualization/sort/BubbleSort': BubbleSort,
-    '/visualization/sort/SelectionSort': SelectionSort,
-    '/visualization/sort/InsertionSort': InsertionSort,
-    '/visualization/tree/Heap': Heap,
-    '/visualization/geometry/ConvexHull': ConvexHull,
-    '/visualization/Linear/LinkedList': LinkedList,
-    '/visualization/Linear/Stack': Stack,
-    '/visualization/Linear/Queue': Queue,
-    '/visualization/Linear/Deque': Deque,
-    '/visualization/graph/Dfs': Dfs,
-    '/visualization/graph/Bfs': Bfs,
+      '/': Index,
+      '/main' : MainPage,
+      '/signup': SignupPage,
+      '/find-password' : FindPassword,
+      '/main/myPage' : MyPage,
+      '/visualization/sort/BubbleSort': BubbleSort,
+      '/visualization/sort/SelectionSort': SelectionSort,
+      '/visualization/sort/InsertionSort': InsertionSort,
+      '/visualization/tree/Heap': Heap,
+      '/visualization/geometry/ConvexHull': ConvexHull,
+      '/visualization/Linear/LinkedList': LinkedList,
+      '/visualization/Linear/Stack': Stack,
+      '/visualization/Linear/Queue': Queue,
+      '/visualization/Linear/Deque': Deque,
+      '/visualization/graph/Dfs': Dfs,
+      '/visualization/graph/Bfs': Bfs,
+      '/signup-success': SignupSuccessPage
   };
 </script>
 

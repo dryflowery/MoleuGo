@@ -41,8 +41,6 @@ public class MemberService {
                         
                         이메일 인증을 완료하면 <b>moleugo</b>의 모든 서비스를 이용할 수 있습니다.<br/>
                         만약 회원가입을 요청하지 않았다면 이 이메일을 무시하셔도 됩니다.<br/><br/>
-                        
-                        감사합니다.
                         """.replace("{url}", verificationLink);
 
         mailService.setTo(to);
@@ -57,11 +55,16 @@ public class MemberService {
         return uuid;
     }
 
-    public void signUp(String uuid) {
+    public HttpStatus signUp(String uuid) {
         Member member = (Member)session.getAttribute(uuid);
 
-        if(member != null) {
+        if(member != null && !memberRepository.isRegisteredEmail(member)) {
+            session.removeAttribute(uuid);
             memberRepository.registerMember(member);
+            return HttpStatus.OK;
+        }
+        else {
+            return HttpStatus.NOT_FOUND;
         }
     }
 

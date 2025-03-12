@@ -6,6 +6,7 @@ import com.Moleugo.moleugo.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +32,15 @@ public class MemberController {
     }
 
     @GetMapping("/signup/{uuid}")
-    public void signUp(@PathVariable("uuid") String uuid) {
-        memberService.signUp(uuid);
+    public String signUp(@PathVariable("uuid") String uuid) {
+        HttpStatus status = memberService.signUp(uuid);
+
+        if(status == HttpStatus.OK) {
+            return "redirect:/#/signup-success";
+        }
+        else {
+            return "redirect:/#";
+        }
     }
 
     @PostMapping("/login")
