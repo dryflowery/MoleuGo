@@ -116,7 +116,7 @@
             <button id="login-btn" on:click={login}>로그인</button>
             
             <div id="link-container">
-                <span on:click={()=> push('/findpassword')}>비밀번호 찾기</span> | <span on:click={()=> push('/signup')}>회원가입</span>
+                <span on:click={()=> push('/find-password')}>비밀번호 찾기</span> | <span on:click={()=> push('/signup')}>회원가입</span>
             </div>
             
             <div class="divider"></div>
