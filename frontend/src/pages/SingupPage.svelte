@@ -91,16 +91,7 @@
 			.then(noArgs => {
 				if (signUpHttpStatusCode === OK) {
 					changeToVerifyEmailPage = true;
-
-					sendVerifyEmailRequest()
-						.then(noArgs => {
-							if (signUpHttpStatusCode === OK) {
-								push('/main/myPage');
-							}
-							else {
-								// 이메일 인증 실패
-							}
-						});
+					sendVerifyEmailRequest();
 				}
 				else if (signUpHttpStatusCode === BAD_REQUEST) {
 					alert("올바르지 않은 형식의 입력입니다.\n이메일 혹은 비밀번호를 다시 입력해주세요.");

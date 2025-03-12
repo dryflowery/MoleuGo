@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -25,13 +26,13 @@ public class MemberController {
     }
 
     @PostMapping("/signup/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestBody Member member) {
-        return ResponseEntity.status(memberService.verifyEmail(member)).build();
+    public void sendVerificationEmail(@RequestBody Member member) {
+        memberService.sendVerificationEmail(member);
     }
 
-    @PostMapping("/signup")
-    public void signUp(@RequestBody Member member) {
-        memberService.signUp(member);
+    @GetMapping("/signup/{uuid}")
+    public void signUp(@PathVariable("uuid") String uuid) {
+        memberService.signUp(uuid);
     }
 
     @PostMapping("/login")
