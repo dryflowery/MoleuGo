@@ -34,7 +34,7 @@ public class MemberController {
     @GetMapping("/signup/{uuid}")
     public String signUp(@PathVariable("uuid") String uuid) {
         HttpStatus status = memberService.signUp(uuid);
-
+        System.out.println(status);
         if(status == HttpStatus.OK) {
             return "redirect:/#/signup-success";
         }

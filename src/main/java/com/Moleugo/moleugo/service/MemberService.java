@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class MemberService {
     private final ApplicationContext ac;
     private final HttpSession session;
+    private final BCryptPasswordEncoder encoder;
     private final MemberRepository memberRepository;
     private final MailService mailService;
 
@@ -60,6 +62,7 @@ public class MemberService {
 
         if(member != null && !memberRepository.isRegisteredEmail(member)) {
             session.removeAttribute(uuid);
+            encodePassword(member);
             memberRepository.registerMember(member);
             return HttpStatus.OK;
         }
@@ -71,5 +74,9 @@ public class MemberService {
     public HttpStatus login(Member member) {
         LoginValidator loginValidator = ac.getBean(LoginValidator.class);
         return loginValidator.isValidLogin(member);
+    }
+
+    public void encodePassword(Member member) {
+        member.setPassword(encoder.encode(member.getPassword()));
     }
 }
