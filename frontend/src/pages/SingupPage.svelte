@@ -285,10 +285,10 @@
 					<img src="https://img.icons8.com/color/200/google-logo.png" alt="Google Login" />
 				</div>
 			{:else}
-				<h1>인증 메일을 보내드렸어요.</h1>
-				<img src="assets/mail.gif" width="120px" height="120px" alt="">
+				<h1>인증 메일을 보내드렸어요.</h1><br>
+				<img src="assets/mail.png" width="120px" alt="">
 
-				<br>
+				<br><br>
 				<p style="color: white; padding-top: 7.5px;">메일함을 확인해주세요.</p>
 				<p style="color: white; padding-top: 7.5px;">가입하신 이메일을 인증해주시면,</p>
 				<p style="color: white; padding-top: 7.5px;">모르고의 서비스를 마음껏 이용하실 수 있어요.</p>
