@@ -79,7 +79,8 @@
             body: JSON.stringify({
                 email: inputEmail,
                 password: inputPassword,
-            })
+            }),
+            credentials: "include"
         })
         .then(response => {
             loginHttpStatusCode = response.status;
