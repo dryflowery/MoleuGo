@@ -23,7 +23,7 @@
       '/main' : MainPage,
       '/signup': SignupPage,
       '/find-password' : FindPassword,
-      '/main/myPage' : MyPage,
+      '/my-page' : MyPage,
       '/visualization/sort/BubbleSort': BubbleSort,
       '/visualization/sort/SelectionSort': SelectionSort,
       '/visualization/sort/InsertionSort': InsertionSort,

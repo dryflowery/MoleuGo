@@ -87,7 +87,7 @@
         <!-- 비 로그인시 로드맵 이동 불가-->
         <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;" 
            class="{isLogin ? '' : 'disabled'}" 
-           on:click={() => { if ($isLogin) push('/main/myPage') }}>
+           on:click={() => { if ($isLogin) push('/my-page') }}>
            
            로드맵
           
