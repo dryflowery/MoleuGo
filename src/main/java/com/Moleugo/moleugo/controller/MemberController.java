@@ -3,6 +3,8 @@ package com.Moleugo.moleugo.controller;
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.response.LoginResponse;
 import com.Moleugo.moleugo.service.MemberService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -33,9 +35,7 @@ public class MemberController {
 
     @GetMapping("/signup/{uuid}")
     public String signUp(@PathVariable("uuid") String uuid) {
-        HttpStatus status = memberService.signUp(uuid);
-        System.out.println(status);
-        if(status == HttpStatus.OK) {
+        if(memberService.signUp(uuid) == HttpStatus.OK) {
             return "redirect:/#/signup-success";
         }
         else {
@@ -44,8 +44,15 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Member member) {
-        LoginResponse loginResponse = ac.getBean("loginResponse", LoginResponse.class);
-        return ResponseEntity.status(memberService.login(member)).body(loginResponse);
+    public ResponseEntity<?> login(@RequestBody Member member, HttpServletResponse resp) {
+        LoginResponse loginResponse = ac.getBean(LoginResponse.class);
+        HttpStatus status = memberService.login(member);
+
+        if(loginResponse.getCookie() != null) {
+            resp.addCookie(loginResponse.getCookie());
+            loginResponse.setCookie(null);
+        }
+
+        return ResponseEntity.status(status).body(loginResponse);
     }
 }

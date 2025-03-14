@@ -2,8 +2,10 @@ package com.Moleugo.moleugo.service;
 
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.repository.MemberRepository;
+import com.Moleugo.moleugo.response.LoginResponse;
 import com.Moleugo.moleugo.service.validator.LoginValidator;
 import com.Moleugo.moleugo.service.validator.SignUpValidator;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,16 @@ public class MemberService {
     private final BCryptPasswordEncoder encoder;
     private final MemberRepository memberRepository;
     private final MailService mailService;
+
+    public String createSession(Member member) {
+        UUID uuid = UUID.randomUUID();
+        session.setAttribute(uuid.toString(), member);
+        return uuid.toString();
+    }
+
+    public void encodePassword(Member member) {
+        member.setPassword(encoder.encode(member.getPassword()));
+    }
 
     public HttpStatus isValidForm(Member member) {
         SignUpValidator signUpValidator = ac.getBean(SignUpValidator.class);
@@ -51,12 +63,6 @@ public class MemberService {
         mailService.send();
     }
 
-    public UUID createSession(Member member) {
-        UUID uuid = UUID.randomUUID();
-        session.setAttribute(uuid.toString(), member);
-        return uuid;
-    }
-
     public HttpStatus signUp(String uuid) {
         Member member = (Member)session.getAttribute(uuid);
 
@@ -73,10 +79,16 @@ public class MemberService {
 
     public HttpStatus login(Member member) {
         LoginValidator loginValidator = ac.getBean(LoginValidator.class);
-        return loginValidator.isValidLogin(member);
-    }
+        HttpStatus status = loginValidator.isValidLogin(member);
 
-    public void encodePassword(Member member) {
-        member.setPassword(encoder.encode(member.getPassword()));
+        if(status == HttpStatus.OK) {
+            encodePassword(member);
+            String uuid = createSession(member);
+
+            LoginResponse loginResponse = ac.getBean(LoginResponse.class);
+            loginResponse.setCookie(new Cookie("sessionId", uuid));
+        }
+
+        return status;
     }
 }

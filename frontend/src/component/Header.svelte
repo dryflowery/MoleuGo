@@ -2,7 +2,7 @@
     import AlgorithmList from "./AlgorithmList.svelte";
     import LoginPopup from "./LoginPopup.svelte";
     import { push } from "svelte-spa-router";
-    import {isListVisible, isLoginVisible} from "../lib/store";
+    import {isListVisible, isLoginVisible, isLogin} from "../lib/store";
     
     const setAlgorithmListVisible = () => {
         $isListVisible = !$isListVisible;
@@ -11,6 +11,10 @@
     const openLoginPopup = () => {
         $isLoginVisible = true;
     };
+
+    const logout = () => {
+        alert("로그아웃 구현 예정")
+    }
 </script>
 
 <main>
@@ -33,10 +37,16 @@
     </span>
 
     <div id="header-right-container">
-        <!-- 로그인, 비로그인 다르게 표시(백엔드) -->
-        <button id="sign-in-btn" class="sign-btn" on:click={openLoginPopup}>로그인</button>
-        <button id="sign-up-btn" class="sign-btn" on:click={() => push('/signup')}>회원가입</button>
-        <!-- 로그인, 비로그인 다르게 표시(백엔드) -->
+        {#if $isLogin === false}
+            <button id="sign-in-btn" class="sign-btn" on:click={openLoginPopup}>로그인</button>
+            <button id="sign-up-btn" class="sign-btn" on:click={() => push('/signup')}>회원가입</button>
+        {:else}
+            <ion-icon name="exit-outline" style="color: white; cursor: pointer;
+             font-size: 40px; margin-right: 15px; " on:click={logout}></ion-icon>
+
+            <!-- 마이 페이지 구현 후 프로필 사진으로 변경 -->
+            <img src="assets/profile.jpg" alt="" id="profile-pic" on:click={() => push('/my-page')}>
+        {/if}
     </div>
 </main>
 
@@ -62,7 +72,7 @@
 
     #header-right-container {
         position: absolute;
-        right: 10px;
+        right: 35px;
     }
 
     #menu-circle {
@@ -129,5 +139,12 @@
 
     #sign-up-btn {
         background-color: #000000;
+    }
+
+    #profile-pic {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
     }
 </style>

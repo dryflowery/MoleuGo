@@ -3,14 +3,18 @@ package com.Moleugo.moleugo.repository;
 import com.Moleugo.moleugo.entity.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 @Primary
 public class JpaMemberRepository implements MemberRepository {
+    private final BCryptPasswordEncoder encoder;
 
     @PersistenceContext
     private EntityManager em;
@@ -32,8 +36,6 @@ public class JpaMemberRepository implements MemberRepository {
 
     @Override
     public boolean isCorrectPassword(Member member) {
-        return em.find(Member.class, member.getEmail())
-                .getPassword()
-                .equals(member.getPassword());
+        return encoder.matches(member.getPassword(), em.find(Member.class, member.getEmail()).getPassword());
     }
 }
