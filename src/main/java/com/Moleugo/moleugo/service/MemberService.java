@@ -101,4 +101,14 @@ public class MemberService {
             return HttpStatus.UNAUTHORIZED;
         }
     }
+
+    public HttpStatus logout(String loginInfo) {
+        if (session.getAttribute(loginInfo) != null) {
+            session.removeAttribute(loginInfo);
+            return HttpStatus.OK;
+        }
+        else {
+            return HttpStatus.NOT_FOUND;
+        }
+    }
 }

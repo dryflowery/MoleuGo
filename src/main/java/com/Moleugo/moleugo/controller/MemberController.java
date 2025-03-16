@@ -3,6 +3,7 @@ package com.Moleugo.moleugo.controller;
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.response.LoginResponse;
 import com.Moleugo.moleugo.service.MemberService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,22 +43,41 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Member member, HttpServletResponse resp) {
         LoginResponse loginResponse = ac.getBean(LoginResponse.class);
-        HttpStatus status = memberService.login(member);
+        HttpStatus loginStatus = memberService.login(member);
 
         if(loginResponse.getCookie() != null) {
             resp.addCookie(loginResponse.getCookie());
             loginResponse.setCookie(null);
         }
 
-        return ResponseEntity.status(status).body(loginResponse);
+        return ResponseEntity.status(loginStatus).body(loginResponse);
     }
 
     @GetMapping("/auth/status")
     public ResponseEntity<?> isUserLoggedIn(@CookieValue(value = "LOGIN-INFO", required = false) String loginInfo) {
         if (loginInfo != null) {
             return ResponseEntity.status(memberService.isUserLoggedIn(loginInfo)).build();
-        } else {
+        }
+        else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@CookieValue(value = "LOGIN-INFO", required = false) String loginInfo, HttpServletResponse resp) {
+        if (loginInfo != null) {
+            HttpStatus logoutStatus = memberService.logout(loginInfo);
+
+            if(logoutStatus == HttpStatus.OK) {
+                Cookie cookie = new Cookie("LOGIN-INFO", null);
+                cookie.setMaxAge(0);
+                resp.addCookie(cookie);
+            }
+
+            return ResponseEntity.status(logoutStatus).build();
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

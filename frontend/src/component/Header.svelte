@@ -2,8 +2,8 @@
     import AlgorithmList from "./AlgorithmList.svelte";
     import LoginPopup from "./LoginPopup.svelte";
     import { push } from "svelte-spa-router";
-    import {isListVisible, isLoginVisible, isLogin} from "../lib/store";
-    
+    import {isListVisible, isLoginVisible, isLogin, checkLoginStatus} from "../lib/store";
+
     const setAlgorithmListVisible = () => {
         $isListVisible = !$isListVisible;
     };
@@ -13,8 +13,15 @@
     };
 
     const logout = () => {
-        alert("로그아웃 구현 예정")
-    }
+        fetch('/logout', {
+            method: 'POST',
+            credentials: 'include',
+        })
+        .then(noArgs => {
+            checkLoginStatus();
+        })
+    };
+
 </script>
 
 <main>
