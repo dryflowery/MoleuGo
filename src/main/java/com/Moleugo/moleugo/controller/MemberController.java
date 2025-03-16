@@ -11,10 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
@@ -46,13 +43,41 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Member member, HttpServletResponse resp) {
         LoginResponse loginResponse = ac.getBean(LoginResponse.class);
-        HttpStatus status = memberService.login(member);
+        HttpStatus loginStatus = memberService.login(member);
 
         if(loginResponse.getCookie() != null) {
             resp.addCookie(loginResponse.getCookie());
             loginResponse.setCookie(null);
         }
 
-        return ResponseEntity.status(status).body(loginResponse);
+        return ResponseEntity.status(loginStatus).body(loginResponse);
+    }
+
+    @GetMapping("/auth/status")
+    public ResponseEntity<?> isUserLoggedIn(@CookieValue(value = "LOGIN-INFO", required = false) String loginInfo) {
+        if (loginInfo != null) {
+            return ResponseEntity.status(memberService.isUserLoggedIn(loginInfo)).build();
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@CookieValue(value = "LOGIN-INFO", required = false) String loginInfo, HttpServletResponse resp) {
+        if (loginInfo != null) {
+            HttpStatus logoutStatus = memberService.logout(loginInfo);
+
+            if(logoutStatus == HttpStatus.OK) {
+                Cookie cookie = new Cookie("LOGIN-INFO", null);
+                cookie.setMaxAge(0);
+                resp.addCookie(cookie);
+            }
+
+            return ResponseEntity.status(logoutStatus).build();
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

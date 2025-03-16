@@ -4,15 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.servlet.http.Cookie;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 @Component
 @Setter
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LoginResponse {
+public class  LoginResponse {
     String loginMessage;
     Cookie cookie;
 

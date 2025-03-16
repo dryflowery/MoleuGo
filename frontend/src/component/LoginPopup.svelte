@@ -1,5 +1,5 @@
 <script>
-    import { isLoginVisible, isLogin } from "../lib/store";
+    import {isLoginVisible, isLogin, checkLoginStatus} from "../lib/store";
     import {OK, UNAUTHORIZED} from "../lib/httpStatusStore.js";
     import { push } from "svelte-spa-router";
 
@@ -29,7 +29,7 @@
         sendLoginRequest()
         .then(noArgs => {
             if (loginHttpStatusCode === OK) {
-                $isLogin = true;
+                checkLoginStatus();
                 closePopup();
                 push("/my-page")
             }

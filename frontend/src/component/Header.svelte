@@ -2,8 +2,8 @@
     import AlgorithmList from "./AlgorithmList.svelte";
     import LoginPopup from "./LoginPopup.svelte";
     import { push } from "svelte-spa-router";
-    import {isListVisible, isLoginVisible, isLogin} from "../lib/store";
-    
+    import {isListVisible, isLoginVisible, isLogin, checkLoginStatus} from "../lib/store";
+
     const setAlgorithmListVisible = () => {
         $isListVisible = !$isListVisible;
     };
@@ -13,8 +13,15 @@
     };
 
     const logout = () => {
-        alert("로그아웃 구현 예정")
-    }
+        fetch('/logout', {
+            method: 'POST',
+            credentials: 'include',
+        })
+        .then(noArgs => {
+            checkLoginStatus();
+        })
+    };
+
 </script>
 
 <main>
@@ -42,7 +49,7 @@
             <button id="sign-up-btn" class="sign-btn" on:click={() => push('/signup')}>회원가입</button>
         {:else}
             <ion-icon name="exit-outline" style="color: white; cursor: pointer;
-             font-size: 40px; margin-right: 15px; " on:click={logout}></ion-icon>
+             font-size: 25px; margin-right: 15px; " on:click={logout}></ion-icon>
 
             <!-- 마이 페이지 구현 후 프로필 사진으로 변경 -->
             <img src="assets/profile.jpg" alt="" id="profile-pic" on:click={() => push('/my-page')}>
