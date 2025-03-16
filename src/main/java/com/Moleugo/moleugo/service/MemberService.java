@@ -28,9 +28,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MailService mailService;
 
-    public String createSession(Member member) {
+    public String createSession(Member member, int second) {
         UUID uuid = UUID.randomUUID();
         session.setAttribute(uuid.toString(), member);
+        session.setMaxInactiveInterval(second);
         return uuid.toString();
     }
 
@@ -44,7 +45,7 @@ public class MemberService {
     }
 
     public void sendVerificationEmail(Member member) {
-        String verificationLink = "http://localhost:8080/signup/" + createSession(member);
+        String verificationLink = "http://localhost:8080/signup/" + createSession(member, 1800);
         String to = member.getEmail();
         String title = "[moleugo] 회원가입을 완료하려면 이메일을 확인하세요!";
         String content = """
@@ -83,12 +84,21 @@ public class MemberService {
 
         if(status == HttpStatus.OK) {
             encodePassword(member);
-            String uuid = createSession(member);
+            String uuid = createSession(member, 7200);
 
             LoginResponse loginResponse = ac.getBean(LoginResponse.class);
-            loginResponse.setCookie(new Cookie("sessionId", uuid));
+            loginResponse.setCookie(new Cookie("LOGIN-INFO", uuid));
         }
 
         return status;
+    }
+
+    public HttpStatus isUserLoggedIn(String loginInfo) {
+        if (session.getAttribute(loginInfo) != null) {
+            return HttpStatus.OK;
+        }
+        else {
+            return HttpStatus.UNAUTHORIZED;
+        }
     }
 }

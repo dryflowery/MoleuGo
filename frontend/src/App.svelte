@@ -17,6 +17,8 @@
   import Dfs from './routes/visualization/graph/Dfs.svelte';
   import Bfs from './routes/visualization/graph/Bfs.svelte';
   import SignupSuccessPage from "./routes/SignupSuccessPage.svelte";
+  import {checkLoginStatus} from "./lib/store.js";
+  import {onMount} from "svelte";
 
   const routes = {
       '/': Index,
@@ -37,6 +39,11 @@
       '/visualization/graph/Bfs': Bfs,
       '/signup-success': SignupSuccessPage
   };
+
+  onMount(() => {
+      checkLoginStatus();
+      setInterval(() => checkLoginStatus(), 10 * 60 * 1000);
+  });
 </script>
 
 <Router {routes}/>
