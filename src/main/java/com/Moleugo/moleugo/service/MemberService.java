@@ -80,9 +80,9 @@ public class MemberService {
 
     public HttpStatus login(Member member) {
         LoginValidator loginValidator = ac.getBean(LoginValidator.class);
-        HttpStatus status = loginValidator.isValidLogin(member);
+        HttpStatus loginStatus = loginValidator.isValidLogin(member);
 
-        if(status == HttpStatus.OK) {
+        if(loginStatus == HttpStatus.OK) {
             encodePassword(member);
             String uuid = createSession(member, 7200);
 
@@ -90,7 +90,7 @@ public class MemberService {
             loginResponse.setCookie(new Cookie("LOGIN-INFO", uuid));
         }
 
-        return status;
+        return loginStatus;
     }
 
     public HttpStatus isUserLoggedIn(String loginInfo) {

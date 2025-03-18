@@ -3,6 +3,7 @@
     import LoginPopup from "./LoginPopup.svelte";
     import { push } from "svelte-spa-router";
     import {isListVisible, isLoginVisible, isLogin, checkLoginStatus} from "../lib/store";
+    import {OK} from "../lib/httpStatusStore.js";
 
     const setAlgorithmListVisible = () => {
         $isListVisible = !$isListVisible;
@@ -17,8 +18,12 @@
             method: 'POST',
             credentials: 'include',
         })
-        .then(noArgs => {
+        .then(response => {
             checkLoginStatus();
+
+            if(response.status === OK) {
+                push('/');
+            }
         })
     };
 
