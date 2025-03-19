@@ -34,11 +34,8 @@ public class SignupController {
     }
 
     @GetMapping("/signup")
-    public String googleSignup(
-            @RequestParam("code") String code,
-            @RequestParam("scope") String scope,
-            @RequestParam("authuser") String authuser,
-            @RequestParam("prompt") String prompt) {
+    public String googleSignup(@RequestParam("code") String code, @RequestParam("scope") String scope,
+                               @RequestParam("authuser") String authuser, @RequestParam("prompt") String prompt) {
 
         HttpStatus googleSignupStatus = memberService.googleSignUp(code);
 
