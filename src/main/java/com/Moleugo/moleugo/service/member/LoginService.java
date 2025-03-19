@@ -22,7 +22,7 @@ public class LoginService {
         HttpStatus loginStatus = loginValidator.isValidLogin(member);
 
         if(loginStatus == HttpStatus.OK) {
-            authService.encodePassword(member);
+            member.setPassword(authService.encode(member.getPassword()));
             String uuid = authService.createSession(member, 7200);
 
             LoginResponse loginResponse = ac.getBean(LoginResponse.class);

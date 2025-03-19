@@ -31,7 +31,7 @@ public class SignUpValidator {
 
     // 중복 이메일 체크
     private boolean isDuplicatedEmail(Member member) {
-        return memberRepository.findByEmail(member) != null;
+        return memberRepository.findByEmail(member.getEmail()) != null;
     }
 
     // 이메일 유효성 검사

@@ -47,9 +47,9 @@ public class SignupService {
     public HttpStatus signUp(String uuid) {
         Member member = (Member)session.getAttribute(uuid);
 
-        if(member != null && !memberRepository.isRegisteredEmail(member)) {
+        if(member != null && !memberRepository.isRegisteredEmail(member.getEmail())) {
             session.removeAttribute(uuid);
-            authService.encodePassword(member);
+            member.setPassword(authService.encode(member.getPassword()));
             memberRepository.registerMember(member);
             return HttpStatus.OK;
         }
@@ -59,7 +59,15 @@ public class SignupService {
     }
 
     public HttpStatus googleSignUp(String code) {
-        // 구현 예정
-        return null;
+        String accessToken = authService.getGoogleAccessToken(code);
+        String email = authService.getGoogleEmail(accessToken);
+
+        if(memberRepository.isRegisteredEmail(email)) {
+            return HttpStatus.CONFLICT;
+        }
+        else {
+            memberRepository.registerMember(new Member(email, authService.encode("1q2w3e4r!")));
+            return HttpStatus.OK;
+        }
     }
 }

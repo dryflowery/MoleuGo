@@ -33,7 +33,7 @@ public class LoginValidator {
 
     // 회원가입한 이메일인지 확인
     private boolean isValidEmail(Member member) {
-        return memberRepository.isRegisteredEmail(member);
+        return memberRepository.isRegisteredEmail(member.getEmail());
     }
 
     // 해당 이메일로 회원가입한 비밀번호와 로그인을 시도한 비밀번호가 동일한지 확인

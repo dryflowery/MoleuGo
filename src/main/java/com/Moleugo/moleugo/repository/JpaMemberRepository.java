@@ -25,13 +25,13 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public Member findByEmail(Member member) {
-        return em.find(Member.class, member.getEmail());
+    public Member findByEmail(String email) {
+        return em.find(Member.class, email);
     }
 
     @Override
-    public boolean isRegisteredEmail(Member member) {
-        return findByEmail(member) != null;
+    public boolean isRegisteredEmail(String email) {
+        return findByEmail(email) != null;
     }
 
     @Override
