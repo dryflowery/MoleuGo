@@ -1,6 +1,6 @@
 <script>
-	import {OK, CONFLICT, BAD_REQUEST} from "../lib/httpStatusStore.js";
-	import { push } from "svelte-spa-router";
+	import {BAD_REQUEST, CONFLICT, OK} from "../lib/httpStatusStore.js";
+	import {push} from "svelte-spa-router";
 
 	let signUpHttpStatusCode = null;
 
@@ -152,6 +152,16 @@
 			signUpHttpStatusCode = response.status;
 		});
 	}
+
+	const googleSignup = () => {
+		const client_id = "548082459277-meajirn1br2a1g2916ottstii0d54sc2.apps.googleusercontent.com";
+		const redirect_uri = "http://localhost:8080/signup";
+		const response_type = "code";
+		const scope = "email profile";
+		let base_url = "https://accounts.google.com/o/oauth2/v2/auth";
+
+		window.location.href = `${base_url}?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=${response_type}&scope=${encodeURIComponent(scope)}`;
+	}
 </script>
 
 
@@ -281,7 +291,7 @@
 
 				<div class="divider"></div>
 
-				<div id="google-login">
+				<div id="google-login" on:click={() => googleSignup()}>
 					<img src="https://img.icons8.com/color/200/google-logo.png" alt="Google Login" />
 				</div>
 			{:else}
