@@ -1,7 +1,7 @@
 package com.Moleugo.moleugo.controller.member;
 
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.service.MemberService;
+import com.Moleugo.moleugo.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,20 +26,27 @@ public class SignupController {
     @GetMapping("/signup/{uuid}")
     public String signUp(@PathVariable("uuid") String uuid) {
         if(memberService.signUp(uuid) == HttpStatus.OK) {
-            return "redirect:/#/signup-success";
+            return "redirect:/#/signup-result?result=" + "normal-signup-success";
         }
         else {
             return "redirect:/#";
         }
     }
 
-//    @GetMapping("/signup")
-//    public String googleSignup(
-//            @RequestParam("code") String code,
-//            @RequestParam("scope") String scope,
-//            @RequestParam("authuser") String authuser,
-//            @RequestParam("prompt") String prompt) {
-//
-//        return "redirect:/#";
-//    }
+    @GetMapping("/signup")
+    public String googleSignup(
+            @RequestParam("code") String code,
+            @RequestParam("scope") String scope,
+            @RequestParam("authuser") String authuser,
+            @RequestParam("prompt") String prompt) {
+
+        HttpStatus googleSignupStatus = memberService.googleSignUp(code);
+
+        if(googleSignupStatus == HttpStatus.OK) {
+            return "redirect:/#/signup-result?result=" + "google-signup-success";
+        }
+        else {
+            return "redirect:/#/signup-result?result=" + "exist-google-account";
+        }
+    }
 }

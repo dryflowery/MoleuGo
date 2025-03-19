@@ -2,7 +2,7 @@ package com.Moleugo.moleugo.controller.member;
 
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.response.LoginResponse;
-import com.Moleugo.moleugo.service.MemberService;
+import com.Moleugo.moleugo.service.member.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
