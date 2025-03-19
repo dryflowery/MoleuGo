@@ -1,6 +1,14 @@
 <script>
     import { push } from "svelte-spa-router";
+    import {onMount} from "svelte";
 
+    let result;
+
+    onMount(() => {
+        const params = new URLSearchParams(window.location.search);
+        result = params.get("result") || "unknown";
+        console.log(result);
+    });
 </script>
 
 
@@ -18,8 +26,16 @@
             <img src="assets/success.png" width="120px" alt="">
 
             <br><br>
-            <p style="color: white; padding-top: 7.5px;">메인 화면으로 이동 후 다시 로그인하시면,</p>
-            <p style="color: white; padding-top: 7.5px;">모르고의 다양한 서비스를 마음껏 이용하실 수 있습니다.</p>
+            {#if result === "normal-signup-success"}
+                <p style="color: white; padding-top: 7.5px;">메인 화면으로 이동 후 다시 로그인하시면,</p>
+                <p style="color: white; padding-top: 7.5px;">모르고의 다양한 서비스를 마음껏 이용하실 수 있습니다.</p>
+            {:else if result === "google-signup-success"}
+                <p style="color: white; padding-top: 7.5px;">메인 화면으로 이동 후 다시 로그인하시면,</p>
+                <p style="color: white; padding-top: 7.5px;">모르고의 다양한 서비스를 마음껏 이용하실 수 있습니다.</p>
+            {:else if result === "exist-google-account"}
+                <p style="color: white; padding-top: 7.5px;">메인 화면으로 이동 후 다시 로그인하시면,</p>
+                <p style="color: white; padding-top: 7.5px;">모르고의 다양한 서비스를 마음껏 이용하실 수 있습니다.</p>
+            {/if}
 
             <button class="return-to-main-button" on:click={() => push('/')}>
                 메인화면으로 돌아가기

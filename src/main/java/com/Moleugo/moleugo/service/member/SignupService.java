@@ -1,43 +1,23 @@
-package com.Moleugo.moleugo.service;
+package com.Moleugo.moleugo.service.member;
 
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.repository.MemberRepository;
-import com.Moleugo.moleugo.response.LoginResponse;
-import com.Moleugo.moleugo.service.validator.LoginValidator;
+import com.Moleugo.moleugo.service.MailService;
 import com.Moleugo.moleugo.service.validator.SignUpValidator;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
-@Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
-public class MemberService {
+public class SignupService {
     private final ApplicationContext ac;
     private final HttpSession session;
-    private final BCryptPasswordEncoder encoder;
-    private final MemberRepository memberRepository;
     private final MailService mailService;
-
-    public String createSession(Member member, int second) {
-        UUID uuid = UUID.randomUUID();
-        session.setAttribute(uuid.toString(), member);
-        session.setMaxInactiveInterval(second);
-        return uuid.toString();
-    }
-
-    public void encodePassword(Member member) {
-        member.setPassword(encoder.encode(member.getPassword()));
-    }
+    private final MemberRepository memberRepository;
+    private final AuthService authService;
 
     public HttpStatus isValidForm(Member member) {
         SignUpValidator signUpValidator = ac.getBean(SignUpValidator.class);
@@ -45,7 +25,7 @@ public class MemberService {
     }
 
     public void sendVerificationEmail(Member member) {
-        String verificationLink = "http://localhost:8080/signup/" + createSession(member, 1800);
+        String verificationLink = "http://localhost:8080/signup/" + authService.createSession(member, 1800);
         String to = member.getEmail();
         String title = "[moleugo] 회원가입을 완료하려면 이메일을 확인하세요!";
         String content = """
@@ -69,7 +49,7 @@ public class MemberService {
 
         if(member != null && !memberRepository.isRegisteredEmail(member)) {
             session.removeAttribute(uuid);
-            encodePassword(member);
+            authService.encodePassword(member);
             memberRepository.registerMember(member);
             return HttpStatus.OK;
         }
@@ -78,37 +58,8 @@ public class MemberService {
         }
     }
 
-    public HttpStatus login(Member member) {
-        LoginValidator loginValidator = ac.getBean(LoginValidator.class);
-        HttpStatus loginStatus = loginValidator.isValidLogin(member);
-
-        if(loginStatus == HttpStatus.OK) {
-            encodePassword(member);
-            String uuid = createSession(member, 7200);
-
-            LoginResponse loginResponse = ac.getBean(LoginResponse.class);
-            loginResponse.setCookie(new Cookie("LOGIN-INFO", uuid));
-        }
-
-        return loginStatus;
-    }
-
-    public HttpStatus isUserLoggedIn(String loginInfo) {
-        if (session.getAttribute(loginInfo) != null) {
-            return HttpStatus.OK;
-        }
-        else {
-            return HttpStatus.UNAUTHORIZED;
-        }
-    }
-
-    public HttpStatus logout(String loginInfo) {
-        if (session.getAttribute(loginInfo) != null) {
-            session.removeAttribute(loginInfo);
-            return HttpStatus.OK;
-        }
-        else {
-            return HttpStatus.NOT_FOUND;
-        }
+    public HttpStatus googleSignUp(String code) {
+        // 구현 예정
+        return null;
     }
 }
