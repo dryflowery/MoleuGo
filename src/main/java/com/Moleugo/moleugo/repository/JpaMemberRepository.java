@@ -36,6 +36,21 @@ public class JpaMemberRepository implements MemberRepository {
 
     @Override
     public boolean isCorrectPassword(Member member) {
-        return encoder.matches(member.getPassword(), em.find(Member.class, member.getEmail()).getPassword());
+        return encoder.matches(member.getPassword(), findByEmail(member.getEmail()).getPassword());
+    }
+
+    @Override
+    public boolean isNormalMember(String email) {
+        return "normal".equals(findByEmail(email).getAccount_type());
+    }
+
+    @Override
+    public boolean isGoogleMember(String email) {
+        return "google".equals(findByEmail(email).getAccount_type());
+    }
+
+    @Override
+    public void updateAccountType(String email, String newAccountType) {
+        findByEmail(email).setAccount_type(newAccountType);
     }
 }

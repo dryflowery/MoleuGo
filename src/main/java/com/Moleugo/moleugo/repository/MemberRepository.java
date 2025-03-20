@@ -7,4 +7,7 @@ public interface MemberRepository {
     Member findByEmail(String email);
     boolean isRegisteredEmail(String email);
     boolean isCorrectPassword(Member member);
+    boolean isNormalMember(String email);
+    boolean isGoogleMember(String email);
+    void updateAccountType(String email, String newAccountType);
 }

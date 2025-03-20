@@ -51,7 +51,7 @@ public class SignupService {
             session.removeAttribute(uuid);
             member.setPassword(authService.encode(member.getPassword()));
             memberRepository.registerMember(member);
-            return HttpStatus.OK;
+            return HttpStatus.CREATED;
         }
         else {
             return HttpStatus.NOT_FOUND;
@@ -63,11 +63,17 @@ public class SignupService {
         String email = authService.getGoogleEmail(accessToken);
 
         if(memberRepository.isRegisteredEmail(email)) {
-            return HttpStatus.CONFLICT;
+            if(memberRepository.isGoogleMember(email)) {
+                return HttpStatus.CONFLICT;
+            }
+            else {
+                memberRepository.updateAccountType(email, "google");
+                return HttpStatus.OK;
+            }
         }
         else {
-            memberRepository.registerMember(new Member(email, authService.encode("1q2w3e4r!")));
-            return HttpStatus.OK;
+            memberRepository.registerMember(new Member(email, authService.encode("1q2w3e4r!"), "google"));
+            return HttpStatus.CREATED;
         }
     }
 }
