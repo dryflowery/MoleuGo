@@ -35,9 +35,9 @@ public class LoginController {
     }
 
     @GetMapping("/auth/status")
-    public ResponseEntity<?> isUserLoggedIn(@CookieValue(value = "LOGIN-INFO", required = false) String loginInfo) {
-        if (loginInfo != null) {
-            return ResponseEntity.status(memberService.isUserLoggedIn(loginInfo)).build();
+    public ResponseEntity<?> isUserLoggedIn(@CookieValue(value = "user_session", required = false) String userSession) {
+        if (userSession != null) {
+            return ResponseEntity.status(memberService.isUserLoggedIn(userSession)).build();
         }
         else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -45,12 +45,12 @@ public class LoginController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(value = "LOGIN-INFO", required = false) String loginInfo, HttpServletResponse resp) {
-        if (loginInfo != null) {
-            HttpStatus logoutStatus = memberService.logout(loginInfo);
+    public ResponseEntity<?> logout(@CookieValue(value = "user_session", required = false) String userSession, HttpServletResponse resp) {
+        if (userSession != null) {
+            HttpStatus logoutStatus = memberService.logout(userSession);
 
             if(logoutStatus == HttpStatus.OK) {
-                Cookie cookie = new Cookie("LOGIN-INFO", null);
+                Cookie cookie = new Cookie("user_session", null);
                 cookie.setMaxAge(0);
                 resp.addCookie(cookie);
             }
