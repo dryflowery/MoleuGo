@@ -14,17 +14,14 @@ import lombok.Setter;
 public class Member {
     public Member() {}
 
-    public Member(String email) {
-        this(email, null, null);
+    public Member(String email, String password, String account_type) {
+        this(email, password, account_type, null);
     }
 
-    public Member(String email, String password) {
-        this(email, password, null);
-    }
-
-    public Member(String email, String password, String verifyPassword) {
+    public Member(String email, String password, String account_type, String verifyPassword) {
         this.email = email;
         this.password = password;
+        this.account_type = account_type;
         this.verifyPassword = verifyPassword;
     }
 
@@ -32,6 +29,7 @@ public class Member {
     private String email;
 
     private String password;
+    private String account_type;
 
     @Transient
     private String verifyPassword;

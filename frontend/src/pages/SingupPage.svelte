@@ -1,5 +1,5 @@
 <script>
-	import {BAD_REQUEST, CONFLICT, OK} from "../lib/httpStatusStore.js";
+	import {BAD_REQUEST, CONFLICT, OK, CREATED} from "../lib/httpStatusStore.js";
 	import {push} from "svelte-spa-router";
 
 	let signUpHttpStatusCode = null;
@@ -89,7 +89,7 @@
 
 		sendCheckFormRequest()
 			.then(noArgs => {
-				if (signUpHttpStatusCode === OK) {
+				if (signUpHttpStatusCode === CREATED) {
 					changeToVerifyEmailPage = true;
 					sendVerifyEmailRequest();
 				}
@@ -128,6 +128,7 @@
 			body: JSON.stringify({
 				email: inputEmail,
 				password: inputPassword,
+				account_type: 'normal',
 				verifyPassword: inputVerifyPassword
 			})
 		})
@@ -145,6 +146,7 @@
 			body: JSON.stringify({
 				email: inputEmail,
 				password: inputPassword,
+				account_type: 'normal',
 				verifyPassword: inputVerifyPassword
 			})
 		})

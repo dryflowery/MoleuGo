@@ -26,7 +26,9 @@
             {#if result === "normal-signup-success" || result === "google-signup-success"}
                 <h1>회원가입이 완료되었습니다!</h1><br>
             {:else if result === "exist-google-account"}
-                <h1>이미 회원가입이 완료된 이메일입니다!</h1><br>
+                <h1>이미 구글 계정과<br> 연동이 완료된 이메일입니다!</h1><br>
+            {:else if result === "google-link-success"}
+                <h1>기존 계정과 연동이 완료되었습니다!</h1><br>
             {/if}
 
             <img src="assets/success.png" width="120px" alt="">
@@ -36,8 +38,8 @@
 
             {#if result === "google-signup-success"}
                 <br>
-                <p style="color: white; padding-top: 7.5px;">발급된 임시 비밀번호는 <b>1q2w3e4r!</b> 입니다.</p>
-                <p style="color: white; padding-top: 7.5px;">로그인 후 <b>마이 페이지 ⮕ 비밀번호 변경</b>에서 반드시 비밀번호를 변경해주세요!</p>
+                <p style="color: white; padding-top: 7.5px;">발급된 임시 비밀번호는 <b style="color: #00a000">1q2w3e4r!</b> 입니다.</p>
+                <p style="color: white; padding-top: 7.5px;">로그인 후 <b style="color: #00a000">마이 페이지 ⮕ 비밀번호 변경</b>에서 반드시 비밀번호를 변경해주세요!</p>
             {/if}
 
             <button class="return-to-main-button" on:click={() => push('/')}>
