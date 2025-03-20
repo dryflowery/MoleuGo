@@ -89,7 +89,7 @@
 
 		sendCheckFormRequest()
 			.then(noArgs => {
-				if (signUpHttpStatusCode === CREATED) {
+				if (signUpHttpStatusCode === OK) {
 					changeToVerifyEmailPage = true;
 					sendVerifyEmailRequest();
 				}
