@@ -34,11 +34,11 @@ public class MemberService {
         return loginService.login(member);
     }
 
-    public HttpStatus isUserLoggedIn(String loginInfo) {
-        return loginService.isUserLoggedIn(loginInfo);
+    public HttpStatus isUserLoggedIn(String userSession) {
+        return loginService.isUserLoggedIn(userSession);
     }
 
-    public HttpStatus logout(String loginInfo) {
-        return loginService.logout(loginInfo);
+    public HttpStatus logout(String userSession) {
+        return loginService.logout(userSession);
     }
 }

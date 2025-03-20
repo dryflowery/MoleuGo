@@ -26,14 +26,14 @@ public class LoginService {
             String uuid = authService.createSession(member, 7200);
 
             LoginResponse loginResponse = ac.getBean(LoginResponse.class);
-            loginResponse.setCookie(new Cookie("LOGIN-INFO", uuid));
+            loginResponse.setCookie(new Cookie("user_session", uuid));
         }
 
         return loginStatus;
     }
 
-    public HttpStatus isUserLoggedIn(String loginInfo) {
-        if (session.getAttribute(loginInfo) != null) {
+    public HttpStatus isUserLoggedIn(String userSession) {
+        if (session.getAttribute(userSession) != null) {
             return HttpStatus.OK;
         }
         else {
@@ -41,9 +41,9 @@ public class LoginService {
         }
     }
 
-    public HttpStatus logout(String loginInfo) {
-        if (session.getAttribute(loginInfo) != null) {
-            session.removeAttribute(loginInfo);
+    public HttpStatus logout(String userSession) {
+        if (session.getAttribute(userSession) != null) {
+            session.removeAttribute(userSession);
             return HttpStatus.OK;
         }
         else {
