@@ -10,10 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,6 +29,25 @@ public class LoginController {
         }
 
         return ResponseEntity.status(loginStatus).body(loginResponse);
+    }
+
+    @GetMapping("/login")
+    public String googleLogin(@RequestParam("code") String code, @RequestParam("scope") String scope,
+                              @RequestParam("authuser") String authuser, @RequestParam("prompt") String prompt,
+                              HttpServletResponse resp) {
+
+        LoginResponse loginResponse = ac.getBean(LoginResponse.class);
+        HttpStatus googleLoginStatus = memberService.googleLogin(code);
+
+        if(googleLoginStatus == HttpStatus.OK) {
+            resp.addCookie(loginResponse.getCookie());
+            loginResponse.setCookie(null);
+
+            return "redirect:/#/my-page";
+        }
+        else {
+            return "redirect:/#/signup";
+        }
     }
 
     @GetMapping("/auth/status")

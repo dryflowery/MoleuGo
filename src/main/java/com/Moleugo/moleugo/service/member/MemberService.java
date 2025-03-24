@@ -34,6 +34,10 @@ public class MemberService {
         return loginService.login(member);
     }
 
+    public HttpStatus googleLogin(String code) {
+        return loginService.googleLogin(code);
+    }
+
     public HttpStatus isUserLoggedIn(String userSession) {
         return loginService.isUserLoggedIn(userSession);
     }
