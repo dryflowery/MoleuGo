@@ -1,6 +1,8 @@
 package com.Moleugo.moleugo.service.member;
 
 import com.Moleugo.moleugo.entity.Member;
+import com.Moleugo.moleugo.repository.JpaMemberRepository;
+import com.Moleugo.moleugo.repository.MemberRepository;
 import com.Moleugo.moleugo.response.LoginResponse;
 import com.Moleugo.moleugo.service.validator.LoginValidator;
 import jakarta.servlet.http.Cookie;
@@ -16,14 +18,18 @@ public class LoginService {
     private final ApplicationContext ac;
     private final HttpSession session;
     private final AuthService authService;
+    private final MemberRepository memberRepository;
 
     public HttpStatus login(Member member) {
         LoginValidator loginValidator = ac.getBean(LoginValidator.class);
         HttpStatus loginStatus = loginValidator.isValidLogin(member);
 
-        if(loginStatus == HttpStatus.OK) {
+        if (loginStatus == HttpStatus.OK) {
             member.setPassword(authService.encode(member.getPassword()));
-            String uuid = authService.createSession(member, 7200);
+
+            Member fullMember = memberRepository.findByEmail(member.getEmail());
+
+            String uuid = authService.createSession(fullMember, 7200);
 
             LoginResponse loginResponse = ac.getBean(LoginResponse.class);
             loginResponse.setCookie(new Cookie("user_session", uuid));
@@ -50,4 +56,9 @@ public class LoginService {
             return HttpStatus.NOT_FOUND;
         }
     }
+
+    public HttpSession getSession() {
+        return session;
+    }
+
 }

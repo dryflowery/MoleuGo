@@ -10,16 +10,19 @@
 
     
 
-    let userName = ""; // 기존 유저 이름
+    let userName = ""; // 입력된 닉네임
+    let savedUserName = '';
+
     let isLengthValid = false; // 길이 판별
     let isSpecialCharValid = false;
     let showResult = false; // 결과 메시지 표시 여부
     let saveMessage = ""; // 저장 메세지
-    let savedUserName = "컴붕이2"; // 저장된 이름
+
+    let nickname = "";
 
     let usedNames = ["컴붕이1"]; // 이미 존재하는 닉네임들 (임의로 추가)
 
-    let userPassword = "comBung@369"; //기존 비밀번호
+    let userPassword = ''; //기존 비밀번호
 
     let inputOldPassword = ""; // 기존 비밀번호 입력값
     let isOldPasswordVisible = false; // 기존 비밀번호 표시 상태
@@ -43,25 +46,72 @@
     let verifyPasswordMessage = "확인을 위해 새 비밀번호를 다시 입력하세요"; // 확인 메시지
     let verifyPasswordMessageStyle = ""; // 메시지 스타일
 
-    let ispasswordCheckIcon = false ;// 비밀번호 설정 옆 아이콘 유/무
 
-    let myEmail = "email@gmail.com";
+    let myEmail = '';
 
     let currentSetting = null; // 현재 설정 상태
     let showSettingBox = true; // 기본적으로 setting-box 표시
 
+    let newEmail = ""; // 새 이메일 입력값
+    let message = '';
+
+    let isLoading = false;
+    let isError = false;
+
+    let passwordMessage = '';
+    let passwordMessageColor = "#bbbbbb";
+
+    let nicknameMessage = '';
+
     const scaleFactorStore = writable(1);
 
+    async function requestEmailChange() {
+      isLoading = true;
+      isError = false;
+      message = '메일을 보내는 중...';
+
+      try {
+        const response = await fetch('/user/change-email-request', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ email: newEmail })
+        });
+
+        if (response.ok) {
+          message = '인증 메일이 전송되었습니다. 메일함을 확인해주세요.';
+          isError = false;
+        } else if (response.status === 409) {
+          message = '이미 사용 중인 이메일입니다.';
+          isError = true;
+        } else {
+          message = '이메일 변경 요청에 실패했습니다.';
+          isError = true;
+        }
+      } catch (err) {
+        console.error(err);
+        message = '오류가 발생했습니다. 다시 시도해주세요.';
+        isError = true;
+      } finally {
+        isLoading = false;
+      }
+    }
+
+
+
     function updateScaleFactor() {
-    const width = window.innerWidth;
-    const isHighResolution = width >= 2560;
-    scaleFactorStore.set(isHighResolution ? 1.333 : 1);
-  }
+      const width = window.innerWidth;
+      const isHighResolution = width >= 2560;
+      scaleFactorStore.set(isHighResolution ? 1.333 : 1);
+    }
 
   updateScaleFactor();
   window.addEventListener("resize", updateScaleFactor);
 
   let scaleFactor;
+
   scaleFactorStore.subscribe((value) => (scaleFactor = value));
 
 
@@ -70,21 +120,6 @@
 
     let showEmailInfo = false; // 설명 표시 여부
 
-    
-    
-
-    function checkOldPassword() {
-        if (inputOldPassword === userPassword) {
-            oldPasswordStatus = "비밀번호가 일치합니다";
-            oldPasswordStatusColor = "#238636";
-            oldPasswordIcon = "checkmark-outline";
-            saveNewPassword(); // 비밀번호가 일치하면 새 비밀번호 저장 함수 호출
-        } else {
-            oldPasswordStatus = "비밀번호가 일치하지 않습니다";
-            oldPasswordStatusColor = "rgb(173, 44, 44)";
-            oldPasswordIcon = "close-outline";
-        }
-    }
 
     // 비밀번호 조건 확인 함수
     function validateNewPassword(password) {
@@ -106,38 +141,56 @@
     }
 
       // 비밀번호 변경 버튼 클릭
-      function saveNewPassword() {
-        // 초기화
-        passwordChangeMessage = "";
+    async function saveNewPassword() {
+      passwordMessage = "";
 
-        // 기존 비밀번호 확인
-        if (inputOldPassword !== userPassword) {
-          return;
-        }
+      if (!inputOldPassword || !inputNewPassword || !inputNewPassword_verify) {
+        passwordMessage = "모든 항목을 입력해주세요.";
+        passwordMessageColor = "red";
+        return;
+      }
 
-        // 새 비밀번호 조건 확인
-        if (!validateNewPassword(inputNewPassword)) {
-          return;
-        }
 
-        // 새 비밀번호와 확인 비밀번호 일치 확인
-        if (inputNewPassword !== inputNewPassword_verify) {
-          return;
-        }
+      const response = await fetch("/user/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          currentPassword: inputOldPassword,
+          newPassword: inputNewPassword,
+          verifyNewPassword: inputNewPassword_verify
+        })
+      });
 
-        // 모든 조건 충족 시 비밀번호 변경
-        userPassword = inputNewPassword;
-        alert("새 비밀번호가 성공적으로 저장되었습니다.");
-        ispasswordCheckIcon = true;
-
-        showSettingBox = true;
-        currentSetting = null;
-        
-        // 입력값 초기화
-        inputOldPassword = "";
-        inputNewPassword = "";
-        inputNewPassword_verify = "";
+      switch (response.status) {
+        case 200:
+          passwordMessage = "비밀번호가 성공적으로 변경되었습니다.";
+          passwordMessageColor = "#3f862d";
+          inputOldPassword = "";
+          inputNewPassword = "";
+          inputNewPassword_verify = "";
+          break;
+        case 403:
+          passwordMessage = "현재 비밀번호가 틀렸습니다.";
+          passwordMessageColor = "#892A35";
+          break;
+        case 400:
+          passwordMessage = "새 비밀번호가 유효하지 않습니다.";
+          passwordMessageColor = "#892A35";
+          break;
+        case 401:
+          passwordMessage = "로그인이 만료되었습니다.";
+          passwordMessageColor = "#892A35";
+          break;
+        default:
+          passwordMessage = "비밀번호 변경에 실패했습니다.";
+          passwordMessageColor = "#892A35";
+      }
     }
+
+
+
 
     // 닉네임 검증 함수
     function validateUserName(name) {
@@ -149,23 +202,35 @@
     }
 
     // 닉네임 저장 버튼 클릭 이벤트
-    function saveUserName() {
-      showResult = true; // 결과 메시지 표시
-      saveMessage = " "; // 기본값 설정
+    async function saveUserName() {
+      try {
+        const res = await fetch('/user/change-nickname', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ newNickname: userName })
+        });
 
-      if (isLengthValid && isSpecialCharValid) {
-        if (usedNames.includes(userName)) {
-          saveMessage = "중복된 닉네임입니다. 다시 설정해주세요.";
-          } else {
-            savedUserName = userName; // 저장된 닉네임 업데이트
-            usedNames.push(userName); // 새 닉네임 추가
-            saveMessage = "중복확인 닉네임 변경 완료";
-            alert("새 닉네임이 변경되었습니다..");
-            showSettingBox = true;
-            currentSetting = null;
-          }
-      } else if (!usedNames.includes(userName)) {
-        saveMessage = "조건을 충족 해주세요";
+        if (res.status === 200) {
+          savedUserName = userName;
+          message = '닉네임이 성공적으로 변경되었습니다.';
+          isError = false;
+        } else if (res.status === 400) {
+          message = '닉네임 형식이 올바르지 않습니다.';
+          isError = true;
+        } else if (res.status === 409) {
+          message = '이미 사용 중인 닉네임입니다.';
+          isError = true;
+        } else {
+          message = '닉네임 변경 실패';
+          isError = true;
+        }
+      } catch (error) {
+        console.error('닉네임 변경 오류:', error);
+        message = '서버 오류가 발생했습니다.';
+        isError = true;
       }
     }
 
@@ -244,6 +309,31 @@
     isRoadMapVisible = !isRoadMapVisible;
   }
 
+  onMount(async () => {
+    const res = await fetch('/user/email', { credentials: 'include' });
+    if (res.ok) {
+      myEmail = await res.text();
+    }
+
+    try {
+      const res = await fetch("/user/nickname", {
+        method: "GET",
+        credentials: "include"
+      });
+
+      const text = await res.text();
+
+      if (res.ok) {
+        nickname = text;
+      } else {
+        nickname = '(로그인 필요)';
+      }
+    } catch (e) {
+      console.error("닉네임 요청 중 에러:", e);
+    }
+
+  });
+
 
   </script>
   
@@ -266,7 +356,7 @@
             <div id="profile-image">
               <button id="profile-edit-Btn"> 설정</button>
             </div>
-            <div id='nickName'>닉네임: {savedUserName} </div>
+            <div id='nickName'>닉네임: {nickname} </div>
           </div>
 
           <div id="profile-bottom-container">
@@ -290,7 +380,7 @@
                 </div>
                 <div id="nickname-setting"> 
                   <div id="nickname-title"> 닉네임 </div>
-                  <div id="nickname-output"> {savedUserName} </div>
+                  <div id="nickname-output"> {nickname} </div>
                   <button id="nickname-btn" on:click={() => { showSettingBox = false; currentSetting = 'nickname'; }}>
                     설정
                   </button>
@@ -307,17 +397,20 @@
               {:else if currentSetting === 'email'} <!--이메일-->
                 <div class="email-settings">
 
-                  <div id="change-email-Title">
+                  <div id="change-email-Title" style="display: flex; align-items: center; gap: 12px;">
                     <span style="color: #bbbbbb;">이메일 변경</span>
+                    {#if message}
+                      <span style="font-size: 14px; color: {isError ? '#892A35' : (isLoading ? '#999' : '#3f862d')};"> {message} </span>
+                    {/if}
                   </div>
 
                   <div id="email-input">
-                    <input type="text" placeholder="example123@email.com" >
+                    <input type="text" placeholder="example123@email.com" bind:value="{newEmail}">
                   </div>
 
                   <div id="email-btn-group">
                     <button id="userName-edit-Btn" on:click={() => {currentSetting = null; showSettingBox = true;} }>취소</button>
-                    <button id="userName-edit-Btn"> 저장</button>
+                    <button id="userName-edit-Btn" on:click={requestEmailChange} > 저장</button>
                   </div>
                 </div>
 
@@ -325,12 +418,7 @@
                 <div class="nickname-settings" >
                   <div id='change-userName-container'  >
                       <div id="change-userName-Title">
-                        <t style="color: #bbbbbb;">현재 닉네임: {savedUserName || "컴붕이1"} </t>
-                        {#if saveMessage == '중복된 닉네임입니다. 다시 설정해주세요.'}
-                          <ion-icon name="warning-outline" style="color: yellow;"></ion-icon>
-                        {:else if saveMessage == "중복확인 닉네임 변경 완료"}
-                          <ion-icon name="checkmark-outline" style="color: green;" ></ion-icon>
-                        {/if}
+                        <t style="color: #bbbbbb;">현재 닉네임: {nickname} </t>
                       </div>
     
                       <div id="change-userName">
@@ -352,15 +440,12 @@
                             <ion-icon name="checkmark-outline"></ion-icon> 
                             띄어쓰기를 포함한 특수문자 X
                         </div>
-    
-                        {#if showResult}
-                          <div id="Requirements_3" 
-                            class:success={saveMessage === "중복확인 닉네임 변경 완료"} 
-                            class:error={saveMessage === "중복된 닉네임입니다. 다시 설정해주세요." || saveMessage === "조건을 충족 해주세요"}>
-                            <ion-icon name="checkmark-outline"></ion-icon>
-                            {saveMessage}
-                          </div>
-                        {/if}
+
+                        <div id="Requirements_2">
+                          <p style="color: {isError ? 'red' : 'green'}">{message}</p>
+                        </div>
+
+
                       </div>
                   </div>
 
@@ -378,8 +463,10 @@
 
                     <div id="change-password-Title">
                       <t style="color: #bbbbbb;">비밀번호 변경</t>
-                      {#if ispasswordCheckIcon }
-                      <ion-icon name="checkmark-outline" style="color: #238636;"></ion-icon>
+                      {#if passwordMessage}
+                        <span style="margin-left: 1rem; font-size: 14px; color: {passwordMessageColor}; font-weight: bold;">
+                          {passwordMessage}
+                        </span>
                       {/if}
                     </div>
 
@@ -480,7 +567,7 @@
                     <div id="password-btn-group">
                       <t id="password-search-Btn"> 비밀번호 찾기 </t> <!--비밀번호 찾기 페이지로 이동-->
                       <button id="userName-edit-Btn" on:click={() => {currentSetting = null; showSettingBox = true;} }>취소</button>
-                      <button id="password-save-Btn" on:click={checkOldPassword}>저장</button>
+                      <button id="password-save-Btn" on:click={saveNewPassword}>저장</button>
                     </div>
                   </div> <!--change-password-container 끝-->
 

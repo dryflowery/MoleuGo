@@ -19,10 +19,15 @@ public class Member {
     }
 
     public Member(String email, String password, String account_type, String verifyPassword) {
+        this(email, password, account_type, verifyPassword, null);
+    }
+
+    public Member(String email, String password, String account_type, String verifyPassword, String nickname) {
         this.email = email;
         this.password = password;
         this.account_type = account_type;
         this.verifyPassword = verifyPassword;
+        this.nickname = nickname;
     }
 
     @Id
@@ -30,6 +35,7 @@ public class Member {
 
     private String password;
     private String account_type;
+    private String nickname;
 
     @Transient
     private String verifyPassword;
