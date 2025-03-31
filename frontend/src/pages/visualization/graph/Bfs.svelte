@@ -421,21 +421,17 @@
         tmpExplanation = '그래프의 초기 상태입니다';
         pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
 
-        // 1. 시작 정점 방문
-        tmpCode = 0;
-        tmpExplanation = `0번 노드를 방문합니다`
-        tmpNodeColor[0] = "#50ad49";
-        visited[0] = true;
-        q.push(0);
-        pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
-
-        // 2. bfs
+        // 1. bfs
         const bfs = (cur) => {
+            q.push(cur)
+            visited[cur] = true;
+
             while(!q.empty()) {
                 let cur = q.top();
                 q.pop();
                 tmpCode = cur == 0 ? 0 : 3;
                 tmpExplanation = `${cur}번 노드에서 탐색을 시작합니다`
+                tmpNodeColor[cur] = "#50ad49";
                 pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
 
                 if(graph[cur] != undefined) {
@@ -474,7 +470,7 @@
             }
         }
 
-        // 3. 알고리즘 종료
+        // 2. 알고리즘 종료
         tmpExplanation = '그래프의 순회를 완료했습니다';
         tmpCode = 1000;
         pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
