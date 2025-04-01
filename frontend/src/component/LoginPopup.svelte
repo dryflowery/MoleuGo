@@ -91,6 +91,16 @@
             loginMessage = data.loginMessage;
         });
     }
+
+    const googleLogin = () => {
+        const client_id = "548082459277-meajirn1br2a1g2916ottstii0d54sc2.apps.googleusercontent.com";
+        const redirect_uri = "http://localhost:8080/login";
+        const response_type = "code";
+        const scope = "email profile";
+        let base_url = "https://accounts.google.com/o/oauth2/v2/auth";
+
+        window.location.href = `${base_url}?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=${response_type}&scope=${encodeURIComponent(scope)}`;
+    }
 </script>
 
 
@@ -125,7 +135,7 @@
             
             <!-- 로그인 추가(백엔드) -->
             <div id="social-login-container">
-                <div id="google-login">
+                <div id="google-login" on:click={() => googleLogin()}>
                     <img src="https://img.icons8.com/color/200/google-logo.png" alt="Google Login" />
                 </div>
             </div>

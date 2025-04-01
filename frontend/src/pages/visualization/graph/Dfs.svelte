@@ -473,6 +473,7 @@
 
         const nodeElements = document.querySelectorAll('.node'); 
         nodeElements.forEach((element, idx) => {
+            element.style.transition = 'color 0s';
             element.style.color = $animationQuery[queryNum].curNodeColor[idx];
             element.style.border = `5px solid ${$animationQuery[queryNum].curNodeColor[idx]}`;
         });

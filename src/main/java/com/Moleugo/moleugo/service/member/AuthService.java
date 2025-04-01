@@ -36,12 +36,12 @@ public class AuthService {
         return encoder.encode(string);
     }
 
-    public String getGoogleAccessToken(String code) {
+    public String getGoogleAccessToken(String code, String redirectUri) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("code", code);
         params.add("client_id", "548082459277-meajirn1br2a1g2916ottstii0d54sc2.apps.googleusercontent.com");
         params.add("client_secret", googleClientSecret);
-        params.add("redirect_uri", "http://localhost:8080/signup");
+        params.add("redirect_uri", redirectUri);
         params.add("grant_type", "authorization_code");
 
         HttpHeaders headers = new HttpHeaders();

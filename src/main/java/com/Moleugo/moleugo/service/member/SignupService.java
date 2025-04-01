@@ -64,7 +64,7 @@ public class SignupService {
     }
 
     public HttpStatus googleSignUp(String code) {
-        String accessToken = authService.getGoogleAccessToken(code);
+        String accessToken = authService.getGoogleAccessToken(code, "http://localhost:8080/signup");
         String email = authService.getGoogleEmail(accessToken);
 
         if(memberRepository.isRegisteredEmail(email)) {

@@ -20,22 +20,38 @@ public class LoginService {
     private final AuthService authService;
     private final MemberRepository memberRepository;
 
+    // create login info(session, cookie)
+    public void createLoginInfo(Member member) {
+        member = memberRepository.findByEmail(member.getEmail());
+        String uuid = authService.createSession(member, 7200);
+
+        LoginResponse loginResponse = ac.getBean(LoginResponse.class);
+        loginResponse.setCookie(new Cookie("user_session", uuid));
+    }
+
     public HttpStatus login(Member member) {
         LoginValidator loginValidator = ac.getBean(LoginValidator.class);
         HttpStatus loginStatus = loginValidator.isValidLogin(member);
 
         if (loginStatus == HttpStatus.OK) {
             member.setPassword(authService.encode(member.getPassword()));
-
-            Member fullMember = memberRepository.findByEmail(member.getEmail());
-
-            String uuid = authService.createSession(fullMember, 7200);
-
-            LoginResponse loginResponse = ac.getBean(LoginResponse.class);
-            loginResponse.setCookie(new Cookie("user_session", uuid));
+            createLoginInfo(member);
         }
 
         return loginStatus;
+    }
+
+    public HttpStatus googleLogin(String code) {
+        String accessToken = authService.getGoogleAccessToken(code, "http://localhost:8080/login");
+        String email = authService.getGoogleEmail(accessToken);
+
+        if(memberRepository.isRegisteredEmail(email) && memberRepository.isGoogleMember(email)) {
+            createLoginInfo(memberRepository.findByEmail(email));
+            return HttpStatus.OK;
+        }
+        else {
+            return HttpStatus.NOT_FOUND;
+        }
     }
 
     public HttpStatus isUserLoggedIn(String userSession) {
