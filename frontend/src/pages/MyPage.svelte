@@ -215,21 +215,21 @@
 
         if (res.status === 200) {
           savedUserName = userName;
-          message = '닉네임이 성공적으로 변경되었습니다.';
+          nicknameMessage = '닉네임이 성공적으로 변경되었습니다.';
           isError = false;
         } else if (res.status === 400) {
-          message = '닉네임 형식이 올바르지 않습니다.';
+          nicknameMessage = '닉네임 형식이 올바르지 않습니다.';
           isError = true;
         } else if (res.status === 409) {
-          message = '이미 사용 중인 닉네임입니다.';
+          nicknameMessage = '이미 사용 중인 닉네임입니다.';
           isError = true;
         } else {
-          message = '닉네임 변경 실패';
+          nicknameMessage = '닉네임 변경 실패';
           isError = true;
         }
       } catch (error) {
         console.error('닉네임 변경 오류:', error);
-        message = '서버 오류가 발생했습니다.';
+        nicknameMessage = '서버 오류가 발생했습니다.';
         isError = true;
       }
     }
@@ -441,8 +441,8 @@
                             띄어쓰기를 포함한 특수문자 X
                         </div>
 
-                        <div id="Requirements_2">
-                          <p style="color: {isError ? 'red' : 'green'}">{message}</p>
+                        <div id="Requirements_2" style="color: {isError ? '#892A35' : '#3f862d'}; margin-left: 1rem;">
+                          {nicknameMessage}
                         </div>
 
 

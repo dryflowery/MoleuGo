@@ -16,7 +16,7 @@ public class NicknameValidator {
     private final MemberRepository memberRepository;
 
     private static final List<String> BLOCKED_WORDS = List.of(
-            // 금지어는 여기에 추가
+         "노무현","문재인"   // 금지어는 여기에 추가
     );
 
     public boolean isValid(String nickname) {
