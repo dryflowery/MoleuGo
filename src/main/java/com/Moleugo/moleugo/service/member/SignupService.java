@@ -4,6 +4,7 @@ import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.repository.MemberRepository;
 import com.Moleugo.moleugo.service.MailService;
 import com.Moleugo.moleugo.service.validator.SignUpValidator;
+import com.Moleugo.moleugo.util.NicknameGenerator;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
@@ -18,6 +19,7 @@ public class SignupService {
     private final MailService mailService;
     private final MemberRepository memberRepository;
     private final AuthService authService;
+    private final NicknameGenerator nicknameGenerator;
 
     public HttpStatus isValidForm(Member member) {
         SignUpValidator signUpValidator = ac.getBean(SignUpValidator.class);
@@ -50,6 +52,9 @@ public class SignupService {
         if(member != null && !memberRepository.isRegisteredEmail(member.getEmail())) {
             session.removeAttribute(uuid);
             member.setPassword(authService.encode(member.getPassword()));
+
+            member.setNickname(nicknameGenerator.generate());
+
             memberRepository.registerMember(member);
             return HttpStatus.CREATED;
         }
@@ -72,7 +77,9 @@ public class SignupService {
             }
         }
         else {
-            memberRepository.registerMember(new Member(email, authService.encode("1q2w3e4r!"), "google"));
+            String nickname = nicknameGenerator.generate();
+            memberRepository.registerMember(new Member(email, authService.encode("1q2w3e4r!"), "google", null, nickname));
+
             return HttpStatus.CREATED;
         }
     }

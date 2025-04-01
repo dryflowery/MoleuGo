@@ -21,7 +21,7 @@
     <div class="content">
 
       <div id="dailyGoal"> <!--일일 목표 -->
-        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold; color: #4C905E" on:click={changeLogin}> 일일 목표</t>
+        <t style="color: #a3a3a3; font-size: 25px; font-weight: bold; color: #4C905E"> 일일 목표</t>
         <div id="dailyGoal-box" style="margin-top: 5px;"> 
 
           <!--비 로그인 시 생기는 잠금-->

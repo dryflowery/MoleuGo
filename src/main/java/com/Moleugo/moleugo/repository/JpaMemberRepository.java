@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 
 @Slf4j
 @Repository
@@ -53,4 +54,38 @@ public class JpaMemberRepository implements MemberRepository {
     public void updateAccountType(String email, String newAccountType) {
         findByEmail(email).setAccount_type(newAccountType);
     }
+
+    @Override
+    public void updateEmail(String oldEmail, String newEmail) {
+        Member oldMember = findByEmail(oldEmail);
+        if (oldMember != null) {
+            Member newMember = new Member(newEmail, oldMember.getPassword(), oldMember.getAccount_type());
+            em.persist(newMember);   // 새 회원 먼저 등록
+            em.remove(oldMember);    // 기존 회원 제거
+        }
+    }
+
+    @Override
+    public List<Member> findAll() {
+        return em.createQuery("SELECT m FROM Member m", Member.class).getResultList();
+    }
+
+    @Override
+    public void updatePassword(String email, String encodedPassword) {
+        Member member = findByEmail(email);
+        if (member != null) {
+            member.setPassword(encodedPassword);
+        }
+    }
+
+    @Override
+    public void updateNickname(String email, String newNickname) {
+        Member member = findByEmail(email);
+        if (member != null) {
+            member.setNickname(newNickname);
+        }
+    }
+
+
+
 }
