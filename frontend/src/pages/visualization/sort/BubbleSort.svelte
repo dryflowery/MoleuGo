@@ -144,12 +144,12 @@
         InitAnimation();
 
         isAsc = e.detail.isAsc;
-        generateBubbleSortQuries(isAsc);
+        generateBubbleSortQueries(isAsc);
 
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
-        executeBubbleSortQuries($asyncCnt++);
+        executeBubbleSortQueries($asyncCnt++);
     };
 
     const changeCodeColor = (idx) => {
@@ -178,7 +178,7 @@
         })
     };
 
-    const generateBubbleSortQuries = (isAsc) => {  
+    const generateBubbleSortQueries = (isAsc) => {
         const graphBg = {normal: "#d9d9d9", selected: "#ecadae", sorted: "#9fda9b"};
         const elementBg = {normal: "#737373", selected: "#ad7677", sorted: "#6a9068"};
         const elementColor = {normal: "#dcdcdc", selected: "#ffebeb", sorted: "#e8ffe6"};
@@ -279,7 +279,7 @@
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
     };
 
-    const executeBubbleSortQuries = async (myAsync) => {
+    const executeBubbleSortQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while(true) {

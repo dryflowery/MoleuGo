@@ -233,7 +233,7 @@
         $pausedIcon = false;
         $isPaused = false;
 
-        executeStackPeekQuries($asyncCnt++);
+        executeStackPeekQueries($asyncCnt++);
 
     };
 
@@ -289,7 +289,7 @@
 
     }
 
-    const executeStackPeekQuries = async (myAsync) => {
+    const executeStackPeekQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while (true) {
@@ -368,7 +368,7 @@
         $pausedIcon = false;
         $isPaused = false;
 
-        executeStackPopQuries($asyncCnt++);
+        executeStackPopQueries($asyncCnt++);
         
     };
 
@@ -545,7 +545,7 @@
         pushStackPopAnimationQuery(tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode);
     };
 
-    const executeStackPopQuries = async (myAsync) => {
+    const executeStackPopQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while (true) {
@@ -646,7 +646,7 @@
         $pausedIcon = false;
         $isPaused = false;
 
-        executeStackPushQuries($asyncCnt++);
+        executeStackPushQueries($asyncCnt++);
         
 
     };
@@ -777,7 +777,7 @@
     };
 
     // 애니메이션(Push) 실행
-    const executeStackPushQuries = async (myAsync) => {
+    const executeStackPushQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while (true) {

@@ -101,7 +101,7 @@
         <div>
            <p class="algo-list-index-text">3. 탐색</p>
 
-           <div class="algo-list-text-div" id="이분탐색">
+           <div class="algo-list-text-div" id="이분탐색" on:click={() => navigateTo('search/BinarySearch')}>
                 <span>이분 탐색</span>
             </div>
         </div>

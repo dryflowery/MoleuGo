@@ -143,12 +143,12 @@
         InitAnimation();
 
         isAsc = e.detail.isAsc;
-        generateSelectionSortQuries(isAsc);
+        generateSelectionSortQueries(isAsc);
 
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
-        executeSelectionSortQuries($asyncCnt++);
+        executeSelectionSortQueries($asyncCnt++);
     };
 
     const changeCodeColor = (idx) => {
@@ -177,7 +177,7 @@
         })
     };
 
-    const generateSelectionSortQuries = (isAsc) => {  
+    const generateSelectionSortQueries = (isAsc) => {
         // min, max 구분하지 않고 min으로 색깔 이름 통일
         const graphBg = {normal: "#d9d9d9", selected: "#ecadae", sorted: "#9fda9b", min: "#adbfec"};
         const elementBg = {normal: "#737373", selected: "#ad7677", sorted: "#6a9068", min: "#7687ad"};
@@ -299,7 +299,7 @@
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode);
     };
 
-    const executeSelectionSortQuries = async (myAsync) => {
+    const executeSelectionSortQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while(true) {

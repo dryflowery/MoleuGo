@@ -188,7 +188,7 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
-        executeHeapQuries($asyncCnt++);
+        executeHeapQueries($asyncCnt++);
     };
 
     const createRandomElement = (e) => {
@@ -215,7 +215,7 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
-        executeHeapQuries($asyncCnt++);
+        executeHeapQueries($asyncCnt++);
     };
 
     const extractMax = (e) => {
@@ -227,7 +227,7 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
-        executeHeapQuries($asyncCnt++);
+        executeHeapQueries($asyncCnt++);
     };
 
     const insertElement = (e) => {
@@ -244,7 +244,7 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
-        executeHeapQuries($asyncCnt++);
+        executeHeapQueries($asyncCnt++);
     };
 
     const pushAnimationQuery = (tmpExplanation, tmpCode, tmpHeap, tmpElementCnt, tmpBorderColor, tmpFontColor, 
@@ -403,7 +403,7 @@
         }
     };
 
-    const executeHeapQuries = async (myAsync) => {
+    const executeHeapQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while(true) {
