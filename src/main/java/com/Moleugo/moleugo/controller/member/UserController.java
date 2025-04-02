@@ -60,7 +60,7 @@ public class UserController {
         if (userSession != null) {
             Member member = (Member) session.getAttribute(userSession);
             if (member != null) {
-                System.out.println("세션 닉네임: " + member.getNickname());
+
                 return ResponseEntity.ok(member.getNickname());
             }
         }

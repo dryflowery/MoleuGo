@@ -59,11 +59,18 @@ public class JpaMemberRepository implements MemberRepository {
     public void updateEmail(String oldEmail, String newEmail) {
         Member oldMember = findByEmail(oldEmail);
         if (oldMember != null) {
-            Member newMember = new Member(newEmail, oldMember.getPassword(), oldMember.getAccount_type());
+            Member newMember = new Member(
+                    newEmail,
+                    oldMember.getPassword(),
+                    oldMember.getAccount_type(),
+                    null,
+                    oldMember.getNickname()
+            );
             em.persist(newMember);   // 새 회원 먼저 등록
             em.remove(oldMember);    // 기존 회원 제거
         }
     }
+
 
     @Override
     public List<Member> findAll() {
