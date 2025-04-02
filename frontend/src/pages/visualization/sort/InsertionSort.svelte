@@ -152,12 +152,12 @@
         InitAnimation();
 
         isAsc = e.detail.isAsc;
-        generateInsertionSortQuries(isAsc);
+        generateInsertionSortQueries(isAsc);
 
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
-        executeInsertionSortQuries($asyncCnt++);
+        executeInsertionSortQueries($asyncCnt++);
     };
 
     const changeCodeColor = (idx) => {
@@ -187,7 +187,7 @@
         })
     };
 
-    const generateInsertionSortQuries = (isAsc) => {  
+    const generateInsertionSortQueries = (isAsc) => {
         const graphBg = {normal: "#d9d9d9", selected: "#ecadae", sorted: "#9fda9b"};
         const elementBg = {normal: "#737373", selected: "#ad7677", sorted: "#6a9068"};
         const elementColor = {normal: "#dcdcdc", selected: "#ffebeb", sorted: "#e8ffe6"};
@@ -286,7 +286,7 @@
         pushAnimationQuery(tmpArr, tmpGraphBgColor, tmpElementBgColor, tmpElementColor, tmpIndexColor, tmpSwap1, tmpSwap2, tmpExplanation, tmpCode, tmpGraphBottom);
     };
 
-    const executeInsertionSortQuries = async (myAsync) => {
+    const executeInsertionSortQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while(true) {

@@ -370,7 +370,7 @@
 
         activePeek = true;
 
-        executeQueuePeekQuries($asyncCnt++);
+        executeQueuePeekQueries($asyncCnt++);
         
     };
 
@@ -437,7 +437,7 @@
 
     }
 
-    const executeQueuePeekQuries = async (myAsync) => {
+    const executeQueuePeekQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while (true) {
@@ -520,7 +520,7 @@
         $pausedIcon = false;
         $isPaused = false;
 
-        executeDequeueQuries($asyncCnt++);
+        executeDequeueQueries($asyncCnt++);
         
     };
 
@@ -993,7 +993,7 @@
         };
     };
 
-    const executeDequeueQuries = async (myAsync) => {
+    const executeDequeueQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while (true) {
@@ -1104,7 +1104,7 @@
         $pausedIcon = false;
         $isPaused = false;
 
-        executeEnqueueQuries($asyncCnt++);
+        executeEnqueueQueries($asyncCnt++);
         
 
     };
@@ -1468,7 +1468,7 @@
     };
 
     // 애니메이션(Push) 실행
-    const executeEnqueueQuries = async (myAsync) => {
+    const executeEnqueueQueries = async (myAsync) => {
         $animationStep = [0, $animationQuery.length - 1];
 
         while (true) {

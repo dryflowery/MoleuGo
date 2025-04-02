@@ -16,6 +16,7 @@
   import Deque from './routes/visualization/Linear/Deque.svelte';
   import Dfs from './routes/visualization/graph/Dfs.svelte';
   import Bfs from './routes/visualization/graph/Bfs.svelte';
+  import BinarySearch from "./routes/visualization/search/BinarySearch.svelte";
   import SignupResultPage from "./routes/SignupResultPage.svelte";
   import {checkLoginStatus} from "./lib/store.js";
   import {onMount} from "svelte";
@@ -37,6 +38,7 @@
       '/visualization/Linear/Deque': Deque,
       '/visualization/graph/Dfs': Dfs,
       '/visualization/graph/Bfs': Bfs,
+      '/visualization/search/BinarySearch': BinarySearch,
       '/signup-result': SignupResultPage
   };
 
