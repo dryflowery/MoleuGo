@@ -8,7 +8,7 @@
     import { writable } from "svelte/store";
     import Template from "./visualization/Template.svelte";
 
-    
+
 
     let userName = ""; // 입력된 닉네임
     let savedUserName = '';
@@ -61,6 +61,8 @@
     let passwordMessage = '';
     let passwordMessageColor = "#bbbbbb";
 
+    let accountType = "";
+
     let nicknameMessage = '';
 
     const scaleFactorStore = writable(1);
@@ -110,7 +112,7 @@
   updateScaleFactor();
   window.addEventListener("resize", updateScaleFactor);
 
-  let scaleFactor;
+  let scaleFactor = 0;
 
   scaleFactorStore.subscribe((value) => (scaleFactor = value));
 
@@ -309,33 +311,42 @@
     isRoadMapVisible = !isRoadMapVisible;
   }
 
-  onMount(async () => {
-    const res = await fetch('/user/email', { credentials: 'include' });
-    if (res.ok) {
-      myEmail = await res.text();
-    }
+    onMount(async () => {
+      try {
+        // 이메일 요청
+        const emailRes = await fetch('/user/email', { credentials: 'include' });
 
-    try {
-      const res = await fetch("/user/nickname", {
-        method: "GET",
-        credentials: "include"
-      });
+        if (emailRes.ok) {
+          myEmail = await emailRes.text();
+        }
 
-      const text = await res.text();
+        // 닉네임 요청
+        const nicknameRes = await fetch('/user/nickname', {
+          method: 'GET',
+          credentials: 'include'
+        });
 
-      if (res.ok) {
-        nickname = text;
-      } else {
-        nickname = '(로그인 필요)';
+        if (nicknameRes.ok) {
+          const nicknameText = await nicknameRes.text();
+          nickname = nicknameText;
+        } else {
+          nickname = '(로그인 필요)';
+        }
+
+        // account_type 요청
+        const typeRes = await fetch('/user/account-type', { credentials: 'include' });
+        if (typeRes.ok) {
+          accountType = await typeRes.text();
+        }
+
+      } catch (e) {
+        console.error('유저 정보 불러오기 중 오류 발생:', e);
       }
-    } catch (e) {
-      console.error("닉네임 요청 중 에러:", e);
-    }
-
-  });
+    });
 
 
-  </script>
+
+</script>
   
 <main>
   <div class="header-container">
@@ -374,8 +385,13 @@
                     {/if}
                   </div>
                   <div id="email-output"> {myEmail} </div>
-                  <button id="email-btn" on:click={() => { showSettingBox = false; currentSetting = 'email'; }}>
+                  <button
+                          id="email-btn"
+                          on:click={() => { showSettingBox = false; currentSetting = 'email'; }}
+                          disabled={accountType !== 'normal'}
+                  >
                     설정
+
                   </button>
                 </div>
                 <div id="nickname-setting"> 
@@ -388,7 +404,13 @@
                 <div id="password-setting">
                   <div id="password-title"> 비밀번호</div>
                   <div id="password-output"> ****** </div>
-                  <button id="password-btn" on:click={() => { showSettingBox = false; currentSetting = 'password'; }}>
+
+                  <button
+                          id="password-btn"
+                          on:click={() => { showSettingBox = false; currentSetting = 'password'; }}
+                          disabled={accountType !== 'normal'}
+                  >
+
                     설정
                   </button>
                 </div>
@@ -1313,12 +1335,15 @@
 
     }
 
-    
-
-    
   }
-  
-  
+
+  #email-btn:disabled,
+  #password-btn:disabled {
+    background-color: #2a2a2a;   /* 어두운 회색 배경 */
+    color: #777777;              /* 흐릿한 글씨색 */
+    border: 1px solid #444444;
+  }
+
 
 </style>
   
