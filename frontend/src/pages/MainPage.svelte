@@ -5,11 +5,6 @@
   import {isLogin } from "../lib/store"
   import { push } from "svelte-spa-router";
 
-  //임시로 사용하는 함수(로그인/비로그인)
-  const changeLogin = ()=> {
-    $isLogin = !$isLogin
-  }
-
 </script>
 
 <main>
@@ -34,22 +29,24 @@
           {/if}
 
           <!--로그인 시 생기는 화면-->
-          <div id="dailyGoal-box-content" class="{ $isLogin ? ' ' : 'blurred' }"> 
-            안녕하세요 
-          </div>
+          <div id="dailyGoal-box-content" class="{ $isLogin ? ' ' : 'blurred' }">
+
+            <img src="assets/daily.png" height="262" width="435"/></div>
 
         </div>
+
       </div>
 
       <div id="recentAlgorithm"> <!--최근알고리즘 -->
         <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;">최근 알고리즘</t>
-        <div id="recentAlgorithm-box" style="margin-top: 5px;"> 최근 알고리즘
+        <div id="recentAlgorithm-box" style="margin-top: 5px;">
+          <img src="assets/recent.png" height="297" width="425"/>
         </div>
       </div>
 
       <div id="community"> <!--커뮤니티 -->
         <t style="color: #a3a3a3; font-size: 25px; font-weight: bold;">커뮤니티</t>
-        <div id="community-box" style="margin-top: 5px;">안녕하세요</div>
+        <div id="community-box" style="margin-top: 5px;">제작 중</div>
       </div>
 
       <div id="myProfile"> <!--마이페이지 -->
@@ -73,7 +70,7 @@
 
         <div id="myProfile-box" style="margin-top: 5px;">
           <div id="myProfile-box-content" class="{ $isLogin ? ' ' : 'blurred' }"> 
-            안녕하세요
+            미완성
           </div>
 
         </div>
@@ -207,8 +204,32 @@
   }
 
   #dailyGoal-box-content {
+    display: grid;
+    grid-template-rows: 2fr 10fr 0.5fr;
+  }
+
+  #dailyGoal-box-header {
     
   }
+
+  #dailyGoal-box-content-body {
+    display: grid;
+    grid-template-columns: 0.5fr 1fr;
+  }
+
+  #dailyGoal-box-content-body-left {
+    
+  }
+
+  #dailyGoal-box-content-body-right {
+    
+  }
+
+
+  #dailyGoal-box-footer {
+    
+  }
+
 
   #recentAlgorithm {
     grid-column: 3;

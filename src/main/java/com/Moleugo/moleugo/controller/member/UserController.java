@@ -60,14 +60,12 @@ public class UserController {
         if (userSession != null) {
             Member member = (Member) session.getAttribute(userSession);
             if (member != null) {
-                System.out.println("세션 닉네임: " + member.getNickname());
+
                 return ResponseEntity.ok(member.getNickname());
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
-
 
     @PostMapping("/change-nickname")
     public ResponseEntity<?> changeNickname(@CookieValue("user_session") String sessionId,
@@ -75,5 +73,18 @@ public class UserController {
         HttpStatus status = memberService.changeNickname(sessionId, req.getNewNickname());
         return ResponseEntity.status(status).build();
     }
+
+    @GetMapping("/account-type")
+    public ResponseEntity<String> getUserAccountType(@CookieValue(value = "user_session", required = false) String userSession) {
+        HttpSession session = memberService.getSession();
+        if (userSession != null) {
+            Member member = (Member) session.getAttribute(userSession);
+            if (member != null) {
+                return ResponseEntity.ok(member.getAccount_type());
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
 
 }

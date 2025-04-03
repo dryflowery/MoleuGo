@@ -1,26 +1,35 @@
 <script>
     import Footer from "../component/Footer.svelte";
     import Header from "../component/Header.svelte";
+    import Toast from '../component/Toast.svelte';
+
     import {isListVisible } from "../lib/store"
-    import {isLogin } from "../lib/store"
-    import { push } from "svelte-spa-router";
     import { onMount } from "svelte";
     import { writable } from "svelte/store";
-    import Template from "./visualization/Template.svelte";
 
-    
+    let showToast = false;
+    let toastMessage = '';
+    let toastType = 'success'; // or 'error'
+
+    function showToastMessage(message, type = 'success') {
+      toastMessage = message;
+      toastType = type;
+      showToast = true;
+
+      setTimeout(() => {
+        showToast = false;
+      }, 2000); // 2초 후 자동 숨김
+    }
 
     let userName = ""; // 입력된 닉네임
-    let savedUserName = '';
+    let savedUserName = ''; // 현재 닉네임 (서버에서 가져온 값)
+    let nicknameMessage = '';
+
 
     let isLengthValid = false; // 길이 판별
     let isSpecialCharValid = false;
     let showResult = false; // 결과 메시지 표시 여부
     let saveMessage = ""; // 저장 메세지
-
-    let nickname = "";
-
-    let usedNames = ["컴붕이1"]; // 이미 존재하는 닉네임들 (임의로 추가)
 
     let userPassword = ''; //기존 비밀번호
 
@@ -61,9 +70,15 @@
     let passwordMessage = '';
     let passwordMessageColor = "#bbbbbb";
 
-    let nicknameMessage = '';
+    let accountType = "";
 
     const scaleFactorStore = writable(1);
+
+    const socialIcons = {
+      google: { src: 'assets/google.png',
+                alt: '구글 계정'
+      }
+    };
 
     async function requestEmailChange() {
       isLoading = true;
@@ -81,25 +96,27 @@
         });
 
         if (response.ok) {
-          message = '인증 메일이 전송되었습니다. 메일함을 확인해주세요.';
-          isError = false;
+          showToastMessage("인증 메일이 전송되었습니다. 메일함을 확인해주세요.", "success");
+          message = '';
+
         } else if (response.status === 409) {
-          message = '이미 사용 중인 이메일입니다.';
-          isError = true;
+          showToastMessage("이미 사용 중인 이메일입니다.", "error");
+          message = '';
+
         } else {
-          message = '이메일 변경 요청에 실패했습니다.';
-          isError = true;
+          showToastMessage("이메일 변경 요청에 실패했습니다.", "error");
+          message = '';
+
         }
       } catch (err) {
         console.error(err);
-        message = '오류가 발생했습니다. 다시 시도해주세요.';
-        isError = true;
+        showToastMessage("오류가 발생했습니다. 다시 시도해주세요.", "error");
+        message = '';
+
       } finally {
         isLoading = false;
       }
     }
-
-
 
     function updateScaleFactor() {
       const width = window.innerWidth;
@@ -110,98 +127,98 @@
   updateScaleFactor();
   window.addEventListener("resize", updateScaleFactor);
 
-  let scaleFactor;
+  let scaleFactor = 0;
 
   scaleFactorStore.subscribe((value) => (scaleFactor = value));
 
+  let currentHeight = 525 * scaleFactor; // 기본 높이
+  let currentHeight_U = 224 * scaleFactor; // 기본 높이
 
-    let currentHeight = 525 * scaleFactor; // 기본 높이
-    let currentHeight_U = 224 * scaleFactor; // 기본 높이
-
-    let showEmailInfo = false; // 설명 표시 여부
+  let showEmailInfo = false; // 설명 표시 여부
 
 
     // 비밀번호 조건 확인 함수
-    function validateNewPassword(password) {
-      // 1. 영문/숫자/특수문자 중 2가지 이상 포함
-      condition1Met = [
-        /[a-zA-Z]/.test(password), // 영문
-        /[0-9]/.test(password), // 숫자
-        /[^a-zA-Z0-9\s]/.test(password), // 특수문자
-      ].filter(Boolean).length >= 2;
+  function validateNewPassword(password) {
+    // 1. 영문/숫자/특수문자 중 2가지 이상 포함
+    condition1Met = [
+      /[a-zA-Z]/.test(password), // 영문
+      /[0-9]/.test(password), // 숫자
+      /[^a-zA-Z0-9\s]/.test(password), // 특수문자
+    ].filter(Boolean).length >= 2;
 
-      // 2. 8자 이상 32자 이하 입력 (공백 제외)
-      condition2Met = password.replace(/\s/g, "").length >= 8 && password.length <= 32;
+    // 2. 8자 이상 32자 이하 입력 (공백 제외)
+    condition2Met = password.replace(/\s/g, "").length >= 8 && password.length <= 32;
 
-      // 3. 연속 3자 이상 동일한 문자/숫자 제외
-      condition3Met = !/(.)\1\1/.test(password);
+    // 3. 연속 3자 이상 동일한 문자/숫자 제외
+    condition3Met = !/(.)\1\1/.test(password);
 
-      // 모든 조건 충족 여부 반환
-      return condition1Met && condition2Met && condition3Met;
-    }
+    // 모든 조건 충족 여부 반환
+    return condition1Met && condition2Met && condition3Met;
+  }
 
-      // 비밀번호 변경 버튼 클릭
-    async function saveNewPassword() {
-      passwordMessage = "";
+    // 비밀번호 변경 버튼 클릭
+  async function saveNewPassword() {
+    passwordMessage = "";
 
-      if (!inputOldPassword || !inputNewPassword || !inputNewPassword_verify) {
-        passwordMessage = "모든 항목을 입력해주세요.";
-        passwordMessageColor = "red";
-        return;
-      }
-
-
-      const response = await fetch("/user/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          currentPassword: inputOldPassword,
-          newPassword: inputNewPassword,
-          verifyNewPassword: inputNewPassword_verify
-        })
-      });
-
-      switch (response.status) {
-        case 200:
-          passwordMessage = "비밀번호가 성공적으로 변경되었습니다.";
-          passwordMessageColor = "#3f862d";
-          inputOldPassword = "";
-          inputNewPassword = "";
-          inputNewPassword_verify = "";
-          break;
-        case 403:
-          passwordMessage = "현재 비밀번호가 틀렸습니다.";
-          passwordMessageColor = "#892A35";
-          break;
-        case 400:
-          passwordMessage = "새 비밀번호가 유효하지 않습니다.";
-          passwordMessageColor = "#892A35";
-          break;
-        case 401:
-          passwordMessage = "로그인이 만료되었습니다.";
-          passwordMessageColor = "#892A35";
-          break;
-        default:
-          passwordMessage = "비밀번호 변경에 실패했습니다.";
-          passwordMessageColor = "#892A35";
-      }
+    if (!inputOldPassword || !inputNewPassword || !inputNewPassword_verify) {
+      passwordMessage = "모든 항목을 입력해주세요.";
+      passwordMessageColor = "red";
+      return;
     }
 
 
+    const response = await fetch("/user/change-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        currentPassword: inputOldPassword,
+        newPassword: inputNewPassword,
+        verifyNewPassword: inputNewPassword_verify
+      })
+    });
 
-
-    // 닉네임 검증 함수
-    function validateUserName(name) {
-      const lengthRegex = /^.{2,10}$/; // 2~10 글자
-      const specialCharRegex = /^[^\s!@#$%^&*(),.?":{}|<>]*$/; // 띄어쓰기 및 특수문자 제외
-
-      isLengthValid = lengthRegex.test(name);
-      isSpecialCharValid = specialCharRegex.test(name);
+    switch (response.status) {
+      case 200:
+        passwordMessage = "비밀번호가 성공적으로 변경되었습니다.";
+        passwordMessageColor = "#3f862d";
+        inputOldPassword = "";
+        inputNewPassword = "";
+        inputNewPassword_verify = "";
+        showToastMessage("성공적으로 업데이트되었습니다.", "success");
+        break;
+      case 403:
+        passwordMessage = "현재 비밀번호가 틀렸습니다.";
+        passwordMessageColor = "#892A35";
+        break;
+      case 400:
+        passwordMessage = "새 비밀번호가 유효하지 않습니다.";
+        passwordMessageColor = "#892A35";
+        break;
+      case 401:
+        passwordMessage = "로그인이 만료되었습니다.";
+        passwordMessageColor = "#892A35";
+        break;
+      default:
+        passwordMessage = "비밀번호 변경에 실패했습니다.";
+        passwordMessageColor = "#892A35";
     }
+  }
 
-    // 닉네임 저장 버튼 클릭 이벤트
+
+
+
+  // 닉네임 검증 함수
+  function validateUserName(name) {
+    const lengthRegex = /^.{2,10}$/; // 2~10 글자
+    const specialCharRegex = /^[^\s!@#$%^&*(),.?":{}|<>]*$/; // 띄어쓰기 및 특수문자 제외
+
+    isLengthValid = lengthRegex.test(name);
+    isSpecialCharValid = specialCharRegex.test(name);
+  }
+
+  // 닉네임 저장 버튼 클릭 이벤트
     async function saveUserName() {
       try {
         const res = await fetch('/user/change-nickname', {
@@ -214,9 +231,12 @@
         });
 
         if (res.status === 200) {
-          savedUserName = userName;
+          await fetchNickname();
           nicknameMessage = '닉네임이 성공적으로 변경되었습니다.';
           isError = false;
+          userName = "";
+          showToastMessage("성공적으로 업데이트되었습니다.", "success");
+
         } else if (res.status === 400) {
           nicknameMessage = '닉네임 형식이 올바르지 않습니다.';
           isError = true;
@@ -234,60 +254,60 @@
       }
     }
 
-    function toggleOldPasswordVisibility() { // OLD
-        isOldPasswordVisible = !isOldPasswordVisible;
-    }
+  function toggleOldPasswordVisibility() { // OLD
+      isOldPasswordVisible = !isOldPasswordVisible;
+  }
 
-    function toggleNewPasswordVisibility() { // NEW
-        isNewPasswordVisible = !isNewPasswordVisible;
-    }
+  function toggleNewPasswordVisibility() { // NEW
+      isNewPasswordVisible = !isNewPasswordVisible;
+  }
 
-    function toggleNewPasswordVisibility_verify() { // NEW
-      isNewPasswordVisible_verify = !isNewPasswordVisible_verify;
-    }
+  function toggleNewPasswordVisibility_verify() { // NEW
+    isNewPasswordVisible_verify = !isNewPasswordVisible_verify;
+  }
 
-    // 닉네임이 변경될 때마다 검증
-    $: validateUserName(userName);
+  // 닉네임이 변경될 때마다 검증
+  $: validateUserName(userName);
 
-    // 비밀번호 변경 시 조건 확인
-    $: validateNewPassword(inputNewPassword);
-      // 비밀번호 확인 일치 여부 검사
-      $: {
-      if (inputNewPassword_verify === "") {
-        verifyPasswordMessage = "확인을 위해 새 비밀번호를 다시 입력하세요";
-        verifyPasswordMessageStyle = ""; // 기본 스타일
-      } else if (inputNewPassword_verify === inputNewPassword) {
-        verifyPasswordMessage = "비밀번호가 일치합니다";
-        verifyPasswordMessageStyle = "color: #238636;"; // 초록색
-      } else {
-        verifyPasswordMessage = "비밀번호가 일치하지 않습니다";
-        verifyPasswordMessageStyle = "color: rgb(173, 44, 44);"; // 빨간색
-      }
-    }
-
+  // 비밀번호 변경 시 조건 확인
+  $: validateNewPassword(inputNewPassword);
+    // 비밀번호 확인 일치 여부 검사
     $: {
-      const isHighResolution = window.innerWidth >= 2560; // 화면 너비 체크
-      if (!isHighResolution) { // 2560 이상이면 적용하지 않음
-        if (currentSetting === null) currentHeight = 525 * scaleFactor;
-        else if (currentSetting === "email") currentHeight = 490 * scaleFactor;
-        else if (currentSetting === "nickname") currentHeight = 580 * scaleFactor;
-        else if (currentSetting === "password") currentHeight = 720 * scaleFactor;
-      } else {
-        currentHeight = 525* scaleFactor; // 고정 높이
-      }
+    if (inputNewPassword_verify === "") {
+      verifyPasswordMessage = "확인을 위해 새 비밀번호를 다시 입력하세요";
+      verifyPasswordMessageStyle = ""; // 기본 스타일
+    } else if (inputNewPassword_verify === inputNewPassword) {
+      verifyPasswordMessage = "비밀번호가 일치합니다";
+      verifyPasswordMessageStyle = "color: #238636;"; // 초록색
+    } else {
+      verifyPasswordMessage = "비밀번호가 일치하지 않습니다";
+      verifyPasswordMessageStyle = "color: rgb(173, 44, 44);"; // 빨간색
     }
+  }
 
-    $: {
-      const isHighResolution = window.innerWidth >= 2560; // 화면 너비 체크
-      if (!isHighResolution) { // 2560 이상이면 적용하지 않음
-        if (currentSetting === null) currentHeight_U = 224 * scaleFactor;
-        else if (currentSetting === "email") currentHeight_U = 257 * scaleFactor;
-        else if (currentSetting === "nickname") currentHeight_U = 169 * scaleFactor;
-        else if (currentSetting === "password") currentHeight_U = 27 * scaleFactor;
-      } else {
-        currentHeight_U = 224* scaleFactor; // 고정 높이
-      }
+  $: {
+    const isHighResolution = window.innerWidth >= 2560; // 화면 너비 체크
+    if (!isHighResolution) { // 2560 이상이면 적용하지 않음
+      if (currentSetting === null) currentHeight = 525 * scaleFactor;
+      else if (currentSetting === "email") currentHeight = 490 * scaleFactor;
+      else if (currentSetting === "nickname") currentHeight = 580 * scaleFactor;
+      else if (currentSetting === "password") currentHeight = 720 * scaleFactor;
+    } else {
+      currentHeight = 525* scaleFactor; // 고정 높이
     }
+  }
+
+  $: {
+    const isHighResolution = window.innerWidth >= 2560; // 화면 너비 체크
+    if (!isHighResolution) { // 2560 이상이면 적용하지 않음
+      if (currentSetting === null) currentHeight_U = 224 * scaleFactor;
+      else if (currentSetting === "email") currentHeight_U = 257 * scaleFactor;
+      else if (currentSetting === "nickname") currentHeight_U = 169 * scaleFactor;
+      else if (currentSetting === "password") currentHeight_U = 27 * scaleFactor;
+    } else {
+      currentHeight_U = 224* scaleFactor; // 고정 높이
+    }
+  }
 
   let roadMap_h = 50 * scaleFactor;
   let activity_h = 700 * scaleFactor;
@@ -309,35 +329,45 @@
     isRoadMapVisible = !isRoadMapVisible;
   }
 
-  onMount(async () => {
-    const res = await fetch('/user/email', { credentials: 'include' });
-    if (res.ok) {
-      myEmail = await res.text();
-    }
-
-    try {
-      const res = await fetch("/user/nickname", {
-        method: "GET",
-        credentials: "include"
-      });
-
-      const text = await res.text();
-
-      if (res.ok) {
-        nickname = text;
-      } else {
-        nickname = '(로그인 필요)';
+    async function fetchNickname() {
+      try {
+        const res = await fetch("/user/nickname", { credentials: "include" });
+        if (res.ok) {
+          savedUserName = await res.text();
+        }
+      } catch (err) {
+        console.error("닉네임 로딩 실패:", err);
       }
-    } catch (e) {
-      console.error("닉네임 요청 중 에러:", e);
     }
 
+  onMount(async () => {
+    try {
+      // 이메일 요청
+      const emailRes = await fetch('/user/email', { credentials: 'include' });
+
+      if (emailRes.ok) {
+        myEmail = await emailRes.text();
+      }
+
+      fetchNickname(); // 닉네임 요청
+
+      // account_type 요청
+      const typeRes = await fetch('/user/account-type', { credentials: 'include' });
+      if (typeRes.ok) {
+        accountType = await typeRes.text();
+      }
+
+    } catch (e) {
+      console.error('유저 정보 불러오기 중 오류 발생:', e);
+    }
   });
 
-
-  </script>
+</script>
   
 <main>
+
+  <Toast message={toastMessage} type={toastType} show={showToast} />
+
   <div class="header-container">
     <Header />
   </div>
@@ -353,10 +383,21 @@
 
           <div id="profile-top-container">
             <span id='profile-title'>내 프로필</span>
+
             <div id="profile-image">
               <button id="profile-edit-Btn"> 설정</button>
             </div>
-            <div id='nickName'>닉네임: {nickname} </div>
+
+            <div id='nickName'>닉네임: {savedUserName}
+              {#if accountType && socialIcons[accountType]}
+                <img
+                        src={socialIcons[accountType].src}
+                        alt={socialIcons[accountType].alt}
+                        class="social-icon"
+                />
+              {/if}
+            </div>
+
           </div>
 
           <div id="profile-bottom-container">
@@ -368,27 +409,46 @@
                 <div id="email-setting">
                   <div id="email-title"> 이메일 </div>
                   <div id="email-icon" on:mouseover={() => (showEmailInfo = true)} on:mouseout={() => (showEmailInfo = false)}>
-                    <ion-icon name="mail-outline"></ion-icon>
+                    <ion-icon name="help-circle-outline"></ion-icon>
                     {#if showEmailInfo}
-                    <div class="tooltip">이메일 인증이 필요합니다.</div>
+                    <div class="tooltip">
+                      {#if accountType === 'normal'}
+                        이메일 인증이 필요합니다.
+                      {:else}
+                         소셜계정은 이메일과 비밀번호를 변경할 수 없습니다.
+                      {/if}
+                    </div>
                     {/if}
                   </div>
                   <div id="email-output"> {myEmail} </div>
-                  <button id="email-btn" on:click={() => { showSettingBox = false; currentSetting = 'email'; }}>
+
+                  <button
+                          id="email-btn"
+                          on:click={() => { showSettingBox = false; currentSetting = 'email'; }}
+                          disabled={accountType !== 'normal'}>
                     설정
                   </button>
+
                 </div>
                 <div id="nickname-setting"> 
                   <div id="nickname-title"> 닉네임 </div>
-                  <div id="nickname-output"> {nickname} </div>
+                  <div id="nickname-output"> {savedUserName} </div>
                   <button id="nickname-btn" on:click={() => { showSettingBox = false; currentSetting = 'nickname'; }}>
                     설정
                   </button>
                 </div>
                 <div id="password-setting">
                   <div id="password-title"> 비밀번호</div>
+
+
                   <div id="password-output"> ****** </div>
-                  <button id="password-btn" on:click={() => { showSettingBox = false; currentSetting = 'password'; }}>
+
+                  <button
+                          id="password-btn"
+                          on:click={() => { showSettingBox = false; currentSetting = 'password'; }}
+                          disabled={accountType !== 'normal'}
+                  >
+
                     설정
                   </button>
                 </div>
@@ -400,7 +460,7 @@
                   <div id="change-email-Title" style="display: flex; align-items: center; gap: 12px;">
                     <span style="color: #bbbbbb;">이메일 변경</span>
                     {#if message}
-                      <span style="font-size: 14px; color: {isError ? '#892A35' : (isLoading ? '#999' : '#3f862d')};"> {message} </span>
+                      <span style="font-size: 14px; color: #999;"> {message} </span>
                     {/if}
                   </div>
 
@@ -418,7 +478,7 @@
                 <div class="nickname-settings" >
                   <div id='change-userName-container'  >
                       <div id="change-userName-Title">
-                        <t style="color: #bbbbbb;">현재 닉네임: {nickname} </t>
+                        <t style="color: #bbbbbb;">현재 닉네임: {savedUserName} </t>
                       </div>
     
                       <div id="change-userName">
@@ -450,7 +510,7 @@
                   </div>
 
                   <div id="btn-container">
-                    <button id="userName-edit-Btn" on:click={() => {currentSetting = null; showSettingBox = true;} }>취소</button>
+                    <button id="userName-edit-Btn" on:click={() => {currentSetting = null; showSettingBox = true; nicknameMessage = ''; userName = ''; } }>취소</button>
                     <button id="userName-edit-Btn" on:click={saveUserName}>저장</button>
                   </div>
 
@@ -566,7 +626,7 @@
 
                     <div id="password-btn-group">
                       <t id="password-search-Btn"> 비밀번호 찾기 </t> <!--비밀번호 찾기 페이지로 이동-->
-                      <button id="userName-edit-Btn" on:click={() => {currentSetting = null; showSettingBox = true;} }>취소</button>
+                      <button id="userName-edit-Btn" on:click={() => {currentSetting = null; showSettingBox = true; passwordMessage = ''; inputOldPassword = ""; inputNewPassword = ""; inputNewPassword_verify = "";} }>취소</button>
                       <button id="password-save-Btn" on:click={saveNewPassword}>저장</button>
                     </div>
                   </div> <!--change-password-container 끝-->
@@ -678,6 +738,7 @@
   
    overflow: hidden;
 
+
   }
 
   #activity-box {
@@ -757,7 +818,15 @@
     font-weight: bold;
     font-size: large;
     color: #c4c4c4;
-    margin: 15px 0px 0px 132px;
+
+    margin: 15px 0px 0px 0px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-wrap: wrap;
+
   }
 
 
@@ -1182,16 +1251,16 @@
   /* -------------------  로드맵 ------------------ */
 
   .roadMap {
-   display: grid;
-   grid-template-rows: 40px 1fr 0.8fr 60px;
-   margin:20px 0px 0px 0px;
-   width: 800px;
-   height: 50px;
-   background-color: #151b23;
-   border: 1px solid #3d444d;
-   border-radius: 8px;
-   box-sizing: border-box;
-   padding: 0px;
+     display: grid;
+     grid-template-rows: 40px 1fr 0.8fr 60px;
+     margin:20px 0px 0px 0px;
+     width: 800px;
+     height: 50px;
+     background-color: #151b23;
+     border: 1px solid #3d444d;
+     border-radius: 8px;
+     box-sizing: border-box;
+     padding: 0px;
   }
 
   @media screen and (min-width: 2560px)  {
@@ -1215,7 +1284,17 @@
     }
 
     #nickName {
-      margin: 15px 0px 0px 200px;
+      font-weight: bold;
+      font-size: large;
+      color: #c4c4c4;
+
+      margin: 15px 0px 0px 0px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      flex-wrap: wrap;
     }
 
     #email-setting, #nickname-setting, #password-setting {
@@ -1313,12 +1392,21 @@
 
     }
 
-    
-
-    
   }
-  
-  
+
+  #email-btn:disabled,
+  #password-btn:disabled {
+    background-color: #2a2a2a;   /* 어두운 회색 배경 */
+    color: #777777;              /* 흐릿한 글씨색 */
+    border: 1px solid #444444;
+  }
+
+  .social-icon {
+    width: 18px;
+    height: 18px;
+    margin-left: 3px;
+    vertical-align: middle;
+  }
 
 </style>
   

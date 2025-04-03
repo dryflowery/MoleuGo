@@ -1,13 +1,30 @@
 <script>
+    import '../component/Toast.svelte'
     import {isLoginVisible, isLogin, checkLoginStatus} from "../lib/store";
     import {OK, UNAUTHORIZED} from "../lib/httpStatusStore.js";
     import { push } from "svelte-spa-router";
+    import Toast from "./Toast.svelte";
 
     let loginHttpStatusCode;
     let loginMessage;
 
     let inputEmail = "";
     let inputPassword = "";
+
+    let showToast = false;
+    let toastMessage = '';
+    let toastType = 'success'; // or 'error'
+
+    function showToastMessage(message, type = 'success') {
+        toastMessage = message;
+        toastType = type;
+        showToast = true;
+
+        setTimeout(() => {
+            showToast = false;
+        }, 2000); // 2초 후 자동 숨김
+    }
+
 
     const closeLoginPopup = (event) => {
         const popupContent = document.getElementById("popup-content");
@@ -34,7 +51,8 @@
                 push("/my-page")
             }
             else if (loginHttpStatusCode === UNAUTHORIZED) {
-                alert(loginMessage);
+
+                showToastMessage(loginMessage, "error");
             }
         });
     }
@@ -105,6 +123,8 @@
 
 
 <main>
+    <Toast message={toastMessage} type={toastType} show={showToast} />
+
     <div id="popup-container" on:click={closeLoginPopup}>
         <div id="popup-content">
             <button id="close-btn" on:click={closePopup}>x</button>
