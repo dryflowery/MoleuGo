@@ -71,7 +71,6 @@ public class JpaMemberRepository implements MemberRepository {
         }
     }
 
-
     @Override
     public List<Member> findAll() {
         return em.createQuery("SELECT m FROM Member m", Member.class).getResultList();
@@ -92,7 +91,4 @@ public class JpaMemberRepository implements MemberRepository {
             member.setNickname(newNickname);
         }
     }
-
-
-
 }

@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class SignUpValidator {
     private final MemberRepository memberRepository;
 
-    public HttpStatus isFormValid(Member member) {
+    public HttpStatus isValidForm(Member member) {
         if(isDuplicatedEmail(member)) {
             return HttpStatus.CONFLICT;
         }
