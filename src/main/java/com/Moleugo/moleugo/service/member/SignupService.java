@@ -23,7 +23,7 @@ public class SignupService {
 
     public HttpStatus isValidForm(Member member) {
         SignUpValidator signUpValidator = ac.getBean(SignUpValidator.class);
-        return signUpValidator.isFormValid(member);
+        return signUpValidator.isValidForm(member);
     }
 
     public void sendVerificationEmail(Member member) {
@@ -68,17 +68,11 @@ public class SignupService {
         String email = authService.getGoogleEmail(accessToken);
 
         if(memberRepository.isRegisteredEmail(email)) {
-            if(memberRepository.isGoogleMember(email)) {
-                return HttpStatus.CONFLICT;
-            }
-            else {
-                memberRepository.updateAccountType(email, "google");
-                return HttpStatus.OK;
-            }
+            return HttpStatus.CONFLICT;
         }
         else {
             String nickname = nicknameGenerator.generate();
-            memberRepository.registerMember(new Member(email, authService.encode("1q2w3e4r!"), "google", null, nickname));
+            memberRepository.registerMember(new Member(email, null, "google", null, nickname));
 
             return HttpStatus.CREATED;
         }

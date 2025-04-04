@@ -53,13 +53,21 @@ public class MemberService {
         return loginService.logout(userSession);
     }
 
-    public HttpSession getSession() { return loginService.getSession(); }
+    public HttpSession getSession() {
+        return loginService.getSession();
+    }
 
-    public HttpStatus requestEmailChange(String sessionId, String newEmail) { return emailChangeService.requestEmailChange(sessionId, newEmail); }
+    public HttpStatus requestEmailChange(String sessionId, String newEmail) {
+        return emailChangeService.requestEmailChange(sessionId, newEmail);
+    }
 
-    public HttpStatus confirmEmailChange(String uuid) { return emailChangeService.confirmEmailChange(uuid); }
+    public HttpStatus confirmEmailChange(String uuid) {
+        return emailChangeService.confirmEmailChange(uuid);
+    }
 
-    public HttpStatus changePassword(String sessionId, PasswordChangeRequest req) { return passwordChangeService.changePassword(sessionId, req); }
+    public HttpStatus changePassword(String sessionId, PasswordChangeRequest req) {
+        return passwordChangeService.changePassword(sessionId, req);
+    }
 
     public HttpStatus changeNickname(String sessionId, String newNickname) {
         Member member = loginService.getSession().getAttribute(sessionId) instanceof Member m ? m : null;
@@ -67,7 +75,4 @@ public class MemberService {
 
         return nicknameChangeService.changeNickname(member, newNickname);
     }
-
-
-
 }

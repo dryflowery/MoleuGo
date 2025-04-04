@@ -22,6 +22,11 @@ public class LoginValidator {
             return HttpStatus.UNAUTHORIZED;
         }
 
+        if(!memberRepository.isNormalMember(member.getEmail())) {
+            loginResponse.setLoginMessage("이미 다른 **와 연동된 계정입니다. 간편 로그인 기능을 사용해주세요.");
+            return HttpStatus.UNAUTHORIZED;
+        }
+
         if(!isValidPassword(member)) {
             loginResponse.setLoginMessage("잘못된 비밀번호입니다.");
             return HttpStatus.UNAUTHORIZED;
