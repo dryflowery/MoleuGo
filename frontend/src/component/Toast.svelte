@@ -32,7 +32,7 @@
         color: white;
         border-radius: 0.5rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        z-index: 1000;
+        z-index: 2000;
 
         transition:
                 opacity 0.4s ease,
