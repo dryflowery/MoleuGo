@@ -1,4 +1,4 @@
-package com.Moleugo.moleugo.repository;
+package com.Moleugo.moleugo.repository.member;
 
 import com.Moleugo.moleugo.entity.Member;
 import jakarta.persistence.EntityManager;

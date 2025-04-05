@@ -3,7 +3,7 @@ package com.Moleugo.moleugo.service.member.profile;
 
 import com.Moleugo.moleugo.dto.PasswordChangeRequest;
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.repository.MemberRepository;
+import com.Moleugo.moleugo.repository.member.MemberRepository;
 import com.Moleugo.moleugo.service.member.auth.AuthService;
 import com.Moleugo.moleugo.validator.PasswordChangeValidator;
 import jakarta.servlet.http.HttpSession;
