@@ -1,7 +1,7 @@
 package com.Moleugo.moleugo.validator;
 
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.repository.MemberRepository;
+import com.Moleugo.moleugo.repository.member.MemberRepository;
 import com.Moleugo.moleugo.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;

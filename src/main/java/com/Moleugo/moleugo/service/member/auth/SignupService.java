@@ -1,7 +1,7 @@
 package com.Moleugo.moleugo.service.member.auth;
 
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.repository.MemberRepository;
+import com.Moleugo.moleugo.repository.member.MemberRepository;
 import com.Moleugo.moleugo.service.member.mail.MailService;
 import com.Moleugo.moleugo.validator.SignUpValidator;
 import com.Moleugo.moleugo.util.NicknameGenerator;
