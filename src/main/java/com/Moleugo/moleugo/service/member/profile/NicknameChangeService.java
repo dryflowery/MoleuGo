@@ -1,14 +1,13 @@
-package com.Moleugo.moleugo.service.member;
+package com.Moleugo.moleugo.service.member.profile;
 
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.repository.MemberRepository;
-import com.Moleugo.moleugo.service.validator.NicknameValidator;
+import com.Moleugo.moleugo.service.member.auth.LoginService;
+import com.Moleugo.moleugo.validator.NicknameValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -16,8 +15,15 @@ import java.util.List;
 public class NicknameChangeService {
     private final MemberRepository memberRepository;
     private final NicknameValidator nicknameValidator;
+    private final LoginService loginService;
 
-    public HttpStatus changeNickname(Member member, String newNickname) {
+    public HttpStatus changeNickname(String sessionId, String newNickname) {
+        Member member = loginService.getSession().getAttribute(sessionId) instanceof Member m ? m : null;
+
+        if (member == null) {
+            return HttpStatus.UNAUTHORIZED;
+        }
+
         if (!nicknameValidator.isValid(newNickname)) {
             return HttpStatus.BAD_REQUEST;
         }
@@ -27,4 +33,3 @@ public class NicknameChangeService {
         return HttpStatus.OK;
     }
 }
-

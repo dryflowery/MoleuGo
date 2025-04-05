@@ -1,9 +1,9 @@
-package com.Moleugo.moleugo.service.member;
+package com.Moleugo.moleugo.service.member.profile;
 
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.repository.MemberRepository;
-import com.Moleugo.moleugo.service.member.AuthService;
-import com.Moleugo.moleugo.service.MailService;
+import com.Moleugo.moleugo.service.member.auth.AuthService;
+import com.Moleugo.moleugo.service.member.mail.MailService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

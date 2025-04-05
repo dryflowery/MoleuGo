@@ -11,7 +11,6 @@ public interface MemberRepository {
     boolean isCorrectPassword(Member member);
     boolean isNormalMember(String email);
     boolean isGoogleMember(String email);
-    void updateAccountType(String email, String newAccountType);
     void updateEmail(String oldEmail, String newEmail);
     void updatePassword(String email, String encodedPassword);
     void updateNickname(String email, String newNickname);

@@ -1,4 +1,4 @@
-package com.Moleugo.moleugo.service.validator;
+package com.Moleugo.moleugo.validator;
 
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.repository.MemberRepository;

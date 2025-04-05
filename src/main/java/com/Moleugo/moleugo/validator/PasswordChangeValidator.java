@@ -1,4 +1,4 @@
-package com.Moleugo.moleugo.service.validator;
+package com.Moleugo.moleugo.validator;
 
 import com.Moleugo.moleugo.dto.PasswordChangeRequest;
 import org.springframework.stereotype.Component;

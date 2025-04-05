@@ -3,7 +3,7 @@ package com.Moleugo.moleugo.controller.member;
 import com.Moleugo.moleugo.dto.NicknameChangeRequest;
 import com.Moleugo.moleugo.dto.PasswordChangeRequest;
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.service.member.MemberService;
+import com.Moleugo.moleugo.service.member.facade.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -85,6 +85,4 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
-
 }

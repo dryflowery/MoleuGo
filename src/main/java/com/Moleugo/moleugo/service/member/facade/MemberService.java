@@ -1,13 +1,17 @@
-package com.Moleugo.moleugo.service.member;
+package com.Moleugo.moleugo.service.member.facade;
 
 import com.Moleugo.moleugo.dto.PasswordChangeRequest;
 import com.Moleugo.moleugo.entity.Member;
+import com.Moleugo.moleugo.service.member.auth.LoginService;
+import com.Moleugo.moleugo.service.member.auth.SignupService;
+import com.Moleugo.moleugo.service.member.profile.EmailChangeService;
+import com.Moleugo.moleugo.service.member.profile.NicknameChangeService;
+import com.Moleugo.moleugo.service.member.profile.PasswordChangeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import jakarta.servlet.http.HttpSession;
-import com.Moleugo.moleugo.service.member.EmailChangeService;
 
 
 @Service
@@ -70,9 +74,6 @@ public class MemberService {
     }
 
     public HttpStatus changeNickname(String sessionId, String newNickname) {
-        Member member = loginService.getSession().getAttribute(sessionId) instanceof Member m ? m : null;
-        if (member == null) return HttpStatus.UNAUTHORIZED;
-
-        return nicknameChangeService.changeNickname(member, newNickname);
+        return nicknameChangeService.changeNickname(sessionId, newNickname);
     }
 }
