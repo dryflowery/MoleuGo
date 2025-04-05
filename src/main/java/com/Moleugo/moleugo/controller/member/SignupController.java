@@ -1,7 +1,7 @@
 package com.Moleugo.moleugo.controller.member;
 
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.service.member.MemberService;
+import com.Moleugo.moleugo.service.member.facade.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

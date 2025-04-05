@@ -1,4 +1,4 @@
-package com.Moleugo.moleugo.service.member;
+package com.Moleugo.moleugo.service.member.auth;
 
 import com.Moleugo.moleugo.entity.Member;
 import jakarta.servlet.http.HttpSession;

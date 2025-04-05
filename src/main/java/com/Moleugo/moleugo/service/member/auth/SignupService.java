@@ -1,9 +1,9 @@
-package com.Moleugo.moleugo.service.member;
+package com.Moleugo.moleugo.service.member.auth;
 
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.repository.MemberRepository;
-import com.Moleugo.moleugo.service.MailService;
-import com.Moleugo.moleugo.service.validator.SignUpValidator;
+import com.Moleugo.moleugo.service.member.mail.MailService;
+import com.Moleugo.moleugo.validator.SignUpValidator;
 import com.Moleugo.moleugo.util.NicknameGenerator;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

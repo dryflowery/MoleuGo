@@ -51,11 +51,6 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public void updateAccountType(String email, String newAccountType) {
-        findByEmail(email).setAccount_type(newAccountType);
-    }
-
-    @Override
     public void updateEmail(String oldEmail, String newEmail) {
         Member oldMember = findByEmail(oldEmail);
         if (oldMember != null) {

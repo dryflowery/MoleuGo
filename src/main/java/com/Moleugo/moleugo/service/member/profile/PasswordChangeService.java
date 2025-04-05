@@ -1,10 +1,11 @@
 // service/member/PasswordChangeService.java
-package com.Moleugo.moleugo.service.member;
+package com.Moleugo.moleugo.service.member.profile;
 
 import com.Moleugo.moleugo.dto.PasswordChangeRequest;
 import com.Moleugo.moleugo.entity.Member;
 import com.Moleugo.moleugo.repository.MemberRepository;
-import com.Moleugo.moleugo.service.validator.PasswordChangeValidator;
+import com.Moleugo.moleugo.service.member.auth.AuthService;
+import com.Moleugo.moleugo.validator.PasswordChangeValidator;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
