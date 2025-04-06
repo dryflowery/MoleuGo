@@ -23,12 +23,15 @@ public interface MemberRepository {
     boolean isGoogleMember(String email);
 
     // 이메일 수정
-    void updateEmail(String oldEmail, String newEmail);
+    void updateEmail(Member newMember, String oldEmail);
 
     // 비밀번호 수정
-    void updatePassword(String email, String encodedPassword);
+    void updatePassword(Member updatedMember);
 
     // 닉네임 수정
-    void updateNickname(String email, String newNickname);
+    void updateNickname(Member updatedMember);
+
+    // 멤버 객체 갱신
     List<Member> findAll();
+
 }
