@@ -57,34 +57,43 @@ public class EmailChangeService {
      * 인증 메일 링크 클릭 시 이메일을 실제로 변경
      */
     public HttpStatus confirmEmailChange(String uuid) {
-        Member newMember = (Member) session.getAttribute(uuid);
+        Member sessionMember = (Member) session.getAttribute(uuid);
         String oldEmail = (String) session.getAttribute("old_email_" + uuid);
 
-        if (newMember == null || oldEmail == null) {
+        if (sessionMember == null || oldEmail == null) {
             return HttpStatus.NOT_FOUND;
         }
-
-        log.info("이메일 변경 시도: {} → {}", oldEmail, newMember.getEmail());
 
         session.removeAttribute(uuid);
         session.removeAttribute("old_email_" + uuid);
 
-        memberRepository.updateEmail(oldEmail, newMember.getEmail());
+        //새 Member 구성 (모든 필드 복사)
+        Member oldMember = memberRepository.findByEmail(oldEmail);
+        Member newMember = new Member(
+                sessionMember.getEmail(),
+                oldMember.getPassword(),
+                oldMember.getAccount_type(),
+                null,
+                oldMember.getNickname()
+        );
 
+        // Repository에 "저장/삭제" 요청
+        memberRepository.updateEmail(newMember, oldEmail);
+
+        // 세션 갱신
         Enumeration<String> attributeNames = session.getAttributeNames();
-
-        while (attributeNames.hasMoreElements()) { // 세션 내 user_session도 새 이메일로 업데이트
+        while (attributeNames.hasMoreElements()) {
             String attr = attributeNames.nextElement();
             Object obj = session.getAttribute(attr);
 
-            if (obj instanceof Member member && member.getEmail().equals(oldEmail)) {
-                Member updatedMember = memberRepository.findByEmail(newMember.getEmail());
-                session.setAttribute(attr, updatedMember); // 세션 갱신
-                log.info("세션 이메일 업데이트 완료: {}", updatedMember.getEmail());
+            if (obj instanceof Member m && m.getEmail().equals(oldEmail)) {
+                session.setAttribute(attr, newMember);
+                log.info("세션 이메일 업데이트 완료: {}", newMember.getEmail());
                 break;
             }
         }
 
         return HttpStatus.OK;
     }
+
 }

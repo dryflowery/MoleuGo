@@ -28,8 +28,18 @@ public class NicknameChangeService {
             return HttpStatus.BAD_REQUEST;
         }
 
-        member.setNickname(newNickname);
-        memberRepository.updateNickname(member.getEmail(), newNickname);
+        Member updatedMember = new Member(
+                member.getEmail(),
+                member.getPassword(),
+                member.getAccount_type(),
+                null,
+                newNickname
+        );
+
+        memberRepository.updateNickname(updatedMember);
+
+        loginService.getSession().setAttribute(sessionId, updatedMember); // 세션도 새 객체로 교체
+
         return HttpStatus.OK;
     }
 }

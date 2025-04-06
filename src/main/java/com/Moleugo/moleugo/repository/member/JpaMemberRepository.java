@@ -36,9 +36,7 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public boolean isCorrectPassword(Member member) {
-        return encoder.matches(member.getPassword(), findByEmail(member.getEmail()).getPassword());
-    }
+    public boolean isCorrectPassword(Member member) { return encoder.matches(member.getPassword(), findByEmail(member.getEmail()).getPassword()); }
 
     @Override
     public boolean isNormalMember(String email) {
@@ -51,19 +49,7 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public void updateEmail(String oldEmail, String newEmail) {
-        Member oldMember = findByEmail(oldEmail);
-        if (oldMember != null) {
-            Member newMember = new Member(
-                    newEmail,
-                    oldMember.getPassword(),
-                    oldMember.getAccount_type(),
-                    null,
-                    oldMember.getNickname()
-            );
-            em.persist(newMember);   // 새 회원 먼저 등록
-            em.remove(oldMember);    // 기존 회원 제거
-        }
+    public void updateEmail(Member newMember, String oldEmail) { em.persist(newMember); em.remove(findByEmail(oldEmail));
     }
 
     @Override
@@ -72,18 +58,9 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public void updatePassword(String email, String encodedPassword) {
-        Member member = findByEmail(email);
-        if (member != null) {
-            member.setPassword(encodedPassword);
-        }
-    }
+    public void updatePassword(Member updatedMember) { em.merge(updatedMember); }
 
     @Override
-    public void updateNickname(String email, String newNickname) {
-        Member member = findByEmail(email);
-        if (member != null) {
-            member.setNickname(newNickname);
-        }
-    }
+    public void updateNickname(Member updatedMember) { em.merge(updatedMember); }
+
 }
