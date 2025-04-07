@@ -43,7 +43,7 @@ public class PasswordChangeService {
                 sessionMember.getNickname()
         );
 
-        memberRepository.updatePassword(updatedMember); // Repository에 저장
+        memberRepository.updateMember(updatedMember); // Repository에 저장
 
         session.setAttribute(sessionId, sessionMember); // 세션 갱신
 

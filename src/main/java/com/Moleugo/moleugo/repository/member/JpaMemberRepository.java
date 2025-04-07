@@ -58,9 +58,6 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public void updatePassword(Member updatedMember) { em.merge(updatedMember); }
-
-    @Override
-    public void updateNickname(Member updatedMember) { em.merge(updatedMember); }
+    public void updateMember(Member updatedMember) { em.merge(updatedMember); }
 
 }
