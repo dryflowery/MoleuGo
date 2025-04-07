@@ -25,7 +25,10 @@ public class NicknameChangeService {
         }
 
         if (!nicknameValidator.isValid(newNickname)) {
-            return HttpStatus.BAD_REQUEST;
+            if (nicknameValidator.isDuplicate(newNickname)) {
+                return HttpStatus.CONFLICT; //409 반환
+            }
+            return HttpStatus.BAD_REQUEST; // 그 외 400
         }
 
         Member updatedMember = new Member(
@@ -36,7 +39,7 @@ public class NicknameChangeService {
                 newNickname
         );
 
-        memberRepository.updateNickname(updatedMember);
+        memberRepository.updateMember(updatedMember);
 
         loginService.getSession().setAttribute(sessionId, updatedMember); // 세션도 새 객체로 교체
 

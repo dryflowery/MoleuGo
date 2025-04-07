@@ -38,7 +38,7 @@ public class NicknameValidator {
         return BLOCKED_WORDS.stream().anyMatch(nickname::contains);
     }
 
-    private boolean isDuplicate(String nickname) {
+    public  boolean isDuplicate(String nickname) {
         return memberRepository.findAll().stream()
                 .anyMatch(member -> nickname.equals(member.getNickname()));
     }
