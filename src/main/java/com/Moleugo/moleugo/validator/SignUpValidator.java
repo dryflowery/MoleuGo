@@ -1,7 +1,7 @@
-package com.Moleugo.moleugo.service.validator;
+package com.Moleugo.moleugo.validator;
 
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.repository.MemberRepository;
+import com.Moleugo.moleugo.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class SignUpValidator {
     private final MemberRepository memberRepository;
 
-    public HttpStatus isFormValid(Member member) {
+    public HttpStatus isValidForm(Member member) {
         if(isDuplicatedEmail(member)) {
             return HttpStatus.CONFLICT;
         }

@@ -150,8 +150,13 @@
         }
     };
 
-    const createRandomElement = (e) => {
+    const createRandomElement = async (e) => {
         InitAnimation();
+
+        let tableElement = document.getElementById('bs-array');
+        tableElement.style.transition = 'opacity 0.25s ease';
+        tableElement.style.opacity = 0;
+        await delay(250);
 
         const elementCnt = e.detail.elementCnt;
         arr = [];
@@ -165,10 +170,19 @@
         low = 0;
         high = arr.length - 1;
         mid = Math.floor((low + high) / 2);
+
+        tableElement.style.opacity = 1;
+        await delay(250);
+        tableElement.style.transition = 'opacity 0s ease';
     };
 
-    const createInputtedElement = (e) => {
+    const createInputtedElement = async (e) => {
         InitAnimation();
+
+        let tableElement = document.getElementById('bs-array');
+        tableElement.style.transition = 'opacity 0.25s ease';
+        tableElement.style.opacity = 0;
+        await delay(250);
 
         arr = e.detail.tmpArr;
         arr.sort((a, b) => a - b);
@@ -176,6 +190,10 @@
         low = 0;
         high = arr.length - 1;
         mid = Math.floor((low + high) / 2);
+
+        tableElement.style.opacity = 1;
+        await delay(250);
+        tableElement.style.transition = 'opacity 0s ease';
     };
 
     const startBinarySearch = (e) => {

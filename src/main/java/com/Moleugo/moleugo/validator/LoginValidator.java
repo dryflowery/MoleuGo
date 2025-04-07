@@ -1,7 +1,7 @@
-package com.Moleugo.moleugo.service.validator;
+package com.Moleugo.moleugo.validator;
 
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.repository.MemberRepository;
+import com.Moleugo.moleugo.repository.member.MemberRepository;
 import com.Moleugo.moleugo.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -19,6 +19,11 @@ public class LoginValidator {
     public HttpStatus isValidLogin(Member member) {
         if(!isValidEmail(member)) {
             loginResponse.setLoginMessage("등록되지 않은 이메일 주소입니다.");
+            return HttpStatus.UNAUTHORIZED;
+        }
+
+        if(!memberRepository.isNormalMember(member.getEmail())) {
+            loginResponse.setLoginMessage("이미 다른 **와 연동된 계정입니다. 간편 로그인 기능을 사용해주세요.");
             return HttpStatus.UNAUTHORIZED;
         }
 

@@ -1,4 +1,4 @@
-package com.Moleugo.moleugo.service;
+package com.Moleugo.moleugo.service.member.mail;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

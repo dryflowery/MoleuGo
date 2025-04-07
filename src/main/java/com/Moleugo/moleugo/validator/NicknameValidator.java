@@ -1,6 +1,6 @@
-package com.Moleugo.moleugo.service.validator;
+package com.Moleugo.moleugo.validator;
 
-import com.Moleugo.moleugo.repository.MemberRepository;
+import com.Moleugo.moleugo.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -38,7 +38,7 @@ public class NicknameValidator {
         return BLOCKED_WORDS.stream().anyMatch(nickname::contains);
     }
 
-    private boolean isDuplicate(String nickname) {
+    public  boolean isDuplicate(String nickname) {
         return memberRepository.findAll().stream()
                 .anyMatch(member -> nickname.equals(member.getNickname()));
     }

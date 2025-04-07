@@ -1,7 +1,7 @@
 package com.Moleugo.moleugo.controller.member;
 
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.service.member.MemberService;
+import com.Moleugo.moleugo.service.member.facade.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ public class SignupController {
     @GetMapping("/signup/{uuid}")
     public String signUp(@PathVariable("uuid") String uuid) {
         if(memberService.signUp(uuid) == HttpStatus.CREATED) {
-            return "redirect:/#/signup-result?result=" + "normal-signup-success";
+            return "redirect:/#/signup-result?result=" + "signup-success";
         }
         else {
             return "redirect:/#";
@@ -40,13 +40,10 @@ public class SignupController {
         HttpStatus googleSignupStatus = memberService.googleSignUp(code);
 
         if(googleSignupStatus == HttpStatus.CREATED) {
-            return "redirect:/#/signup-result?result=" + "google-signup-success";
-        }
-        else if(googleSignupStatus == HttpStatus.OK) {
-            return "redirect:/#/signup-result?result=" + "google-link-success";
+            return "redirect:/#/signup-result?result=" + "signup-success";
         }
         else {
-            return "redirect:/#/signup-result?result=" + "exist-google-account";
+            return "redirect:/#/signup-result?result=" + "exist-account";
         }
     }
 }

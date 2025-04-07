@@ -1,10 +1,9 @@
-package com.Moleugo.moleugo.service.member;
+package com.Moleugo.moleugo.service.member.auth;
 
 import com.Moleugo.moleugo.entity.Member;
-import com.Moleugo.moleugo.repository.JpaMemberRepository;
-import com.Moleugo.moleugo.repository.MemberRepository;
+import com.Moleugo.moleugo.repository.member.MemberRepository;
 import com.Moleugo.moleugo.response.LoginResponse;
-import com.Moleugo.moleugo.service.validator.LoginValidator;
+import com.Moleugo.moleugo.validator.LoginValidator;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ public class LoginService {
         HttpStatus loginStatus = loginValidator.isValidLogin(member);
 
         if (loginStatus == HttpStatus.OK) {
-            member.setPassword(authService.encode(member.getPassword()));
             createLoginInfo(member);
         }
 
@@ -76,5 +74,4 @@ public class LoginService {
     public HttpSession getSession() {
         return session;
     }
-
 }
