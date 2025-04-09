@@ -1,5 +1,6 @@
 package com.Moleugo.moleugo.controller.member;
 
+import com.Moleugo.moleugo.dto.FindPasswordRequest;
 import com.Moleugo.moleugo.dto.NicknameChangeRequest;
 import com.Moleugo.moleugo.dto.PasswordChangeRequest;
 import com.Moleugo.moleugo.entity.Member;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
-
+    private final HttpSession session;
     private final MemberService memberService;
 
     @GetMapping("/email")
@@ -41,9 +42,11 @@ public class UserController {
     public String confirmEmailChange(@PathVariable String uuid) {
         HttpStatus status = memberService.confirmEmailChange(uuid);
         if (status == HttpStatus.OK) {
-            return "redirect:/#/signup-result?result=email-change-success";
+            return "redirect:/#/result?type=" + "email-change-success";
         }
-        return "redirect:/#/signup-result?result=email-change-fail";
+        else {
+            return "redirect:/#/result?type=" + "fail";
+        }
     }
 
     @PostMapping("/change-password")
@@ -84,5 +87,29 @@ public class UserController {
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @PostMapping("/find-password/verify-email")
+    public void sendVerificationEmail(@RequestBody FindPasswordRequest req) {
+        memberService.sendVerificationEmail(req);
+    }
+
+    @GetMapping("/find-password/{uuid}")
+    public String setTemporaryPassword(@PathVariable("uuid") String uuid) {
+        Member member = (Member) session.getAttribute(uuid);
+
+        if(session.getAttribute(uuid) != null) {
+            memberService.setTemporaryPassword(uuid);
+            return "redirect:/#/result?type=" + "find-password-success" + "&uuid=" + uuid;
+        }
+        else {
+            return "redirect:/#/result?type=" + "fail";
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/get-temporary-password/{uuid}")
+    public String getTemporaryPassword(@PathVariable("uuid") String uuid) {
+        return memberService.getTemporaryPassword(uuid);
     }
 }
