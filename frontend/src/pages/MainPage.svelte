@@ -37,9 +37,17 @@
               <div id="dailyGoal-box-content-body">
 
                 <div class="dailyGoal-box-content-body-left">
-                  <div class="section">첫 번째 구역</div>
-                  <div class="section">두 번째 구역</div>
-                  <div class="section">세 번째 구역</div>
+                  <div class="section">
+                    일일 목표_1
+                  </div>
+
+                  <div class="section">
+                    일일 목표_2
+                  </div>
+
+                  <div class="section">
+                    일일 목표_3
+                  </div>
                 </div>
 
                 <div id="dailyGoal-box-content-body-right">
@@ -246,16 +254,18 @@
   .dailyGoal-box-content-body-left {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 75%;
+    padding: 30px 0px 0px 10px;
   }
 
   .dailyGoal-box-content-body-left .section {
     flex: 1;
     padding: 8px;
+
   }
 
   #dailyGoal-box-content-body-right {
-    padding: 5px 0px 0px 0px;
+    padding: 10px 0px 0px 0px;
   }
 
   .dailyGoal-content {
