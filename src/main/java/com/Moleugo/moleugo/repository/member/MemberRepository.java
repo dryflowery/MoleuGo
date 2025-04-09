@@ -25,10 +25,12 @@ public interface MemberRepository {
     // 이메일 수정
     void updateEmail(Member newMember, String oldEmail);
 
+    // 비밀번호 변경
+    void updatePassword(String email, String password);
+
     // 멤버 객체 갱신
     void updateMember(Member updatedMember);
 
     // 멤버 객체 모두찾기
     List<Member> findAll();
-
 }

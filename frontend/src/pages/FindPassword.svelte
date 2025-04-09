@@ -1,106 +1,219 @@
+<script>
+	import {push} from "svelte-spa-router";
+
+	let findPasswordHttpStatusCode;
+	let inputEmail = "";
+	let emailErrorMessage = "";
+	let changeToVerifyEmailPage = false;
+
+	// 이메일 유효성 검사
+	const validateEmail = (email) => {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+		if (!emailRegex.test(email)) {
+			emailErrorMessage = "이메일 형식이 올바르지 않습니다.";
+		} else {
+			emailErrorMessage = "";
+		}
+	};
+
+	const isValidEmail = () => {
+		return inputEmail !== "" && emailErrorMessage === "";
+	};
+
+	const sendVerifyEmailRequest = () => {
+		return fetch('/user/find-password/verify-email', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				email: inputEmail,
+			})
+		});
+	};
+
+	const findPassword = () => {
+		if(!isValidEmail()) {
+			return;
+		}
+
+		changeToVerifyEmailPage = true;
+		sendVerifyEmailRequest();
+	};
+</script>
+
+
 <main>
-	<body>
-    
-		<div class="box">
-			<br>
-			<h1>MoleuGo</h1>
+	<div class="app-container">
+		<div class="form-container">
+			{#if changeToVerifyEmailPage === false}
+				<h1>비밀번호 찾기</h1>
+				<p style="font-size: 0.9rem">가입한 이메일을 입력해 주세요.<br>이메일을 통해 비밀번호 재설정 메일을 보내드립니다.</p>
 
-			<h2>비밀번호 찾기</h2>
-			<h3>가입한 이메일을 입력해 주세요. <br>
-				이메일을 통해 비밀번호 재설정 메일을 보내드립니다.</h3>
-			
-			<br><br><br>
+				<form on:submit|preventDefault={findPassword}>
+					<!-- 이메일 입력 -->
+					<div class="input-field">
+						<label for="email">이메일</label>
 
-			<div class="container">
-				<div class="submit-text">이메일</div> 
-				<input type="email" class="input-box" placeholder="example@MoleuGo.com">
-				<button class="submit-button" style="margin-left: 10px;">인증</button>
-			</div>
-			
-			<br>
+						<input
+								id="sign-up-email-input"
+								type="email"
+								placeholder="example@moleugo.com"
+								bind:value={inputEmail}
+								on:input={() => validateEmail(inputEmail)}
+						/>
 
-			<div class="container">
-				<button class="submit-button" style="width: 19.8vw;">비밀번호 재설정</button>
-			</div>
+						{#if emailErrorMessage}
+							<p class="error-message">{emailErrorMessage}</p>
+						{/if}
+					</div>
 
+					<!-- 가입 버튼 -->
+					<button type="submit" class="submit-button">
+						전송하기
+					</button>
+				</form>
+			{:else}
+				<h1>인증 메일을 보내드렸어요.</h1><br>
+				<img src="assets/mail.png" width="120px" alt="">
+
+				<br><br>
+				<p style="color: white; padding-top: 7.5px;">메일함을 확인해주세요.</p>
+				<p style="color: white; padding-top: 7.5px;">가입하신 이메일을 인증해주시면,</p>
+				<p style="color: white; padding-top: 7.5px;">비밀번호 재설정이 가능해요.</p>
+
+				<button class="return-to-main-button" on:click={() => push('/')}>
+					메인화면으로 돌아가기
+				</button>
+			{/if}
 		</div>
-	</body>
+	</div>
 </main>
 
 <style>
-	body {
-		margin: 0;
-		padding: 0;
-		width: 100vw;
-		height: 100vh;
-		background-color: #000000;  
-	}
 
-	.box {
-		width: 35vw;  
-		height: 98%; 
-		background-color: #101010;
-		border-radius: 20px; 
-		position: absolute;   
-		top: 50%;              
-		left: 50%;             
-		transform: translate(-50%, -50%);  
-		display: flex;         
-		flex-direction: column;  
-		align-items: center;      
-		text-align: center;   
-	}
-
-	h1, h2{
-		padding: 0; 
-		color: #fff; 
-	}
-
-	h3 {
-		font-size: 0.8rem;  
-		color: #424141;   
-	}
-
-	.container {
-		display: flex; 
-		justify-content: flex-start;
+	/* 전체 컨테이너 스타일 */
+	.app-container {
+		display: flex;
+		flex-direction: column;
 		align-items: center;
-		position: relative; 
+		justify-content: flex-start;
+		min-height: 100vh;
+		background-color: rgb(20, 20, 20);
+		padding: 20px;
+		box-sizing: border-box;
 	}
 
-	.submit-text {
-		font-size: 13px;  
-		color: #fff;
+	/* 헤더 스타일 */
+	.header {
+		margin-bottom: 20px;
+	}
+
+	.logo {
+		text-align: center;
+	}
+
+	/* 폼 컨테이너 스타일 */
+	.form-container {
+		width: 100%;
+		height: 650px;
+		max-width: 400px;
+		text-align: center;
+	}
+
+	h1 {
+		margin-bottom: 8px;
+		font-size: 1.5rem;
+		color: #ffffff;
+	}
+
+	p {
 		margin: 0;
-		position: absolute;
-		left: 1px;; 
-		top: -25px; 
+		font-size: 1rem;
+		color: #8d8d8d;
+	}
+
+	form {
+		align-items: center;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		margin: 50px 0px 10px;
+	}
+
+	.input-field {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		position: relative;
+	}
+
+	label {
+		text-align: left;
+		font-size: 1rem;
+		color: #ffffff;
+	}
+
+	input {
+		background-color: #414141;
+		padding: 10px;
+		border: 1px solid #292929;
+		border-radius: 6px;
+		font-size: 1rem;
+		width: 300px;
+		height: 20px;
+		color: #ffffff;
+	}
+
+	input:focus {
+		outline: none;
+		border-color: #ffffff;
+	}
+
+	.submit-button {
+		padding: 12px;
+		background-color: #00a000;
+		color: #fff;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 1rem;
+		font-weight: bold;
+		width: 322px;
 	}
 
 	.submit-button:hover {
-		background-color: #444; 
+		background-color: #007d00;
 	}
 
-	.input-box {
-        padding: 5px;
-        font-size: 1.2rem;
-        width: 15.5vw;
-        border: 2px solid #131b1a;
-        border-radius: 10px;
-        background-color: #131b1a;
-        color: #fff;
-        height: 30px; 
-    }
+	.return-to-main-button {
+		padding: 12px;
+		background-color: #00a000;
+		color: #fff;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 1rem;
+		font-weight: bold;
+		width: 270px;
+		margin-top: 30px;
+	}
+	.return-to-main-button:hover {
+		background-color: #007d00;
+	}
 
-	.submit-button {
-        font-size: 1.2rem; 
-        background-color: #086c42;
-        color: #fff;
-        border-radius: 10px;
-        cursor: pointer;
-        border: none;
-        height: 44px; 
-        padding: 0 10px; 
-    }
+	.error-message {
+		margin-top: 5px;
+		font-size: 0.85rem;
+		color: rgb(173, 44, 44);
+		text-align: left;
+	}
 
+	@media (min-width: 2560px) {
+		.header {
+			margin-bottom: 20px;
+			margin-top: 130px;
+		}
+	}
 </style>
