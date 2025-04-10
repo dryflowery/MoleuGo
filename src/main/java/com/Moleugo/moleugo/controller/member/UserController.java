@@ -19,18 +19,6 @@ public class UserController {
     private final HttpSession session;
     private final MemberService memberService;
 
-    @GetMapping("/email")
-    public ResponseEntity<String> getUserEmail(@CookieValue(value = "user_session", required = false) String userSession) {
-        HttpSession session = memberService.getSession();
-        if (userSession != null) {
-            Member member = (Member) session.getAttribute(userSession);
-            if (member != null) {
-                return ResponseEntity.ok(member.getEmail());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
     @PostMapping("/change-email-request")
     public ResponseEntity<?> requestEmailChange(@CookieValue("user_session") String sessionId,
                                                 @RequestBody Member newMemberInfo) {
@@ -57,36 +45,11 @@ public class UserController {
 
     }
 
-    @GetMapping("/nickname")
-    public ResponseEntity<String> getUserNickname(@CookieValue(value = "user_session", required = false) String userSession) {
-        HttpSession session = memberService.getSession();
-        if (userSession != null) {
-            Member member = (Member) session.getAttribute(userSession);
-            if (member != null) {
-
-                return ResponseEntity.ok(member.getNickname());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
     @PostMapping("/change-nickname")
     public ResponseEntity<?> changeNickname(@CookieValue("user_session") String sessionId,
                                             @RequestBody NicknameChangeRequest req) {
         HttpStatus status = memberService.changeNickname(sessionId, req.getNewNickname());
         return ResponseEntity.status(status).build();
-    }
-
-    @GetMapping("/account-type")
-    public ResponseEntity<String> getUserAccountType(@CookieValue(value = "user_session", required = false) String userSession) {
-        HttpSession session = memberService.getSession();
-        if (userSession != null) {
-            Member member = (Member) session.getAttribute(userSession);
-            if (member != null) {
-                return ResponseEntity.ok(member.getAccount_type());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/find-password/verify-email")
