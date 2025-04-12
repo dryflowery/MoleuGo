@@ -3,10 +3,11 @@
     import Header from "../component/Header.svelte";
     import Toast from '../component/Toast.svelte';
 
-    import {BAD_REQUEST, CONFLICT, FORBIDDEN, OK, UNAUTHORIZED} from "../lib/httpStatusStore.js";
-    import {isListVisible} from "../lib/store"
-    import {onMount} from "svelte";
-    import {writable} from "svelte/store";
+    import { BAD_REQUEST, CONFLICT, FORBIDDEN, OK, UNAUTHORIZED } from "../lib/httpStatusStore.js";
+    import { isListVisible } from "../lib/store"
+    import { onMount } from "svelte";
+    import { writable } from "svelte/store";
+    import { push } from "svelte-spa-router";
 
     let showToast = false;
     let toastMessage = '';
@@ -59,8 +60,10 @@
     const scaleFactorStore = writable(1);
     let showEmailInfo = false; // 설명 표시 여부
 
-    let year = 2025;
-    let achievedCount = Array.from({ length: 365 }, () => 0);
+    let dailyGoalYear = 2025; // dailyGoalYear년의 일일 목표 출력
+    let achievedCount = Array.from({ length: 371 }, () => 3);
+    let weeksByMonth = []; // 각 달의 시작일이 몇 주차인지
+    let monthMargin = 13.25;
 
     const socialIcons = {
         google: {
@@ -76,7 +79,7 @@
 
         if (timeout) {
             setTimeout(() => {
-              showToast = false;
+                showToast = false;
             }, 2000); // 2초 후 자동 숨김
         }
     };
@@ -220,7 +223,7 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                  newNickname: userName
+                    newNickname: userName
                 })
             });
 
@@ -300,9 +303,12 @@
             else if (currentSetting === "password") {
                 currentHeight = 720 * scaleFactor;
             }
+
+            monthMargin = 13.25
         }
         else {
             currentHeight = 525 * scaleFactor; // 고정 높이
+            monthMargin = 18.2;
         }
     }
 
@@ -321,9 +327,12 @@
             else if (currentSetting === "password") {
                 currentHeight_U = 27 * scaleFactor;
             }
+
+            monthMargin = 13.25
         }
         else {
             currentHeight_U = 224 * scaleFactor; // 고정 높이
+            monthMargin = 18.2;
         }
     }
 
@@ -350,11 +359,11 @@
 
     // 이메일 요청
     const fetchEmail = async () => {
-      const emailRes = await fetch('/mypage/email', {credentials: 'include'});
+        const emailRes = await fetch('/mypage/email', {credentials: 'include'});
 
-      if (emailRes.ok) {
-        myEmail = await emailRes.text();
-      }
+        if (emailRes.ok) {
+            myEmail = await emailRes.text();
+        }
     };
 
     // 닉네임 요청
@@ -375,17 +384,28 @@
         const typeRes = await fetch('/mypage/account-type', {credentials: 'include'});
 
         if (typeRes.ok) {
-          accountType = await typeRes.text();
+            accountType = await typeRes.text();
         }
     };
 
     // 일일 목표를 가져와요
     const fetchDailyGoal = async () => {
-        const dailyGoalRes = await fetch('/mypage/daily-goal', { credentials: 'include' });
+        const dailyGoalRes = await fetch('/mypage/daily-goal', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dailyGoalYear)
+        });
+
         achievedCount = await dailyGoalRes.json();
+        getMonthStartWeek();
     };
 
+    // 페이지 로드될 때 요소들 초기화
     onMount(async () => {
+        getMonthStartWeek();
         await fetchEmail();
         await fetchNickname();
         await fetchAccountType();
@@ -394,7 +414,10 @@
 
     // 값에 따라 배경색을 결정하는 함수
     const getColorByValue = (value) => {
-        if (value === 0) {
+        if(value === -1) {
+            return "transparent";
+        }
+        else if (value === 0) {
             return "#48413b";
         }
         else if (value === 1) {
@@ -407,6 +430,64 @@
             return "#1a5321";
         }
     };
+
+    // 각 달이 몇 주차에 시작하는지 구하는 함수
+    const getMonthStartWeek = () => {
+        weeksByMonth = [0];
+        const jan1 = new Date(dailyGoalYear, 0, 1);
+
+        // 1월 1일이 속한 주의 일요일
+        const startOfFirstWeek = new Date(jan1);
+        startOfFirstWeek.setDate(jan1.getDate() - jan1.getDay());
+
+        for (let month = 0; month < 12; month++) {
+            const firstDayOfMonth = new Date(dailyGoalYear, month, 1);
+            const diffInDays = Math.floor((firstDayOfMonth.getTime() - startOfFirstWeek.getTime()) / (1000 * 60 * 60 * 24));
+            const weekNumber = Math.floor(diffInDays / 7);
+
+            weeksByMonth.push(weekNumber);
+        }
+    };
+
+    // N번째 일이 몇 월 몇 일인지 구하는 함수
+    const getDateByDayOfYear = (dayOfYear) => {
+        const date = new Date(dailyGoalYear, 0);
+        date.setDate(dayOfYear);
+
+        return {
+            month: date.getMonth() + 1,
+            date: date.getDate()
+        };
+    }
+
+    // 잔디에 커서 올리면 해당 년, 월, 일에 달성한 일일 목표 개수 알려주는 코드
+    const showDailyGoalInfo = (idx) => {
+        let startDay;
+
+        for(let i = 0; i < achievedCount.length; i++) {
+            if(achievedCount[i] !== -1) {
+                startDay = idx - i + 1;
+                break;
+            }
+        }
+
+        const { month, date } = getDateByDayOfYear(startDay);
+        const msg = `${dailyGoalYear}년 ${month}월 ${date}일 일일 목표 달성 횟수는 ${achievedCount[idx]}회`;
+        showToastMessage(msg, "info", false);
+    };
+
+    // 잔디에서 커서 치웠을 때 toast 숨기기
+    const hideDailyGoalInfo = () => {
+        if(toastType === "info") {
+            showToast = false;
+        }
+    };
+
+    // 사용자가 잔디 위의 숫자 클릭해서 보고 싶은 년도로 변경
+    const changeDailyGoalYear = (selectedYear) => {
+        dailyGoalYear = selectedYear;
+        fetchDailyGoal();
+    }
 </script>
 
 <main>
@@ -721,47 +802,95 @@
                     <span id='activity-title'>활동 내역</span>
                     <div id="activity-top-container">
                         <div class="lawn-container">
-
-                            <span id='lawn-title'></span>
-
-                            <div id="lawn-box">
-                                <div class="grid-container">
-                                    {#each achievedCount as countValue}
-                                        <div
-                                                class="lawn"
-                                                style="background-color: {getColorByValue(countValue)};"
-                                        >
-                                        </div>
-                                    {/each}
-                                </div>
+                            <div id='lawn-year-container'>
+                                {#each [2025, 2024, 2023, 2022, 2021] as year}
+                                    <div class="lawn-year {dailyGoalYear === year ? 'selected' : ''}"
+                                         on:click={() => changeDailyGoalYear(year)}>{year}
+                                    </div>
+                                {/each}
                             </div>
 
+                            <div id="lawn-box">
+                                <!-- 박스 왼쪽(요일 있는 영역) -->
+                                <div id="lawn-left">
+                                    <div class="nope"></div>
+                                    <!-- 요일 -->
+                                    <div id="lawn-day-container">
+                                        <div class="lawn-day">Mon</div>
+                                        <div class="lawn-day">Wed</div>
+                                        <div class="lawn-day">Fri</div>
+                                    </div>
+
+                                    <div class="nope"></div>
+                                </div>
+
+                                <!-- 박스 오른쪽 -->
+                                <div id="lawn-right">
+                                    <div id="lawn-month-container">
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[1] - weeksByMonth[0]) * monthMargin}px">Jan</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[2] - weeksByMonth[1]) * monthMargin}px">Feb</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[3] - weeksByMonth[2]) * monthMargin}px">Mar</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[4] - weeksByMonth[3]) * monthMargin}px">Apr</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[5] - weeksByMonth[4]) * monthMargin}px">May</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[6] - weeksByMonth[5]) * monthMargin}px">Jun</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[7] - weeksByMonth[6]) * monthMargin}px">Jul</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[8] - weeksByMonth[7]) * monthMargin}px">Aug</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[9] - weeksByMonth[8]) * monthMargin}px">Sep</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[10] - weeksByMonth[9]) * monthMargin}px">Oct</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[11] - weeksByMonth[10]) * monthMargin}px">Nov</div>
+                                        <div class="lawn-month" style="margin-left: {(weeksByMonth[12] - weeksByMonth[11]) * monthMargin}px">Dec</div>
+
+                                    </div>
+
+                                    <div class="grid-container">
+                                        {#each achievedCount as countValue, idx}
+                                            <div class="lawn"
+                                                 style="background-color: {getColorByValue(countValue)};"
+                                                 on:mouseover={() => showDailyGoalInfo(idx)}
+                                                 on:mouseleave={hideDailyGoalInfo}>
+                                            </div>
+                                        {/each}
+                                    </div>
+
+                                    <div id="lawn-info-container">
+                                        <div id="lawn-goto-main" on:click={()=> push('/main')}>일일 목표 바로 가기</div>
+
+                                        <div id="lawn-info">
+                                            Less
+                                            {#each [0, 1, 2, 3] as color}
+                                                <div class="lawn" style="background-color: {getColorByValue(color)};"></div>
+                                            {/each}
+                                            More
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div id="activity-top-information-container">
-                            <span id='informaition-txt'>최근 공부한 알고리즘: bubble-sort </span>
-                            <span id='informaition-txt'>연속 출석일수: 3일 </span>
-                            <span id='informaition-txt' style="color:#83b06d ">모은 commit: 162 </span>
+                            <!--                            <span id='informaition-txt'>최근 공부한 알고리즘: bubble-sort </span>-->
+                            <!--                            <span id='informaition-txt'>연속 출석일수: 3일 </span>-->
+                            <!--                            <span id='informaition-txt' style="color:#83b06d ">모은 commit: 162 </span>-->
                         </div>
                     </div>
 
                     <div id="activity-bottom-container">
-                        <div id="wrote-container">
-                            <span id='wrote-title'>내가 쓴 글</span>
-                            <div id="wrote-box"></div>
-                        </div>
+                        <!--                        <div id="wrote-container">-->
+                        <!--                            <span id='wrote-title'>내가 쓴 글</span>-->
+                        <!--                            <div id="wrote-box"></div>-->
+                        <!--                        </div>-->
 
-                        <div id="comment-container" style="padding-left:10px;">
-                            <span id='comment-title'>내가 쓴 댓글</span>
-                            <div id="comment-box"></div>
-                        </div>
+                        <!--                        <div id="comment-container" style="padding-left:10px;">-->
+                        <!--                            <span id='comment-title'>내가 쓴 댓글</span>-->
+                        <!--                            <div id="comment-box"></div>-->
+                        <!--                        </div>-->
 
                     </div>
                 </div> <!--activity-box 끝-->
 
                 <div class="roadMap" style="height: {roadMap_h}px; transition: height 0.3s ease; overflow: hidden;">
                     <div id="goToRoadMap">
-                        <div id="RoadMapBtn" style="margin-top:8px;" on:click={toggleView}>
+                        <div id="RoadMapBtn"on:click={toggleView}>
                             <div style="margin-left: 22px;">
                                 <ion-icon size="large" name="map-outline"></ion-icon>
                             </div>
@@ -796,7 +925,7 @@
 
     .content {
         display: grid;
-        grid-template-columns: 1fr 1.9fr;
+        grid-template-columns: 1fr 2.5fr;
     }
 
     .left-container {
@@ -827,8 +956,8 @@
 
     #activity-box {
         display: grid;
-        grid-template-rows: 40px 1fr 1fr;
-        width: 800px;
+        grid-template-rows: 20px 1fr 1fr;
+        width: 1050px;
         height: 700px;
         background-color: #151b23;
         border: 1px solid #3d444d;
@@ -930,8 +1059,12 @@
 
     #setting-title, #under-title, #activity-title {
         font-weight: bold;
-        font-size: 18px;
+        font-size: 1.25rem;
         color: #d1d1d1;
+    }
+
+    #activity-title {
+        margin-left: 6px;
     }
 
     #setting-box {
@@ -1266,31 +1399,95 @@
 
     #lawn-box {
         height: 200px;
-        width: 750px;
+        width: 1000px;
         background-color: #151b23;
         border: 2px solid #3d444d;
         border-radius: 5px;
         margin-left: 4px;
         box-sizing: border-box;
+
+        display: grid;
+        grid-template-columns: 40px 1fr;
     }
 
-    #lawn-title {
-        margin: 20px 0px 0px 28px;
+    #lawn-left {
+        display: grid;
+        grid-template-rows: 50px 111px 1fr;
+    }
+
+    #lawn-right {
+        display: grid;
+        grid-template-rows: 50px 111px 1fr;
+    }
+
+    .lawn-day {
+        padding-top: 16px;
+        padding-left: 5px;
+        font-size: 0.8rem;
+    }
+
+    #lawn-year-container {
+        display: flex;
+        margin: 20px 0px 5px 6px;
         font-size: 1.2rem;
+        gap: 10px;
+    }
+    
+    .lawn-year {
+        cursor: pointer;
         color: #8d8d8d;
+    }
+
+    .lawn-year:hover {
+        text-decoration: underline;
+    }
+
+    .lawn-year.selected {
+        color: #1c6b24;
+    }
+
+    #lawn-month-container {
+        display: flex;
+        font-size: 0.8rem;
+    }
+
+    .lawn-month {
+        margin-top: 30px;
     }
 
     .grid-container {
         display: grid;
-        grid-template-rows: repeat(10, 15px);
+        grid-template-rows: repeat(7, 15px);
         grid-auto-flow: column;
-        gap: 5px; /* 칸 사이 간격 */
+        gap: 1px; /* 칸 사이 간격 */
     }
 
     .lawn {
-        width: 15px;
-        height: 15px;
-        border-radius: 4px; /* 모서리를 살짝 둥글게 */
+        width: 11px;
+        height: 11px;
+        border-radius: 2px; /* 모서리를 살짝 둥글게 */
+    }
+
+    #lawn-info-container {
+        display: flex;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #a0a0a0;
+    }
+
+    #lawn-goto-main {
+        cursor: pointer;
+    }
+
+    #lawn-goto-main:hover {
+        color: #1c6b24;
+    }
+
+    #lawn-info {
+        gap: 6px;
+        padding-left: 725px;
+        display: flex;
+        align-items: center;
     }
 
     #activity-top-information-container {
@@ -1328,13 +1525,13 @@
     #RoadMapBtn {
         display: inline-block;
         transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+        margin-top: 8px;
         color: #858585;
     }
 
     #RoadMapBtn:hover {
         animation: shake 0.5s ease-in-out infinite;
         color: #1c682b;
-
     }
 
     @keyframes shake {
@@ -1369,7 +1566,7 @@
         display: grid;
         grid-template-rows: 40px 1fr 0.8fr 60px;
         margin: 20px 0px 0px 0px;
-        width: 800px;
+        width: 1050px;
         height: 50px;
         background-color: #151b23;
         border: 1px solid #3d444d;
@@ -1387,7 +1584,6 @@
         #profile-box {
             width: 533px; /* 400px x 1.333 */
             height: 700px; /* 525px x 1.333 */
-
         }
 
         #profile-image-container {
@@ -1449,8 +1645,13 @@
         }
 
         #activity-box {
-            width: 1066px; /* 800px x 1.333 */
+            width: 1400px; /* 800px x 1.333 */
             height: 933px; /* 700px x 1.333 */
+            grid-template-rows: 30px 1fr 1fr;
+        }
+
+        #activity-title {
+            margin-left: 8px;
         }
 
         #left-under-box {
@@ -1459,9 +1660,45 @@
         }
 
         #lawn-box {
-            height: 220px; /* 200px x 1.333 */
-            width: 960px; /* 700px x 1.333 */
-            margin-left: 28px;
+            height: 260px; /* 200px x 1.333 */
+            width: 1340px; /* 700px x 1.333 */
+            margin-left: 6px;
+            grid-template-columns: 50px 1fr;
+        }
+
+        #activity-title {
+            font-size: 1.5rem;
+        }
+
+        #lawn-year-container {
+            margin-left: 8px;
+            font-size: 1.5rem;
+        }
+
+        .lawn-day, .lawn-month {
+            font-size: 1rem;
+        }
+
+        .lawn-month {
+            margin-top: 35px;
+        }
+
+        .lawn-day {
+            padding-top: 27.7px;
+            padding-left: 7px;
+        }
+
+        #lawn-right {
+            display: grid;
+            grid-template-rows: 60px 1fr 50px;
+        }
+
+        #lawn-info-container {
+            font-size: 1rem;
+        }
+
+        #lawn-info {
+            padding-left: 1000px;
         }
 
         #activity-bottom-container {
@@ -1473,13 +1710,14 @@
         }
 
         .grid-container {
-            grid-template-rows: repeat(13.33, 15px);
+            grid-template-rows: repeat(7, 15px);
+            padding-right: 10px;
             gap: 7px;
         }
 
         .lawn {
-            width: 18px;
-            height: 18px;
+            width: 15px;
+            height: 15px;
         }
 
         #wrote-box, #comment-box {
@@ -1488,8 +1726,12 @@
         }
 
         .roadMap {
-            width: 1066px; /* 800px x 1.333 */
+            width: 1400px; /* 800px x 1.333 */
             height: 67px; /* 50px x 1.333 */
+        }
+
+        #RoadMapBtn {
+            margin-top: 16px;
         }
 
         #change-userName input[type="text"] {
