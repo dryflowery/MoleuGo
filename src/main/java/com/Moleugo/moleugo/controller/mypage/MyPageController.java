@@ -5,10 +5,9 @@ import com.Moleugo.moleugo.service.mypage.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -35,9 +34,10 @@ public class MyPageController {
         return userInfoService.getUserAccountType(userSession);
     }
 
-    // 사용자 계정 타입 반환
-    @GetMapping("/daily-goal")
-    public ResponseEntity<List<Integer>> getDailyGoal(@CookieValue(value = "user_session", required = false) String userSession) {
-        return userInfoService.getDailyGoal(userSession);
+    // dailyGoalYear 기준으로 해당 년도의 일일목표 히스토리 반환
+    @PostMapping("/daily-goal")
+    public ResponseEntity<List<Integer>> getDailyGoal(@CookieValue(value = "user_session", required = false) String userSession,
+                                                      @RequestBody(required = false) Integer dailyGoalYear) {
+        return userInfoService.getDailyGoal(userSession, dailyGoalYear);
     }
 }
