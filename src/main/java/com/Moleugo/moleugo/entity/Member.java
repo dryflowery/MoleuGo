@@ -14,6 +14,10 @@ import lombok.Setter;
 public class Member {
     public Member() {}
 
+    public Member(String email) {
+        this(email, null, "normal", null, null);
+    }
+
     public Member(String email, String password, String account_type) {
         this(email, password, account_type, null);
     }

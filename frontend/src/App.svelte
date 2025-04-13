@@ -1,4 +1,6 @@
 <script>
+  import {checkLoginStatus} from "./lib/store.js";
+  import {onMount} from "svelte";
   import Router from 'svelte-spa-router';
   import Index from "./routes/Index.svelte";
   import MainPage from './routes/MainPage.svelte';
@@ -17,9 +19,7 @@
   import Dfs from './routes/visualization/graph/Dfs.svelte';
   import Bfs from './routes/visualization/graph/Bfs.svelte';
   import BinarySearch from "./routes/visualization/search/BinarySearch.svelte";
-  import SignupResultPage from "./routes/SignupResultPage.svelte";
-  import {checkLoginStatus} from "./lib/store.js";
-  import {onMount} from "svelte";
+  import ResultPage from "./routes/ResultPage.svelte";
 
   const routes = {
       '/': Index,
@@ -39,7 +39,7 @@
       '/visualization/graph/Dfs': Dfs,
       '/visualization/graph/Bfs': Bfs,
       '/visualization/search/BinarySearch': BinarySearch,
-      '/signup-result': SignupResultPage
+      '/result': ResultPage
   };
 
   onMount(() => {

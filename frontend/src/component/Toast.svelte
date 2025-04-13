@@ -9,6 +9,8 @@
 
         {#if type === 'success'}
             ✅
+        {:else if type === 'info'}
+            ℹ️
         {:else}
             ❌
         {/if}

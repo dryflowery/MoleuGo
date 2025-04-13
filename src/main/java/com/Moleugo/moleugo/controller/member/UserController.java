@@ -1,5 +1,6 @@
 package com.Moleugo.moleugo.controller.member;
 
+import com.Moleugo.moleugo.dto.FindPasswordRequest;
 import com.Moleugo.moleugo.dto.NicknameChangeRequest;
 import com.Moleugo.moleugo.dto.PasswordChangeRequest;
 import com.Moleugo.moleugo.entity.Member;
@@ -15,20 +16,8 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
-
+    private final HttpSession session;
     private final MemberService memberService;
-
-    @GetMapping("/email")
-    public ResponseEntity<String> getUserEmail(@CookieValue(value = "user_session", required = false) String userSession) {
-        HttpSession session = memberService.getSession();
-        if (userSession != null) {
-            Member member = (Member) session.getAttribute(userSession);
-            if (member != null) {
-                return ResponseEntity.ok(member.getEmail());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
 
     @PostMapping("/change-email-request")
     public ResponseEntity<?> requestEmailChange(@CookieValue("user_session") String sessionId,
@@ -41,9 +30,11 @@ public class UserController {
     public String confirmEmailChange(@PathVariable String uuid) {
         HttpStatus status = memberService.confirmEmailChange(uuid);
         if (status == HttpStatus.OK) {
-            return "redirect:/#/signup-result?result=email-change-success";
+            return "redirect:/#/result?type=" + "email-change-success";
         }
-        return "redirect:/#/signup-result?result=email-change-fail";
+        else {
+            return "redirect:/#/result?type=" + "fail";
+        }
     }
 
     @PostMapping("/change-password")
@@ -54,19 +45,6 @@ public class UserController {
 
     }
 
-    @GetMapping("/nickname")
-    public ResponseEntity<String> getUserNickname(@CookieValue(value = "user_session", required = false) String userSession) {
-        HttpSession session = memberService.getSession();
-        if (userSession != null) {
-            Member member = (Member) session.getAttribute(userSession);
-            if (member != null) {
-
-                return ResponseEntity.ok(member.getNickname());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
     @PostMapping("/change-nickname")
     public ResponseEntity<?> changeNickname(@CookieValue("user_session") String sessionId,
                                             @RequestBody NicknameChangeRequest req) {
@@ -74,15 +52,27 @@ public class UserController {
         return ResponseEntity.status(status).build();
     }
 
-    @GetMapping("/account-type")
-    public ResponseEntity<String> getUserAccountType(@CookieValue(value = "user_session", required = false) String userSession) {
-        HttpSession session = memberService.getSession();
-        if (userSession != null) {
-            Member member = (Member) session.getAttribute(userSession);
-            if (member != null) {
-                return ResponseEntity.ok(member.getAccount_type());
-            }
+    @PostMapping("/find-password/verify-email")
+    public void sendVerificationEmail(@RequestBody FindPasswordRequest req) {
+        memberService.sendVerificationEmail(req);
+    }
+
+    @GetMapping("/find-password/{uuid}")
+    public String setTemporaryPassword(@PathVariable("uuid") String uuid) {
+        Member member = (Member) session.getAttribute(uuid);
+
+        if(session.getAttribute(uuid) != null) {
+            memberService.setTemporaryPassword(uuid);
+            return "redirect:/#/result?type=" + "find-password-success" + "&uuid=" + uuid;
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        else {
+            return "redirect:/#/result?type=" + "fail";
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/get-temporary-password/{uuid}")
+    public String getTemporaryPassword(@PathVariable("uuid") String uuid) {
+        return memberService.getTemporaryPassword(uuid);
     }
 }

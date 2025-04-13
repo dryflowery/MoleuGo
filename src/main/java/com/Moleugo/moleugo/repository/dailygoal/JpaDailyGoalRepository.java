@@ -33,7 +33,7 @@ public class JpaDailyGoalRepository implements DailyGoalRepository {
 
     @Override
     public List<DailyGoal> findAllByEmail(String email) {
-        return em.createQuery("SELECT d FROM DailyGoal d WHERE d.id.email = :email", DailyGoal.class)
+        return em.createQuery("SELECT d FROM DailyGoal d WHERE d.id.email = :email ORDER BY d.id.goalDate ASC", DailyGoal.class)
                 .setParameter("email", email)
                 .getResultList();
     }

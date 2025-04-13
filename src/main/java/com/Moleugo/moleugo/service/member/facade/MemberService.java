@@ -1,7 +1,9 @@
 package com.Moleugo.moleugo.service.member.facade;
 
+import com.Moleugo.moleugo.dto.FindPasswordRequest;
 import com.Moleugo.moleugo.dto.PasswordChangeRequest;
 import com.Moleugo.moleugo.entity.Member;
+import com.Moleugo.moleugo.service.member.auth.FindPasswordService;
 import com.Moleugo.moleugo.service.member.auth.LoginService;
 import com.Moleugo.moleugo.service.member.auth.SignupService;
 import com.Moleugo.moleugo.service.member.profile.EmailChangeService;
@@ -23,6 +25,7 @@ public class MemberService {
     private final EmailChangeService emailChangeService;
     private final PasswordChangeService passwordChangeService;
     private final NicknameChangeService nicknameChangeService;
+    private final FindPasswordService findPasswordService;
 
 
     public HttpStatus isValidForm(Member member) {
@@ -75,5 +78,17 @@ public class MemberService {
 
     public HttpStatus changeNickname(String sessionId, String newNickname) {
         return nicknameChangeService.changeNickname(sessionId, newNickname);
+    }
+
+    public void sendVerificationEmail(FindPasswordRequest req) {
+        findPasswordService.sendVerificationEmail(req);
+    }
+
+    public void setTemporaryPassword(String uuid) {
+        findPasswordService.setTemporaryPassword(uuid);
+    }
+
+    public String getTemporaryPassword(String uuid) {
+        return findPasswordService.getTemporaryPassword(uuid);
     }
 }
