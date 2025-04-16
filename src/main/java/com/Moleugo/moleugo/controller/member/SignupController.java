@@ -26,10 +26,10 @@ public class SignupController {
     @GetMapping("/signup/{uuid}")
     public String signUp(@PathVariable("uuid") String uuid) {
         if(memberService.signUp(uuid) == HttpStatus.CREATED) {
-            return "redirect:/#/signup-result?result=" + "signup-success";
+            return "redirect:/#/result?result=" + "signup-success";
         }
         else {
-            return "redirect:/#";
+            return "redirect:/#/result?result=" + "fail";
         }
     }
 
@@ -40,10 +40,10 @@ public class SignupController {
         HttpStatus googleSignupStatus = memberService.googleSignUp(code);
 
         if(googleSignupStatus == HttpStatus.CREATED) {
-            return "redirect:/#/signup-result?result=" + "signup-success";
+            return "redirect:/#/result?type=" + "signup-success";
         }
         else {
-            return "redirect:/#/signup-result?result=" + "exist-account";
+            return "redirect:/#/result?type=" + "fail";
         }
     }
 }

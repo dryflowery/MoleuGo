@@ -36,7 +36,9 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public boolean isCorrectPassword(Member member) { return encoder.matches(member.getPassword(), findByEmail(member.getEmail()).getPassword()); }
+    public boolean isCorrectPassword(Member member) {
+        return encoder.matches(member.getPassword(), findByEmail(member.getEmail()).getPassword());
+    }
 
     @Override
     public boolean isNormalMember(String email) {
@@ -49,7 +51,16 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public void updateEmail(Member newMember, String oldEmail) { em.persist(newMember); em.remove(findByEmail(oldEmail));
+    public void updateEmail(Member newMember, String oldEmail) {
+        em.persist(newMember);
+        em.remove(findByEmail(oldEmail));
+    }
+
+    @Override
+    public void updatePassword(String email, String password) {
+        Member member = findByEmail(email);
+        member.setPassword(password);
+        em.merge(member);
     }
 
     @Override
@@ -58,6 +69,7 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public void updateMember(Member updatedMember) { em.merge(updatedMember); }
-
+    public void updateMember(Member updatedMember) {
+        em.merge(updatedMember);
+    }
 }
