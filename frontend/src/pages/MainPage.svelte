@@ -21,7 +21,7 @@
 
           <!--비 로그인 시 생기는 잠금-->
           {#if !$isLogin}
-            <div id="locked-box-daily">
+            <div id="locked-box-daily" style="z-index: 2000;">
               <!-- svelte-ignore a11y-missing-attribute -->
               <img src="assets/lock.png" style="height: 130px;">
               <p>로그인 하고 컨텐츠 보기</p>
@@ -30,8 +30,41 @@
 
           <!--로그인 시 생기는 화면-->
           <div id="dailyGoal-box-content" class="{ $isLogin ? ' ' : 'blurred' }">
+              <div id="dailyGoal-box-header">
+                안녕하세요 유저네임 님 일일목표 입니다.
+              </div>
 
-            <img src="assets/daily.png" height="262" width="435"/></div>
+              <div id="dailyGoal-box-content-body">
+
+                <div class="dailyGoal-box-content-body-left">
+                  <div class="section">
+                    일일 목표_1
+                  </div>
+
+                  <div class="section">
+                    일일 목표_2
+                  </div>
+
+                  <div class="section">
+                    일일 목표_3
+                  </div>
+                </div>
+
+                <div id="dailyGoal-box-content-body-right">
+                  <div class="dailyGoal-box-content-body-right-content">
+                      <div class="dailyGoal-content">
+                        
+                      </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div id="dailyGoal-box-footer">
+                푸터
+              </div>
+
+          </div>
 
         </div>
 
@@ -209,25 +242,49 @@
   }
 
   #dailyGoal-box-header {
-    
+    padding: 3px 0px 0px 5px;
+    font-weight: 400;
   }
 
   #dailyGoal-box-content-body {
     display: grid;
-    grid-template-columns: 0.5fr 1fr;
+    grid-template-columns: 0.5fr 0.75fr;
   }
 
-  #dailyGoal-box-content-body-left {
-    
+  .dailyGoal-box-content-body-left {
+    display: flex;
+    flex-direction: column;
+    height: 75%;
+    padding: 30px 0px 0px 10px;
+  }
+
+  .dailyGoal-box-content-body-left .section {
+    flex: 1;
+    padding: 8px;
+
   }
 
   #dailyGoal-box-content-body-right {
-    
+    padding: 10px 0px 0px 0px;
+  }
+
+  .dailyGoal-content {
+    box-sizing: border-box;
+    width: 240px;
+    height: 175px;
+    background-color: #433c32;
+    border: 2px solid #221e1a;
+    border-radius: 8px;
+    padding: 10px;
   }
 
 
   #dailyGoal-box-footer {
     
+  }
+
+  .dailyGoal-box-content-body-right-content {
+
   }
 
 
