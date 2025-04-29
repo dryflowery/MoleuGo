@@ -5,6 +5,7 @@
 
     import { BAD_REQUEST, CONFLICT, FORBIDDEN, OK, UNAUTHORIZED } from "../lib/httpStatusStore.js";
     import { isListVisible } from "../lib/store"
+    import { isLogin } from "../lib/store"
     import { onMount } from "svelte";
     import { writable } from "svelte/store";
     import { push } from "svelte-spa-router";
@@ -61,7 +62,7 @@
     let showEmailInfo = false; // 설명 표시 여부
 
     let dailyGoalYear = 2025; // dailyGoalYear년의 일일 목표 출력
-    let achievedCount = Array.from({ length: 371 }, () => 3);
+    let achievedCount = Array.from({ length: 371 }, () => 0);
     let weeksByMonth = []; // 각 달의 시작일이 몇 주차인지
     let monthMargin = 13.25;
 
@@ -363,6 +364,8 @@
 
         if (emailRes.ok) {
             myEmail = await emailRes.text();
+        } else {
+            myEmail = "비로그인 상태";
         }
     };
 
@@ -371,7 +374,9 @@
         try {
             const res = await fetch("/mypage/nickname", {credentials: "include"});
             if (res.ok) {
-                savedUserName = await res.text();
+                savedUserName = await res.text();``
+            } else {
+                savedUserName = 'Guest';
             }
         }
         catch (err) {
@@ -412,6 +417,16 @@
         await fetchDailyGoal();
     });
 
+    // 로그인시 바로 요소들 초기화(일반 로그인시)
+    $: if ($isLogin) {
+        getMonthStartWeek();
+        fetchEmail();
+        fetchNickname();
+        fetchAccountType();
+        fetchDailyGoal();
+    }
+
+
     // 값에 따라 배경색을 결정하는 함수
     const getColorByValue = (value) => {
         if(value === -1) {
@@ -421,13 +436,13 @@
             return "#48413b";
         }
         else if (value === 1) {
-            return "#219e29";
+            return "#1a5321";
         }
         else if (value === 2) {
             return "#1c6b24";
         }
         else if (value === 3) {
-            return "#1a5321";
+            return "#219e29";
         }
     };
 
@@ -513,7 +528,7 @@
 
                         <div id="profile-image-container">
                             <!--나중에 수정-->
-                            <img id="profile-image" src="assets/profile.jpg" alt="">
+                            <img id="profile-image" src={ $isLogin ? 'assets/profile_1.png' : 'assets/profile_guest.png' } alt="">
                             <button id="profile-edit-Btn"> 설정</button>
                         </div>
 
@@ -537,19 +552,23 @@
                             <div id="setting-box">
                                 <div id="email-setting">
                                     <div id="email-title"> 이메일</div>
-                                    <div id="email-icon" on:mouseover={() => (showEmailInfo = true)}
-                                         on:mouseout={() => (showEmailInfo = false)}>
-                                        <ion-icon name="help-circle-outline"></ion-icon>
-                                        {#if showEmailInfo}
-                                            <div class="tooltip">
-                                                {#if accountType === 'normal'}
-                                                    이메일 인증이 필요합니다.
-                                                {:else}
-                                                    소셜계정은 이메일과 비밀번호를 변경할 수 없습니다.
-                                                {/if}
-                                            </div>
-                                        {/if}
-                                    </div>
+                                        <div id="email-icon" on:mouseover={() => (showEmailInfo = true)}
+                                             on:mouseout={() => (showEmailInfo = false)}>
+                                            <ion-icon name="help-circle-outline"></ion-icon>
+                                            {#if showEmailInfo}
+                                                <div class="tooltip">
+
+                                                    {#if accountType === 'normal'}
+                                                        이메일 인증이 필요합니다.
+                                                    {:else if accountType ==='google'}
+                                                        소셜계정은 이메일과 비밀번호를 변경할 수 없습니다.
+                                                    {:else}
+                                                        비로그인 상태입니다.
+                                                    {/if}
+
+                                                </div>
+                                            {/if}
+                                        </div>
                                     <div id="email-output"> {myEmail} </div>
 
                                     <button
@@ -564,7 +583,8 @@
                                     <div id="nickname-title"> 닉네임</div>
                                     <div id="nickname-output"> {savedUserName} </div>
                                     <button id="nickname-btn"
-                                            on:click={() => { showSettingBox = false; currentSetting = 'nickname'; }}>
+                                            on:click={() => { showSettingBox = false; currentSetting = 'nickname'; }}
+                                            disabled={!$isLogin}>
                                         설정
                                     </button>
                                 </div>
@@ -801,6 +821,7 @@
                      style="height: {activity_h}px; padding-top: {isRoadMapVisible ? '10px' : '20px'}; transition: height 0.3s ease, padding 0.3s ease;">
                     <span id='activity-title'>활동 내역</span>
                     <div id="activity-top-container">
+
                         <div class="lawn-container">
                             <div id='lawn-year-container'>
                                 {#each [2025, 2024, 2023, 2022, 2021] as year}
@@ -811,6 +832,13 @@
                             </div>
 
                             <div id="lawn-box">
+
+                                {#if !$isLogin}
+                                    <div id="overlay-blocker">
+                                        <img id='overlay-image' style="width: 5%" src="assets/lock.png" />
+                                    </div>
+                                {/if}
+
                                 <!-- 박스 왼쪽(요일 있는 영역) -->
                                 <div id="lawn-left">
                                     <div class="nope"></div>
@@ -1397,7 +1425,31 @@
 
     /* -------------------  활동(잔디밭) 칸 ------------------ */
 
+    #overlay-blocker {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.3); /* 반투명 처리, 선택 */
+        backdrop-filter: blur(3px); /* 뒷배경을 흐림 */
+        pointer-events: all; /* 클릭 막기 */
+        user-select: none;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #overlay-image {
+        pointer-events: none;
+        user-select: none;
+    }
+
     #lawn-box {
+        position: relative;
+
         height: 200px;
         width: 1000px;
         background-color: #151b23;
@@ -1771,7 +1823,8 @@
     }
 
     #email-btn:disabled,
-    #password-btn:disabled {
+    #password-btn:disabled,
+    #nickname-btn:disabled {
         background-color: #2a2a2a; /* 어두운 회색 배경 */
         color: #777777; /* 흐릿한 글씨색 */
         border: 1px solid #444444;
