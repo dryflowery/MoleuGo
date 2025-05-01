@@ -2,6 +2,7 @@ package com.Moleugo.moleugo.service.mypage;
 
 import com.Moleugo.moleugo.entity.DailyGoal;
 import com.Moleugo.moleugo.entity.Member;
+import com.Moleugo.moleugo.repository.animationcount.AnimationCountRepository;
 import com.Moleugo.moleugo.repository.dailygoal.DailyGoalRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class UserInfoService {
     private final HttpSession session;
     private final DailyGoalRepository dailyGoalRepository;
+    private final AnimationCountRepository animationCountRepository;
 
     private Member getMember(String userSession) {
         return (Member) session.getAttribute(userSession);
@@ -108,6 +111,18 @@ public class UserInfoService {
             }
 
             return ResponseEntity.ok(result);
+        }
+    }
+
+    // { algorithm type, animation type } 형식
+    public ResponseEntity<Map<String, Integer>> getAnimationCount(String userSession) {
+        Member member = getMember(userSession);
+
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        else {
+            return ResponseEntity.ok(animationCountRepository.findAllCountsByEmail(member.getEmail()));
         }
     }
 }
