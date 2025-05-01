@@ -66,6 +66,24 @@
     let weeksByMonth = []; // 각 달의 시작일이 몇 주차인지
     let monthMargin = 13.25;
 
+    let animationCnt = {
+        linkedList: undefined,
+        stack: undefined,
+        queue: undefined,
+        deque: undefined,
+        heap: undefined,
+        binarySearch: undefined,
+        bubbleSort: undefined,
+        selectionSort: undefined,
+        insertionSort: undefined,
+        dfs: undefined,
+        bfs: undefined,
+        dijkstra: undefined,
+        bellmanFord: undefined,
+        floydWarshall: undefined,
+        convexHull: undefined,
+    };
+
     const socialIcons = {
         google: {
             src: 'assets/google.png',
@@ -364,7 +382,8 @@
 
         if (emailRes.ok) {
             myEmail = await emailRes.text();
-        } else {
+        }
+        else {
             myEmail = "비로그인 상태";
         }
     };
@@ -374,8 +393,9 @@
         try {
             const res = await fetch("/mypage/nickname", {credentials: "include"});
             if (res.ok) {
-                savedUserName = await res.text();``
-            } else {
+                savedUserName = await res.text();
+            }
+            else {
                 savedUserName = 'Guest';
             }
         }
@@ -408,24 +428,35 @@
         getMonthStartWeek();
     };
 
-    // 페이지 로드될 때 요소들 초기화
-    onMount(async () => {
+    // 애니메이션 실행 횟수 가져오기
+    const fetchAnimationCnt = async () => {
+        const animationCntRes = await fetch('/mypage/animation-count', {credentials: 'include'});
+
+        if (animationCntRes.ok) {
+            const data = await animationCntRes.json();
+            animationCnt = { ...animationCnt, ...data };
+        }
+    };
+
+    // 마이페이지 요소 초기화
+    const initMypageInfo = async () => {
         getMonthStartWeek();
         await fetchEmail();
         await fetchNickname();
         await fetchAccountType();
         await fetchDailyGoal();
-    });
-
-    // 로그인시 바로 요소들 초기화(일반 로그인시)
-    $: if ($isLogin) {
-        getMonthStartWeek();
-        fetchEmail();
-        fetchNickname();
-        fetchAccountType();
-        fetchDailyGoal();
+        await fetchAnimationCnt();
     }
 
+    // 페이지 로드될 때 초기화
+    onMount(async () => {
+        await initMypageInfo();
+    });
+
+    // 일반 로그인시 초기화
+    $: if ($isLogin) {
+        initMypageInfo();
+    }
 
     // 값에 따라 배경색을 결정하는 함수
     const getColorByValue = (value) => {

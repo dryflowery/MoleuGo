@@ -8,7 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -39,5 +41,11 @@ public class MyPageController {
     public ResponseEntity<List<Integer>> getDailyGoal(@CookieValue(value = "user_session", required = false) String userSession,
                                                       @RequestBody(required = false) Integer dailyGoalYear) {
         return userInfoService.getDailyGoal(userSession, dailyGoalYear);
+    }
+    
+    // 애니메이션 실행 횟수 반환
+    @GetMapping("/animation-count")
+    public ResponseEntity<Map<String, Integer>> getAnimationCount(@CookieValue(value = "user_session", required = false) String userSession) {
+        return userInfoService.getAnimationCount(userSession);
     }
 }
