@@ -66,6 +66,7 @@
     let weeksByMonth = []; // 각 달의 시작일이 몇 주차인지
     let monthMargin = 13.25;
 
+    // 애니메이션 실행 횟수
     let animationCnt = {
         linkedList: undefined,
         stack: undefined,
@@ -378,7 +379,7 @@
 
     // 이메일 요청
     const fetchEmail = async () => {
-        const emailRes = await fetch('/mypage/email', {credentials: 'include'});
+        const emailRes = await fetch('/mypage/get-email', {credentials: 'include'});
 
         if (emailRes.ok) {
             myEmail = await emailRes.text();
@@ -391,7 +392,7 @@
     // 닉네임 요청
     const fetchNickname = async () => {
         try {
-            const res = await fetch("/mypage/nickname", {credentials: "include"});
+            const res = await fetch("/mypage/get-nickname", {credentials: "include"});
             if (res.ok) {
                 savedUserName = await res.text();
             }
@@ -406,7 +407,7 @@
 
     // account_type 요청
     const fetchAccountType = async () => {
-        const typeRes = await fetch('/mypage/account-type', {credentials: 'include'});
+        const typeRes = await fetch('/mypage/get-account-type', {credentials: 'include'});
 
         if (typeRes.ok) {
             accountType = await typeRes.text();
@@ -415,7 +416,7 @@
 
     // 일일 목표를 가져와요
     const fetchDailyGoal = async () => {
-        const dailyGoalRes = await fetch('/mypage/daily-goal', {
+        const dailyGoalRes = await fetch('/mypage/get-daily-goal', {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -430,7 +431,7 @@
 
     // 애니메이션 실행 횟수 가져오기
     const fetchAnimationCnt = async () => {
-        const animationCntRes = await fetch('/mypage/animation-count', {credentials: 'include'});
+        const animationCntRes = await fetch('/mypage/get-animation-count', {credentials: 'include'});
 
         if (animationCntRes.ok) {
             const data = await animationCntRes.json();

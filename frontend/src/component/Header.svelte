@@ -54,7 +54,6 @@
             <button id="sign-up-btn" class="sign-btn" on:click={() => push('/signup')}>회원가입</button>
         {:else}
             <ion-icon name="exit-outline" class="icon-hover-logout" on:click={logout}></ion-icon>
-
             <ion-icon name="home-outline" class="icon-hover-home" on:click={() => push('/my-page')} ></ion-icon>
         {/if}
     </div>

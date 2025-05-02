@@ -4,7 +4,7 @@
     import QueueNavigation from "../../../component/navigation/Linear/QueueNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
-
+    import {incrementAnimationCount} from "../../../lib/mypage/animationCount.js";
 
     let canvasWidth = window.innerWidth * 0.73;
     let canvasHeight = window.innerHeight * 0.78;
@@ -313,8 +313,8 @@
 
         activePeek = true;
 
+        incrementAnimationCount("queue");
         executeQueuePeekQueries($asyncCnt++);
-        
     };
 
     const pushQueuePeekAnimationQuery = (tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode) => {
@@ -463,8 +463,8 @@
         $pausedIcon = false;
         $isPaused = false;
 
+        incrementAnimationCount("queue");
         executeDequeueQueries($asyncCnt++);
-        
     };
 
     const pushDequeueAnimationQuery = (tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodeDequeueAnimations, tmpArrowDequeueAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
@@ -810,9 +810,8 @@
         $pausedIcon = false;
         $isPaused = false;
 
+        incrementAnimationCount("queue");
         executeEnqueueQueries($asyncCnt++);
-        
-
     };
 
     // 애니메이션(Push) 쿼리 저장
