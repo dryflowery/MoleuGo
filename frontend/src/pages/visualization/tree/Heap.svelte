@@ -6,6 +6,7 @@
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
     import { fly } from "svelte/transition";
+    import {incrementAnimationCount} from "../../../lib/mypage/animationCount.js";
 
     let elementCnt = 0, nodeVw = 0, nodeVh = 0;
     let heap = [];
@@ -188,6 +189,8 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
+
+        incrementAnimationCount("heap");
         executeHeapQueries($asyncCnt++);
     };
 
@@ -215,6 +218,8 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
+
+        incrementAnimationCount("heap");
         executeHeapQueries($asyncCnt++);
     };
 
@@ -227,6 +232,8 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
+
+        incrementAnimationCount("heap");
         executeHeapQueries($asyncCnt++);
     };
 
@@ -244,6 +251,8 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
+
+        incrementAnimationCount("heap");
         executeHeapQueries($asyncCnt++);
     };
 

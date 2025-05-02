@@ -4,6 +4,7 @@
     import DequeNavigation from "../../../component/navigation/Linear/DequeNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
+    import {incrementAnimationCount} from "../../../lib/mypage/animationCount.js";
 
 
     let canvasWidth = window.innerWidth * 0.73;
@@ -370,6 +371,7 @@
 
         activePeek = true;
 
+        incrementAnimationCount("deque");
         executeQueuePeekQueries($asyncCnt++);
         
     };
@@ -520,6 +522,7 @@
         $pausedIcon = false;
         $isPaused = false;
 
+        incrementAnimationCount("deque");
         executeDequeueQueries($asyncCnt++);
         
     };
@@ -1104,9 +1107,8 @@
         $pausedIcon = false;
         $isPaused = false;
 
+        incrementAnimationCount("deque");
         executeEnqueueQueries($asyncCnt++);
-        
-
     };
 
     // 애니메이션(Push) 쿼리 저장

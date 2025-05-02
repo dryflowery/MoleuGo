@@ -16,6 +16,28 @@ import java.util.Map;
 @Table(name = "animation_count")
 public class AnimationCount {
 
+    // animation_count의 모든 값을 Map으로 반환
+    public Map<String, Integer> toMap() {
+        Map<String, Integer> ret = new HashMap<>();
+        ret.put("linkedList", linkedList);
+        ret.put("stack", stack);
+        ret.put("queue", queue);
+        ret.put("deque", deque);
+        ret.put("heap", heap);
+        ret.put("binarySearch", binarySearch);
+        ret.put("bubbleSort", bubbleSort);
+        ret.put("selectionSort", selectionSort);
+        ret.put("insertionSort", insertionSort);
+        ret.put("dfs", dfs);
+        ret.put("bfs", bfs);
+        ret.put("dijkstra", dijkstra);
+        ret.put("bellmanFord", bellmanFord);
+        ret.put("floydWarshall", floydWarshall);
+        ret.put("convexHull", convexHull);
+
+        return ret;
+    }
+
     @Id
     private String email;
 
@@ -63,27 +85,4 @@ public class AnimationCount {
 
     @Column(name = "convex_hull", nullable = false)
     private int convexHull = 0;
-
-    // animation_count의 모든 값을 map으로 변환해서 반환
-    public Map<String, Integer> toMap() {
-        Map<String, Integer> ret = new HashMap<>();
-
-        ret.put("linkedList", linkedList);
-        ret.put("stack", stack);
-        ret.put("queue", queue);
-        ret.put("deque", deque);
-        ret.put("heap", heap);
-        ret.put("binarySearch", binarySearch);
-        ret.put("bubbleSort", bubbleSort);
-        ret.put("selectionSort", selectionSort);
-        ret.put("insertionSort", insertionSort);
-        ret.put("dfs", dfs);
-        ret.put("bfs", bfs);
-        ret.put("dijkstra", dijkstra);
-        ret.put("bellmanFord", bellmanFord);
-        ret.put("floydWarshall", floydWarshall);
-        ret.put("convexHull", convexHull);
-
-        return ret;
-    }
 }
