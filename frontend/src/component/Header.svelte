@@ -55,7 +55,7 @@
         {:else}
             <ion-icon name="exit-outline" class="icon-hover-logout" on:click={logout}></ion-icon>
 
-            <ion-icon name="home-outline" class="icon-hover-home" on:click={() => push('/my-page')} ></ion-icon>
+            <ion-icon name="person-outline" class="icon-hover-home" on:click={() => push('/my-page')}></ion-icon>
         {/if}
     </div>
 </main>
@@ -156,11 +156,11 @@
         cursor: pointer;
         font-size: 25px;
         margin-right: 5px;
-        transition: color 0.3s;
+        
     }
 
     .icon-hover-home:hover {
-        color: #00bfff;
+        color: #5e5e5e;
     }
 
     .icon-hover-logout {
@@ -168,11 +168,11 @@
         cursor: pointer;
         font-size: 25px;
         margin-right: 15px;
-        transition: color 0.3s;
+        
     }
 
     .icon-hover-logout:hover {
-        color: #b1132b;
+        color: #5e5e5e;
     }
 
 </style>
