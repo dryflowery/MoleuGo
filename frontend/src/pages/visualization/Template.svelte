@@ -2,10 +2,10 @@
     import { onDestroy } from "svelte";
     import Header from "../../component/Header.svelte";
     import Navigation from "../../component/navigation/sort/BubbleSortNavigation.svelte";
-    import {isListVisible, isUserManualVisible} from "../../lib/store";
+    import {isListVisible, isAlgoGuideVisible} from "../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../lib/visualizationStore";
-    import UserManualPopup from "../../component/UserManualPopup.svelte";
+    import BubbleSortGuide from "../../component/guide/BubbleSortGuide.svelte";
 
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
@@ -87,7 +87,7 @@
 </script>
 
 <main>
-    <div class="navigation-container">
+    <div class="navigation-container" style="display: {$isAlgoGuideVisible ? 'none' : 'block'};">
         <Navigation/>
     </div>
 
@@ -104,11 +104,12 @@
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 버블 정렬(Bubble Sort)
 
-                <!-- 사용자 매뉴얼 -->
-                <button class="manual-button" on:click={() => $isUserManualVisible = true}>?</button>
+                <!-- 알고리즘 가이드 -->
+                <button class="guide-button" on:click={() => $isAlgoGuideVisible = true}>?</button>
 
-                {#if $isUserManualVisible}
-                    <UserManualPopup />
+                {#if $isAlgoGuideVisible}
+                    <!-- 각 알고리즘에 맞는 가이드 넣기 -->
+                    <BubbleSortGuide/>
                 {/if}
             </div>
 

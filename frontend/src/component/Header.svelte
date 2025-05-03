@@ -2,7 +2,7 @@
     import AlgorithmList from "./AlgorithmList.svelte";
     import LoginPopup from "./LoginPopup.svelte";
     import { push } from "svelte-spa-router";
-    import {isListVisible, isLoginVisible, isLogin, checkLoginStatus} from "../lib/store";
+    import {isListVisible, isLoginVisible, isLogin, isAlgoGuideVisible, checkLoginStatus} from "../lib/store";
     import {OK} from "../lib/httpStatusStore.js";
 
     const setAlgorithmListVisible = () => {
@@ -27,9 +27,18 @@
         })
     };
 
+    // Header랑 Main Container가 분리되어 있어서 따로 작성(Header 눌러도 AlgoGuidePopup 안꺼짐 등 여러 문제 있음)
+    const closeAlgoGuidePopup = (event) => {
+        const popupContent = document.getElementById("popup-content");
+
+        if (!popupContent.contains(event.target) && $isAlgoGuideVisible) {
+            $isAlgoGuideVisible = false;
+        }
+    };
 </script>
 
-<main>
+<main  style="background-color: { $isAlgoGuideVisible ? 'rgba(0, 0, 0, 0.4)' : '#000000' }"
+       on:click={closeAlgoGuidePopup}>
     <div class="algorithm-list" class:visible={$isListVisible}>
         <AlgorithmList/>
     </div>
@@ -59,7 +68,7 @@
     </div>
 </main>
 
-<style> 
+<style>
     main, #header-left-container, #header-right-container, #menu-circle {
         display: flex;
         justify-content: center;

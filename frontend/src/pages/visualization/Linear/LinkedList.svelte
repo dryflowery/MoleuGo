@@ -2,10 +2,9 @@
     import { onDestroy, onMount, tick   } from "svelte";
     import Header from "../../../component/Header.svelte";
     import LinkedListNavigation from "../../../component/navigation/Linear/LinkedListNavigation.svelte";
-    import {isListVisible, isUserManualVisible} from "../../../lib/store.js";
+    import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
-    import UserManualPopup from "../../../component/UserManualPopup.svelte";
 
     let numNode = [15, 10, 20, 30, 7]
     let nodePositions = []; // 노드의 실제 위치 저장
@@ -1027,7 +1026,7 @@
 </script>
 
 <main>
-    <div class="navigation-container" style="display: {$isUserManualVisible ? 'none' : 'block'};">
+    <div class="navigation-container">
         <LinkedListNavigation
         {nodePositions} {numNode}
         bind:selectNode
@@ -1051,13 +1050,6 @@
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 연결리스트(LinkedList)
-
-                <!-- 사용자 매뉴얼 -->
-                <button class="manual-button" on:click={() => $isUserManualVisible = true}>?</button>
-
-                {#if $isUserManualVisible}
-                    <UserManualPopup />
-                {/if}
             </div>
 
             <div class="canvas">

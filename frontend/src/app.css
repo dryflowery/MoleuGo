@@ -358,8 +358,8 @@ main {
 }
 /* navigation css */
 
-/* manual-button css */
-.manual-button {
+/* guide-button css */
+.guide-button {
   margin-left: 10px;
   width: 28px;
   height: 28px;
@@ -374,7 +374,7 @@ main {
   cursor: pointer;
 }
 
-.manual-button:hover {
+.guide-button:hover {
   background-color: #444;
 }
-/* manual-button css */
+/* guide-button css */

@@ -1,7 +1,7 @@
 <script>
-    import { isUserManualVisible } from "../lib/store.js";
+    import { isAlgoGuideVisible } from "../../lib/store.js";
 
-    const closeUserManualPopup = (event) => {
+    const closeAlgoGuidePopup = (event) => {
         const popupContent = document.getElementById("popup-content");
 
         if (!popupContent.contains(event.target)) {
@@ -10,17 +10,19 @@
     };
 
     const closePopup = () => {
-        $isUserManualVisible = false;
+        $isAlgoGuideVisible = false;
     };
 </script>
 
 
 <main>
-    <div id="popup-container" on:click={closeUserManualPopup}>
+    <div id="popup-container" on:click={closeAlgoGuidePopup}>
         <div id="popup-content">
             <button id="close-btn" on:click={closePopup}>x</button>
 
             <!-- 매뉴얼 본문 -->
+
+
         </div>
     </div>
 </main>
