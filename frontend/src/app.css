@@ -80,6 +80,8 @@ main {
   color: #FFFFFF;
   font-size: 1.25rem;
   font-weight: bold;
+  display: flex;
+  align-items: center;
 }
 
 .canvas {
@@ -355,3 +357,24 @@ main {
   background-color: #CCCCCC;
 }
 /* navigation css */
+
+/* manual-button css */
+.manual-button {
+  margin-left: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #333;
+  color: #fff;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+.manual-button:hover {
+  background-color: #444;
+}
+/* manual-button css */

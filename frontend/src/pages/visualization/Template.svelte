@@ -2,9 +2,10 @@
     import { onDestroy } from "svelte";
     import Header from "../../component/Header.svelte";
     import Navigation from "../../component/navigation/sort/BubbleSortNavigation.svelte";
-    import {isListVisible} from "../../lib/store";
+    import {isListVisible, isUserManualVisible} from "../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../lib/visualizationStore";
+    import UserManualPopup from "../../component/UserManualPopup.svelte";
 
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
@@ -101,7 +102,14 @@
 
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
-                버블 정렬(Bubble Sort) 
+                버블 정렬(Bubble Sort)
+
+                <!-- 사용자 매뉴얼 -->
+                <button class="manual-button" on:click={() => $isUserManualVisible = true}>?</button>
+
+                {#if $isUserManualVisible}
+                    <UserManualPopup />
+                {/if}
             </div>
 
             <div class="canvas">
