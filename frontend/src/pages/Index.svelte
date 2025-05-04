@@ -453,6 +453,7 @@
         border: 1px solid #3d444d;
         border-radius: 10px;
         padding: 10px;
+        z-index: 0;
     }
 
     /* corner-tag- 1 ~ 3 */
@@ -468,7 +469,7 @@
         padding: 4px 10px;
         font-size: 1em;
         transform-origin: top right;
-        z-index: 10;
+        z-index: 2;
         border-radius: 5px 5px 0px 0px;
         cursor: pointer;
     }
@@ -485,7 +486,7 @@
         padding: 4px 10px;
         font-size: 1em;
         transform-origin: top right;
-        z-index: 10;
+        z-index: 2;
         border-radius: 5px 5px 0px 0px;
         cursor: pointer;
     }
@@ -502,7 +503,7 @@
         padding: 4px 10px;
         font-size: 1em;
         transform-origin: top right;
-        z-index: 10;
+        z-index: 2;
         border-radius: 5px 5px 0px 0px;
         cursor: pointer;
     }
