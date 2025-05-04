@@ -2,9 +2,11 @@
     import { onDestroy, onMount } from "svelte";
     import Header from "../../../component/Header.svelte";
     import Navigation from "../../../component/navigation/sort/BubbleSortNavigation.svelte";
-    import {isListVisible} from "../../../lib/store";
+    import {isListVisible, isAlgoGuideVisible} from "../../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
+    import {incrementAnimationCount} from "../../../lib/mypage/animationCount.js";
+    import BubbleSortGuide from "../../../component/guide/BubbleSortGuide.svelte";
 
     let numArr = [15, 10, 20, 30, 7]
     let graphLeft = [];
@@ -149,6 +151,8 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
+
+        incrementAnimationCount("bubbleSort");
         executeBubbleSortQueries($asyncCnt++);
     };
 
@@ -375,7 +379,7 @@
 </script>
 
 <main>
-    <div class="navigation-container">
+    <div class="navigation-container" style="display: {$isAlgoGuideVisible ? 'none' : 'block'};">
         <Navigation on:createRandomElement={createRandomElement} 
         on:createInputtedElement={createInputtedElement} 
         on:startBubbleSort={startBubbleSort}/>
@@ -392,7 +396,15 @@
 
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
-                버블 정렬(Bubble Sort) 
+                버블 정렬(Bubble Sort)
+
+                <!-- 알고리즘 가이드 -->
+                <button class="guide-button" on:click={() => $isAlgoGuideVisible = true}>?</button>
+
+                {#if $isAlgoGuideVisible}
+                    <!-- 각 알고리즘에 맞는 가이드 넣기 -->
+                    <BubbleSortGuide/>
+                {/if}
             </div>
 
             <div class="canvas">

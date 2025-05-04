@@ -1027,7 +1027,7 @@
 
 <main>
     <div class="navigation-container">
-        <LinkedListNavigation 
+        <LinkedListNavigation
         {nodePositions} {numNode}
         bind:selectNode
         on:createRandomNode={createRandomNode} 

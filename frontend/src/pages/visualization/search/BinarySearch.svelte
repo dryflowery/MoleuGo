@@ -6,6 +6,7 @@
     import {isListVisible} from "../../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep,
         asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
+    import {incrementAnimationCount} from "../../../lib/mypage/animationCount.js";
 
     let arr = [];
     let arrLeft, low, mid, high, lowArrowLeft, midArrowLeft, highArrowLeft;
@@ -205,6 +206,8 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
+
+        incrementAnimationCount("binarySearch");
         executeBinarySearchQueries($asyncCnt++);
     };
 
