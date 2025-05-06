@@ -29,7 +29,7 @@
 
     // Header랑 Main Container가 분리되어 있어서 따로 작성(Header 눌러도 AlgoGuidePopup 안꺼짐 등 여러 문제 있음)
     const closeAlgoGuidePopup = (event) => {
-        const popupContent = document.getElementById("popup-content");
+        const popupContent = document.getElementById("guide-book");
 
         if (!popupContent.contains(event.target) && $isAlgoGuideVisible) {
             $isAlgoGuideVisible = false;
