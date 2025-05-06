@@ -142,7 +142,7 @@
         datastruct_currentIndex = closestIdx;
     };
 
-    // 알고리즘 컨텐츠 박스 스크롤 별 설명 구역  => 스택과 큐에 대한 예시 gif 삽입 예정
+    // 알고리즘 컨텐츠 박스 스크롤 별 설명 구역  => 임의의 알고리즘 두 개정도 gif 삽입 예정
     const algo_sections = [
         {
             title: '버블정렬을 애니메이션으로',
@@ -179,7 +179,7 @@
         algo_currentIndex = closestIdx;
     };
 
-    // 컨텐츠 컨텐츠 박스 스크롤 별 설명 구역  => 스택과 큐에 대한 예시 gif 삽입 예정
+    // 컨텐츠 컨텐츠 박스 스크롤 별 설명 구역  => 모듈에 대한 예시 gif 삽입 예정
     const content_sections = [
         {
             title: '모듈 설명 1',
@@ -256,7 +256,7 @@
             <div id="index-gif-container">
 
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
-                <div id="index-gif-box" style="border: 4px solid {selectedColor}; transition: border 0.5s ease;">
+                <div id="index-gif-box" style="border: 1px solid {selectedColor}; transition: border 0.5s ease;">
                     <!-- svelte-ignore missing-declaration -->
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <div class="corner-tag-1 {selectedTag === 'datastruct' ? 'selected' : ''}" 
@@ -459,7 +459,7 @@
     /* corner-tag- 1 ~ 3 */
     .corner-tag-1 {
         width: 100px;
-        height: 25px;
+        height: 28px;
         position: absolute;
         top: -37px;
         right: 300px;
@@ -476,7 +476,7 @@
 
     .corner-tag-2 {
         width: 100px;
-        height: 25px;
+        height: 28px;
         position: absolute;
         top: -37px;
         right: 170px;
@@ -493,7 +493,7 @@
 
     .corner-tag-3 {
         width: 100px;
-        height: 25px;
+        height: 28px;
         position: absolute;
         top: -37px;
         right: 40px;
@@ -520,7 +520,7 @@
     .corner-tag-2.selected,
     .corner-tag-3.selected {
         height: 35px;
-        transform: translateY(-10px);
+        transform: translateY(-7px);
         transition: all 0.3s ease;
     }
 
@@ -754,7 +754,7 @@
             width: 100px;
             height: 25px;
             position: absolute;
-            top: -37px;
+            top: -34px;
             right: 300px;
             background-color: #4caf50;
             color: white;
@@ -771,7 +771,7 @@
             width: 100px;
             height: 25px;
             position: absolute;
-            top: -37px;
+            top: -34px;
             right: 170px;
             background-color: #8473ff;
             color: white;
@@ -788,7 +788,7 @@
             width: 100px;
             height: 25px;
             position: absolute;
-            top: -37px;
+            top: -34px;
             right: 40px;
             background-color: #424242;
             color: white;
@@ -813,7 +813,7 @@
         .corner-tag-2.selected,
         .corner-tag-3.selected {
             height: 35px;
-            transform: translateY(-10px);
+            transform: translateY(-9px);
             transition: all 0.3s ease;
         }
 

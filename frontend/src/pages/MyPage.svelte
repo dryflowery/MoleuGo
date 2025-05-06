@@ -2,6 +2,7 @@
     import Footer from "../component/Footer.svelte";
     import Header from "../component/Header.svelte";
     import Toast from '../component/Toast.svelte';
+    import TypewriterText from '../component/TypewriterText.svelte';
 
     import { BAD_REQUEST, CONFLICT, FORBIDDEN, OK, UNAUTHORIZED } from "../lib/httpStatusStore.js";
     import { isListVisible } from "../lib/store"
@@ -66,6 +67,91 @@
     let weeksByMonth = []; // 각 달의 시작일이 몇 주차인지
     let monthMargin = 13.25;
 
+    // 로드맵 노드, 간선 활성화 유무 변수들
+    let isLinkedList = false;
+    let isStack = false;
+    let isQueue = false;
+    let isDeque = false;
+    let isHeap = false;
+    let isBubblSort = false;
+    let isSelectionSort = false;
+    let isInsertionSort = false;
+    let isBinarySearchSort = false;
+    let isDFS = false;
+    let isBFS = false;
+    let isDijkstra = false;
+    let isBellmanFord = false;
+    let isFloydWarshall = false;
+    let isConvexHull = false;
+
+    let isStart_to_LikedList = false;
+    let isLinkedList_to_Stack = false;
+    let isStack_to_Queue = false;
+    let isQueue_to_Deque = false;
+    let isDeque_to_Heap = false;
+    let isHeap_to_BubbleSort = false;
+    let isBubbleSort_to_SelectionSort = false;
+    let isSelectionSort_to_InsertionSort = false;
+    let isInsertionSort_to_BinarySearch = false;
+    let isBinarySearch_to_DFS = false;
+    let isDFS_to_BFS = false;
+    let isBFS_to_Dijkstra = false;
+    let isDijkstra_to_BellmanFord = false;
+    let isBellmanFord_to_FloydWarshall = false;
+    let isFloydWarshall_to_ConvexHull = false;
+
+    // 로드맵 설명 칸 변수
+    let isvisible_datastruct = false;
+    let isvisible_datastructTree = false;
+    let isvisible_algorithm = false;
+
+    // 반응형: 로드맵 정보 호출
+    $: dataStructStatus = {
+        "연결리스트": isLinkedList,
+        "스택": isStack,
+        "큐": isQueue,
+        "덱": isDeque
+    };
+
+    $: treeDataStructStatus = {
+        "힙": isHeap
+    };
+
+    $: algorithmStructStatus = {
+        "버블정렬": isBubblSort,
+        "선택정렬": isSelectionSort,
+        "삽입정렬": isInsertionSort,
+        "이분탐색": isBinarySearchSort,
+        "DFS": isDFS,
+        "BFS": isBFS,
+        "다익스트라": isDijkstra,
+        "벨만포드": isBellmanFord,
+        "플로이드워셜": isFloydWarshall,
+        "볼록 껍질": isConvexHull
+    };
+
+    // 반응형: 로드맵 정보 호출 - 애니메이션 정보 작성
+    $: typewriterText_dataStruct = `자료구조 목록: ${JSON.stringify(dataStructStatus, null, 4)}`;
+    $: typewriterText_tree = `트리_자료구조 목록: ${JSON.stringify(treeDataStructStatus, null, 4)}`;
+    $: typewriterText_algorithm = `알고리즘 목록: ${JSON.stringify(algorithmStructStatus, null, 4)}`;
+
+
+    export let text = "";
+    export let speed = 20; // 밀리초 단위
+
+    let displayed = "";
+
+    // 글자를 한 글자씩 추가
+    $: if (text) {
+        displayed = "";
+        let i = 0;
+        const interval = setInterval(() => {
+            displayed += text[i++];
+            if (i >= text.length) clearInterval(interval);
+        }, speed);
+    }
+
+
     // 애니메이션 실행 횟수
     let animationCnt = {
         linkedList: undefined,
@@ -84,6 +170,7 @@
         floydWarshall: undefined,
         convexHull: undefined,
     };
+    
 
     const socialIcons = {
         google: {
@@ -364,8 +451,8 @@
 
     $: {
         if (isRoadMapVisible) {
-            roadMap_h = 710 * scaleFactor;
-            activity_h = 40 * scaleFactor;
+            roadMap_h = 705 * scaleFactor;
+            activity_h = 45 * scaleFactor;
         }
         else {
             roadMap_h = 50 * scaleFactor;
@@ -850,8 +937,25 @@
 
             <div id="right-container">
                 <div id="activity-box"
-                     style="height: {activity_h}px; padding-top: {isRoadMapVisible ? '10px' : '20px'}; transition: height 0.3s ease, padding 0.3s ease;">
-                    <span id='activity-title'>활동 내역</span>
+                     style="height: {activity_h}px; padding-top: {isRoadMapVisible ? '10px' : '20px'}; transition: height 0.3s ease, padding 0.3s ease;"
+                    >
+
+                    <div id='activity-title'> 
+
+                        <span class={isRoadMapVisible ? 'activity-title-span-off' : 'activity-title-span-on'}
+                            on:click={() => isRoadMapVisible = false}>
+                            활동내역
+                        </span> 
+
+                        <span> / </span>
+
+                        <span class={isRoadMapVisible ? 'roadmap-title-span-on' : 'roadmap-title-span-off'}
+                            on:click={() => isRoadMapVisible = true}>
+                            로드맵
+                        </span> 
+
+                    </div>
+                
                     <div id="activity-top-container">
 
                         <div class="lawn-container">
@@ -913,7 +1017,7 @@
                                     </div>
 
                                     <div id="lawn-info-container">
-                                        <div id="lawn-goto-main" on:click={()=> push('/main')}>일일 목표 바로 가기</div>
+                                        <div id="lawn-goto-main">일일 목표를 달성하세요</div>
 
                                         <div id="lawn-info">
                                             Less
@@ -949,14 +1053,188 @@
                 </div> <!--activity-box 끝-->
 
                 <div class="roadMap" style="height: {roadMap_h}px; transition: height 0.3s ease; overflow: hidden;">
+
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
                     <div id="goToRoadMap">
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <div id="RoadMapBtn"on:click={toggleView}>
                             <div style="margin-left: 22px;">
                                 <ion-icon size="large" name="map-outline"></ion-icon>
                             </div>
                         </div>
                     </div>
+
+                    <!--로드맵 캔버스-->
+                    <div class="roadMap-content">
+
+                        <div class="space-ship">
+                            <img class="sapce-ship-img"src="../assets/starship.png"> <!--사용자 현재 위치 표시-->
+                        </div>
+
+                        <div class="start-to-linkedlist" class:active-line={isStart_to_LikedList}></div>
+                        <div class="linkedlist-to-stack" class:active-line={isLinkedList_to_Stack}></div>
+                        <div class="stack-to-queue" class:active-line={isStack_to_Queue}></div>
+                        <div class="queue-to-deque" class:active-line={isQueue_to_Deque}></div>
+                        <div class="deque-to-heap" class:active-line={isDeque_to_Heap}></div>
+                        <div class="heap-to-bubbleSort" class:active-line={isHeap_to_BubbleSort}></div>
+                        <div class="bubbleSort-to-selectionSort" class:active-line={isBubbleSort_to_SelectionSort}></div>
+                        <div class="selectionSort-to-insertionSort" class:active-line={isSelectionSort_to_InsertionSort}></div>
+                        <div class="insertionSort-to-binarySearch" class:active-line={isInsertionSort_to_BinarySearch}></div>
+                        <div class="binarySearch-to-DFS" class:active-line={isBinarySearch_to_DFS}></div>
+                        <div class="DFS-to-BFS" class:active-line={isDFS_to_BFS}></div>
+                        <div class="BFS-to-dijkstra" class:active-line={isBFS_to_Dijkstra}></div>
+                        <div class="dijkstra-to-bellmanFord" class:active-line={isDijkstra_to_BellmanFord}></div>
+                        <div class="bellmanFord-to-floydWarshall" class:active-line={isBellmanFord_to_FloydWarshall}></div>
+                        <div class="floydWarshall-to-convexHull" class:active-line={isFloydWarshall_to_ConvexHull}></div>
+
+
+                        <!-- 자료구조 구역 -->
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <div class="data-container"
+                            on:mouseenter={() => isvisible_datastruct = true}
+                            on:mouseleave={() => isvisible_datastruct = false}>
+
+                            <div class="data-title"> Data-area </div>
+
+                            <div class="linked-list-node" class:active-node-data={isLinkedList}>
+                                {#if isvisible_datastruct}
+                                    <div class="node-label-dataStruct">연결리스트{#if isLinkedList }*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="stack-node" class:active-node-data={isStack}>
+                                {#if isvisible_datastruct}
+                                    <div class="node-label-dataStruct">스택{#if isStack }*{/if} </div>
+                                {/if}
+                            </div>
+                        
+                            <div class="queue-node" class:active-node-data={isQueue}>
+                                {#if isvisible_datastruct}
+                                    <div class="node-label-dataStruct">큐{#if isQueue }*{/if} </div>
+                                {/if}
+                            </div>
+                        
+                            <div class="deque-node" class:active-node-data={isDeque}>
+                                {#if isvisible_datastruct}
+                                    <div class="node-label-dataStruct">덱{#if isDeque }*{/if} </div>
+                                {/if}
+                            </div>
+                            
+                        </div>
+
+                        <!-- 힙 구역 -->
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <div class="heap-container"
+                        on:mouseenter={() => isvisible_datastructTree = true}
+                        on:mouseleave={() => isvisible_datastructTree = false}>
+
+                            <div class="heap-title"> Tree-area </div>
+
+                            <div class="heap-node" class:active-node-heap={isHeap} >
+                                {#if isvisible_datastructTree}
+                                    <div class="node-label-dataStructTree">힙{#if isHeap }*{/if} </div>
+                                {/if}
+                            </div>
+                              
+                        </div>
+
+                        <!-- 알고리즘 구역 -->
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <div class="algo-container"
+                        on:mouseenter={() => isvisible_algorithm = true}
+                        on:mouseleave={() => isvisible_algorithm = false}> 
+
+                            <div class="Algorithm-title"> Algorithm-area </div>
+
+                            <div class="bubbleSort-node" class:active-node-algo={isBubblSort}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm">버블정렬{#if isBubblSort }*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="selectionSort-node" class:active-node-algo={isSelectionSort}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm">선택정렬{#if isSelectionSort }*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="insertionSort-node" class:active-node-algo={isInsertionSort}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm">삽입정렬{#if isInsertionSort }*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="binarySearch-node" class:active-node-algo={isBinarySearchSort}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm">이분탐색{#if isBinarySearchSort}*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="DFS-node" class:active-node-algo={isDFS}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm_4">D F S{#if isDFS}*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="BFS-node" class:active-node-algo={isBFS}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm_4">B F S{#if isBFS}*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="dijkstra-node" class:active-node-algo={isDijkstra}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm_3">다익스트라{#if isDijkstra}*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="bellmanFord-node" class:active-node-algo={isBellmanFord}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm">벨만포드{#if isBellmanFord}*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="floydWarshall-node" class:active-node-algo={isFloydWarshall}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm_1">플로이드 워셜{#if isFloydWarshall}*{/if}</div>
+                                {/if}
+                            </div>
+
+                            <div class="convexHull-node" class:active-node-final={isConvexHull}>
+                                {#if isvisible_algorithm}
+                                    <div class="node-label-algorithm_2">볼록껍질{#if isConvexHull}*{/if}</div>
+                                {/if}
+                            </div>
+
+                        </div>
+
+                        <div class="ShowRoadMap-Info">
+
+                            {#if isvisible_datastruct}
+
+                                <div class="RoadMap-Info-DataStruct">
+                                    <TypewriterText text={typewriterText_dataStruct} speed={20} />
+                                </div>
+                            
+                            {:else if isvisible_datastructTree}
+
+                                <div class="RoadMap-Info-DataStructTree">
+                                    <TypewriterText text={typewriterText_tree} speed={20} />
+                                </div>
+                            {:else if isvisible_algorithm}
+
+                                <div class="RoadMap-Info-Algorithm ">
+                                    <TypewriterText text={typewriterText_algorithm} speed={12} />
+                                </div>
+
+                            {/if}
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div><!--right-container 끝-->
         </div> <!--content 끝-->
     </div> <!--main-container 끝-->
@@ -1127,6 +1405,33 @@
         margin-left: 6px;
     }
 
+
+    .activity-title-span-off {
+        filter: brightness(0.4);
+        cursor: pointer;
+    }
+
+    .activity-title-span-on {
+        cursor: pointer;
+    }
+
+    .activity-title-span-off:hover {
+        filter: brightness(0.8);
+    }
+
+    .roadmap-title-span-off {
+        filter: brightness(0.4);
+        cursor: pointer;
+    }
+
+    .roadmap-title-span-on {
+        cursor: pointer;
+    }
+
+    .roadmap-title-span-off:hover {
+        filter: brightness(0.8);
+    }
+
     #setting-box {
         margin-top: 30px;
         display: flex;
@@ -1241,10 +1546,6 @@
 
     /* -------------------비밀번호 변경 칸 ------------------ */
 
-
-    #change-password-container {
-
-    }
 
     #change-password-Title {
         margin: 10px 0px 10px 0px;
@@ -1439,7 +1740,7 @@
 
     .tooltip {
         position: absolute;
-        top: 120%; /* 아이콘 아래로 조금 띄우기 */
+        top: 120%;
         left: 200%;
         transform: translateX(-50%);
         background-color: rgba(50, 104, 50, 0.8);
@@ -1543,13 +1844,13 @@
         display: grid;
         grid-template-rows: repeat(7, 15px);
         grid-auto-flow: column;
-        gap: 1px; /* 칸 사이 간격 */
+        gap: 1px;
     }
 
     .lawn {
         width: 11px;
         height: 11px;
-        border-radius: 2px; /* 모서리를 살짝 둥글게 */
+        border-radius: 2px;
     }
 
     #lawn-info-container {
@@ -1559,17 +1860,9 @@
         color: #a0a0a0;
     }
 
-    #lawn-goto-main {
-        cursor: pointer;
-    }
-
-    #lawn-goto-main:hover {
-        color: #1c6b24;
-    }
-
     #lawn-info {
         gap: 6px;
-        padding-left: 725px;
+        padding-left: 700px;
         display: flex;
         align-items: center;
     }
@@ -1648,16 +1941,1192 @@
 
     .roadMap {
         display: grid;
-        grid-template-rows: 40px 1fr 0.8fr 60px;
+        grid-template-rows: 40px 1fr;
         margin: 20px 0px 0px 0px;
         width: 1050px;
         height: 50px;
-        background-color: #151b23;
+        background-color: #12161b;
         border: 1px solid #3d444d;
         border-radius: 8px;
         box-sizing: border-box;
         padding: 0px;
     }
+
+    .roadMap-content {
+        position: relative;
+        padding: 10px;
+        margin: 35px;
+        width: 955px;
+        height: 560px;
+        border: 1px solid #282c31;
+        border-radius: 15px;
+        overflow: hidden;
+
+        background: radial-gradient(ellipse at 50% 80%, #21222c 0%, #020202 60%);
+        box-shadow: inset 0 0 20px #383941;
+    }
+
+    .data-container {
+        position: absolute;
+        top: 320px;
+        left: 620px;
+        width: 300px;
+        height: 200px;
+        border: 1px solid #4caf50;
+        border-radius: 15px;
+        box-shadow: inset 0 0 5px #4caf50;
+        
+        background-color: rgba(76, 175, 80, 0.05);
+
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        
+    }
+
+    .data-container:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 20px rgba(100, 255, 100, 0.3);
+    }
+
+    .algo-container {
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        width: 540px;
+        height: 250px;
+        border: 1px solid #8473ff;
+        border-radius: 15px;
+        box-shadow: inset 0 0 5px #8473ff;
+        
+        background-color: rgba(132, 115, 255, 0.05);
+        
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .algo-container:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 20px rgba(132, 115, 255, 0.8);
+    }
+
+    .heap-container {
+        position: absolute;
+        top: 200px;
+        left: 620px;
+        width: 100px;
+        height: 100px;
+        border: 1px solid #70af4c;
+        border-radius: 15px;
+        box-shadow: inset 0 0 5px #60af4c;
+
+        background-color: rgba(96, 175, 76, 0.05);
+
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .heap-container:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(100, 255, 100, 0.3);
+    }
+
+    .ShowRoadMap-Info {
+        position: absolute;
+        top: 340px;
+        left: 100px;
+        width: 300px;
+        height: 175px;
+        border-radius: 10px 10px 0px 0px;
+    }
+
+    .RoadMap-Info-DataStruct,
+    .RoadMap-Info-DataStructTree,
+    .RoadMap-Info-Algorithm
+    {
+        white-space: pre-wrap;
+        font-family: monospace;
+        padding: 0px 10px 10px 10px;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    /* 타이틀 */
+    .data-title {
+        position: absolute;
+        font-size: 1.5rem;
+        font-weight: 400;
+        color: #4caf50;
+
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+
+        left: -35px;
+        top: 10px;
+    }
+
+    .heap-title {
+        position: absolute;
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: #70af4c;
+
+        left: 5px;
+        top: -30px;
+    }
+
+    .Algorithm-title {
+        position: absolute;
+        font-size: 1.5rem;
+        font-weight: 400;
+        color: #8473ff;
+
+        left: 5px;
+        top: 260px;
+    }
+
+    /* 각 자료구조,알고리즘 이름 호출 CSS */
+
+    @keyframes radarFadeIn {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.4);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+    }
+
+    .node-label-dataStruct {
+        position: absolute;
+        top: 38px; 
+        left: 50%;
+        transform: translateX(-50%) scale(0.8);
+        background-color: rgba(0, 255, 100, 0.1);
+        color: #00ff37;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        border: 1px solid #00ff37;
+        border-radius: 4px;
+        padding: 2px 6px;
+        opacity: 0;
+        animation: radarFadeIn 0.3s ease-out forwards;
+        white-space: nowrap;
+    }
+
+    .node-label-dataStructTree {
+        position: absolute;
+        top: -30px; 
+        left: 50%;
+        transform: translateX(-50%) scale(0.8);
+        background-color: rgba(0, 255, 100, 0.1);
+        color: #a6ff00;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        border: 1px solid #a6ff00;
+        border-radius: 4px;
+        padding: 2px 6px;
+        opacity: 0;
+        animation: radarFadeIn 0.3s ease-out forwards;
+        white-space: nowrap;
+    }
+
+    .node-label-algorithm {
+        position: absolute;
+        top: 17px; 
+        left: 50%;
+        transform: translateX(-50%) scale(0.8);
+        rotate: -45deg;
+        background-color: rgba(98, 0, 255, 0.3);
+        color: #8473ff;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        border: 1px solid #8473ff;
+        border-radius: 4px;
+        padding: 4px 6px;
+        opacity: 0;
+        animation: radarFadeIn 0.3s ease-out forwards;
+        white-space: nowrap;
+    }
+
+    /*플로이드 워셜 개별 수정*/
+    .node-label-algorithm_1 {
+        position: absolute;
+        top: -3px; 
+        left: 50%;
+        transform: translateX(-50%) scale(0.8);
+        rotate: -45deg;
+        background-color: rgba(98, 0, 255, 0.3);
+        color: #8473ff;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        border: 1px solid #8473ff;
+        border-radius: 4px;
+        padding: 4px 6px;
+        opacity: 0;
+        animation: radarFadeIn 0.3s ease-out forwards;
+        white-space: nowrap;
+    }
+
+    /* 볼록껍질 개별 수정*/
+    .node-label-algorithm_2 {
+        position: absolute;
+        top: 25px; 
+        left: 10%;
+        transform: translateX(-50%) scale(0.8);
+        rotate: -45deg;
+        background-color: rgba(98, 0, 255, 0.3);
+        color: #8473ff;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        border: 1px solid #8473ff;
+        border-radius: 4px;
+        padding: 4px 6px;
+        opacity: 0;
+        animation: radarFadeIn 0.3s ease-out forwards;
+        white-space: nowrap;
+    }
+
+    /* 다익스트라 개별 수정*/
+    .node-label-algorithm_3 {
+        position: absolute;
+        top: 20px; 
+        left: -40%;
+        transform: translateX(-50%) scale(0.8);
+        rotate: -45deg;
+        background-color: rgba(98, 0, 255, 0.3);
+        color: #8473ff;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        border: 1px solid #8473ff;
+        border-radius: 4px;
+        padding: 4px 6px;
+        opacity: 0;
+        animation: radarFadeIn 0.3s ease-out forwards;
+        white-space: nowrap;
+    }
+
+    /* BFS DFS 개별 수정*/
+    .node-label-algorithm_4 {
+        position: absolute;
+        top: 20px; 
+        left: -40%;
+        transform: translateX(-50%) scale(0.8);
+        rotate: -45deg;
+        background-color: rgba(98, 0, 255, 0.3);
+        color: #8473ff;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        border: 1px solid #8473ff;
+        border-radius: 4px;
+        padding: 4px 6px;
+        opacity: 0;
+        animation: radarFadeIn 0.3s ease-out forwards;
+        white-space: nowrap;
+    }
+
+    /* 사용자 위치 */
+    .sapce-ship-img {
+        position: absolute;
+        top: 500px;
+        left: 460px;
+        width: 80px;
+        height: 80px;
+    }
+
+    /* 기본적인 선 디자인(비활성화 기준) */
+    .start-to-linkedlist,
+    .linkedlist-to-stack,
+    .stack-to-queue,
+    .queue-to-deque,
+    .deque-to-heap,
+    .heap-to-bubbleSort,
+    .bubbleSort-to-selectionSort,
+    .selectionSort-to-insertionSort,
+    .insertionSort-to-binarySearch,
+    .binarySearch-to-DFS,
+    .DFS-to-BFS,
+    .BFS-to-dijkstra,
+    .dijkstra-to-bellmanFord,
+    .bellmanFord-to-floydWarshall,
+    .floydWarshall-to-convexHull
+    {
+        position: absolute;
+        border: 2px dashed #636363;
+    }
+
+    .active-line {
+        border-style: solid;
+        border-color: rgb(116, 116, 116);
+    }
+
+    /* 각 알고리즘 노드간 선 CSS 모음*/
+    .start-to-linkedlist {
+        width: 180px;
+        height: 100px;
+
+        top: 470px;
+        left: 500px;
+
+        border-right: none; 
+        border-bottom: none;
+
+        border-radius: 15px 0px 0px 0px;
+    }
+
+    .linkedlist-to-stack {
+        width: 125px;
+        height: 25px;
+
+        top: 445px;
+        left: 715px;
+
+        border-top: none; 
+        border-left: none;
+
+        border-radius: 0px 0px 15px 0px;
+    }
+
+    .stack-to-queue {
+        width: 45px;
+        height: 40px;
+
+        top: 368px;
+        left: 795px;
+
+        border-bottom: none; 
+        border-left: none;
+
+        border-radius: 0px 15px 0px 0px;
+    }
+
+    .queue-to-deque {
+        width: 45px;
+        height: 40px;
+
+        top: 368px;
+        left: 715px;
+
+        border-bottom: none; 
+        border-left: none;
+        border-right: none;
+
+        border-radius: 0px 0px 0px 0px;
+    }
+
+    .deque-to-heap {
+        width: 10px;
+        height: 97px;
+
+        top: 267px;
+        left: 670px;
+
+        border-top: none; 
+        border-right: none;
+
+        border-radius: 0px 0px 0px 15px;
+    }
+
+    /* 알고리즘 간선 모음 */
+    .heap-to-bubbleSort {
+        width: 107px;
+        height: 40px;
+
+        top: 250px;
+        left: 547px;
+
+        border-bottom: none; 
+        border-left: none;
+        border-right: none;
+
+        border-radius: 0px 0px 0px 0px;
+    }
+
+    .bubbleSort-to-selectionSort {
+        width: 40px;
+        height: 35px;
+
+        top: 195px;
+        left: 527px;
+
+        border-top: none;
+        border-bottom: none; 
+        border-right: none;
+
+        border-radius: 0px 0px 0px 0px;
+    }
+
+    .selectionSort-to-insertionSort {
+        width: 40px;
+        height: 35px;
+
+        top: 125px;
+        left: 527px;
+
+        border-top: none;
+        border-bottom: none; 
+        border-right: none;
+
+        border-radius: 0px 0px 0px 0px;
+    }   
+
+    .insertionSort-to-binarySearch {
+        width: 70px;
+        height: 10px;
+
+        top: 105px;
+        left: 435px;
+
+        border-bottom: none; 
+        border-right: none;
+
+        border-radius: 15px 0px 0px 0px;
+    }
+
+    .binarySearch-to-DFS {
+        width: 77px;
+        height: 63px;
+
+        top: 155px;
+        left: 357px;
+
+        border-top: none; 
+        border-left: none;
+
+        border-radius: 0px 0px 15px 0px;
+    }
+
+    .DFS-to-BFS {
+        width: 40px;
+        height: 40px;
+
+        top: 159px;
+        left: 337px;
+
+        border-top: none;
+        border-bottom: none; 
+        border-right: none;
+
+        border-radius: 0px 0px 0px 0px;
+    }   
+
+    .BFS-to-dijkstra {
+        width: 89px;
+        height: 10px;
+
+        top: 105px;
+        left: 247px;
+
+        border-bottom: none;
+        border-left: none;
+
+        border-radius: 0px 15px 0px 0px;
+    }
+
+    .dijkstra-to-bellmanFord {
+        width: 40px;
+        height: 35px;
+
+        top: 195px;
+        left: 227px;
+
+        border-top: none;
+        border-bottom: none; 
+        border-right: none;
+
+        border-radius: 0px 0px 0px 0px;
+    }
+
+    .bellmanFord-to-floydWarshall {
+        width: 40px;
+        height: 30px;
+
+        top: 127px;
+        left: 227px;
+
+        border-top: none;
+        border-bottom: none; 
+        border-right: none;
+
+        border-radius: 0px 0px 0px 0px;
+    }
+
+    .floydWarshall-to-convexHull {
+        width: 80px;
+        height: 50px;
+
+        top: 200px;
+        left: 127px;
+
+        border-top: none;
+        border-right: none;
+
+        border-radius: 0px 0px 0px 15px;
+    }
+
+
+    /* 각 자료구조 별 행성 모음 */
+    .linked-list-node,
+    .stack-node,
+    .queue-node,
+    .deque-node,
+    .heap-node
+    {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid #307432;
+        box-shadow: 0 0 7px #4caf50;
+    }
+
+    .linked-list-node {
+        top: 132px;
+        left: 60px;
+    }
+
+    .stack-node {
+        top: 90px;
+        left: 202px;
+    }
+
+    .queue-node {
+        top: 30px;
+        left: 140px;
+    }
+
+    .deque-node {
+        top: 30px;
+        left: 60px;
+    }
+
+    .heap-node {
+        top: 34px;
+        left: 34px;
+
+        border: 2px solid #488028;
+        box-shadow: 0 0 5px rgb(19, 100, 22);
+    }
+
+    /* 자료구조 지역에 활성화된 노드에 적용되는 스타일 */
+    .active-node-data::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        
+        width: 50%;
+        height: 50%;
+        border-radius: 50%;
+        background-color: #00a336;
+        box-shadow: 0 0 7px #00c943;
+    }
+
+    /* 트리 자료구조 지역에 활성화된 노드에 적용되는 스타일 */
+    .active-node-heap::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        
+        width: 50%;
+        height: 50%;
+        border-radius: 50%;
+        background-color: #39c900;
+        box-shadow: 0 0 7px #11c900;
+    }
+
+    /* 각 알고리즘 별 행성 모음 */
+    .bubbleSort-node,
+    .selectionSort-node,
+    .insertionSort-node,
+    .binarySearch-node,
+    .DFS-node,
+    .BFS-node,
+    .dijkstra-node,
+    .bellmanFord-node,
+    .floydWarshall-node,
+    .convexHull-node {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 35%;
+        transform: rotate(45deg);
+        border: 2px solid #6256bc;
+        box-shadow: 0 0 10px #392ba1;
+    }
+
+    .bubbleSort-node {
+        top: 181px;
+        left: 460px;
+    }
+
+    .selectionSort-node {
+        top: 110px;
+        left: 460px;
+    }
+
+    .insertionSort-node {
+        top: 40px;
+        left: 460px;
+    }
+
+    .binarySearch-node {
+        top: 70px;
+        left: 367px;
+    }
+
+    .DFS-node {
+        top: 150px;
+        left: 270px;
+    }
+
+    .BFS-node {
+        top: 70px;
+        left: 270px;
+    }
+
+    .dijkstra-node {
+        top: 40px;
+        left: 160px;
+    }
+
+    .bellmanFord-node {
+        top: 110px;
+        left: 160px;
+    }
+
+    .floydWarshall-node {
+        top: 181px;
+        left: 160px;
+    }
+
+    .convexHull-node {
+        top: 110px;
+        left: 60px;
+        border-radius: 15%;
+    }
+
+    .active-node-algo::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        
+        width: 50%;
+        height: 50%;
+        border-radius: 35%;
+        background-color: #796ae7;
+        box-shadow: 0 0 10px #796ae7;
+    }
+
+    .active-node-final::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        
+        width: 50%;
+        height: 50%;
+        border-radius: 5%;
+        background-color: #e5e76a;
+        box-shadow: 0 0 10px #e7df6a;
+    }
+
+    /* 로드맵 미디어 쿼리 */
+    @media screen and (min-width: 2560px) {
+        .roadMap-content {
+            width: 1305px;
+            height: 800px;
+        }
+
+        .data-container {
+            top: 450px;
+            left: 826px;
+            width: 400px;
+            height: 266px;
+        }
+
+        .algo-container {
+            top: 66px; 
+            left: 66px;
+            width: 719px;
+            height: 333px;
+        }
+
+        .heap-container {
+            top: 266px;
+            left: 826px;
+            width: 133px;
+            height: 133px;
+        }
+
+        /* 사용자 위치 */
+        .sapce-ship-img {
+            position: absolute;
+            top: 666px;
+            left: 613.18px;
+            width: 106.64px;
+            height: 106.64px;
+        }
+
+        /* 각 알고리즘 노드간 선 CSS 모음 */
+        .start-to-linkedlist {
+            width: 239.94px;
+            height: 133.3px;
+
+            top: 650px;
+            left: 666.5px;
+
+            border-right: none;
+            border-bottom: none;
+
+            border-radius: 19.995px 0px 0px 0px;
+        }
+
+        .linkedlist-to-stack {
+            width: 166.63px;
+            height: 33.33px;
+
+            top: 617px;
+            left: 952.1px;
+
+            border-top: none;
+            border-left: none;
+
+            border-radius: 0px 0px 19.995px 0px;
+        }
+
+        .stack-to-queue {
+            width: 62px;
+            height: 55px;
+
+            top: 510px;
+            left: 1057px;
+
+            border-bottom: none;
+            border-left: none;
+
+            border-radius: 0px 19.995px 0px 0px;
+        }
+
+        .queue-to-deque {
+            width: 59.99px;
+            height: 53.32px;
+
+            top: 510px;
+            left: 952.1px;
+
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
+
+            border-radius: 0px 0px 0px 0px;
+        }
+
+        .deque-to-heap {
+            width: 13.33px;
+            height: 150px;
+
+            top: 355.01px;
+            left: 893.1px;
+
+            border-top: none;
+            border-right: none;
+
+            border-radius: 0px 0px 0px 19.995px;
+        }
+
+        .heap-to-bubbleSort {
+            width: 143px;
+            height: 53.32px;
+
+            top: 333.25px;
+            left: 727px;
+
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
+
+            border-radius: 0px 0px 0px 0px;
+        }
+
+        .bubbleSort-to-selectionSort {
+            width: 53.32px;
+            height: 46.66px;
+
+            top: 259.99px;
+            left: 702.49px;
+
+            border-top: none;
+            border-bottom: none;
+            border-right: none;
+
+            border-radius: 0px 0px 0px 0px;
+        }
+
+        .selectionSort-to-insertionSort {
+            width: 53.32px;
+            height: 46.66px;
+
+            top: 166.66px;
+            left: 702.49px;
+
+            border-top: none;
+            border-bottom: none;
+            border-right: none;
+
+            border-radius: 0px 0px 0px 0px;
+        }
+
+        .insertionSort-to-binarySearch {
+            width: 93.31px;
+            height: 13.33px;
+
+            top: 139.96px;
+            left: 579.56px;
+
+            border-bottom: none;
+            border-right: none;
+
+            border-radius: 19.995px 0px 0px 0px;
+        }
+
+        .binarySearch-to-DFS {
+            width: 102.64px;
+            height: 83.78px;
+
+            top: 206.62px;
+            left: 475.08px;
+
+            border-top: none;
+            border-left: none;
+
+            border-radius: 0px 0px 19.995px 0px;
+        }
+
+        .DFS-to-BFS {
+            width: 53.32px;
+            height: 53.32px;
+
+            top: 211.95px;
+            left: 449.32px;
+
+            border-top: none;
+            border-bottom: none;
+            border-right: none;
+
+            border-radius: 0px 0px 0px 0px;
+        }
+
+        .BFS-to-dijkstra {
+            width: 118.64px;
+            height: 13.33px;
+
+            top: 139.96px;
+            left: 329.55px;
+
+            border-bottom: none;
+            border-left: none;
+
+            border-radius: 0px 19.995px 0px 0px;
+        }
+
+        .dijkstra-to-bellmanFord {
+            width: 53.32px;
+            height: 46.66px;
+
+            top: 259.99px;
+            left: 302.29px;
+
+            border-top: none;
+            border-bottom: none;
+            border-right: none;
+
+            border-radius: 0px 0px 0px 0px;
+        }
+
+        .bellmanFord-to-floydWarshall {
+            width: 53.32px;
+            height: 39.99px;
+
+            top: 169.59px;
+            left: 302.29px;
+
+            border-top: none;
+            border-bottom: none;
+            border-right: none;
+
+            border-radius: 0px 0px 0px 0px;
+        }
+
+        .floydWarshall-to-convexHull {
+            width: 106.64px;
+            height: 66.66px;
+
+            top: 266.6px;
+            left: 169.99px;
+
+            border-top: none;
+            border-right: none;
+
+            border-radius: 0px 0px 0px 19.995px;
+        }
+
+        /* 각 알고리즘 별 행성 모음 */
+        .linked-list-node,
+        .stack-node,
+        .queue-node,
+        .deque-node,
+        .heap-node {
+            position: absolute;
+            width: 39.99px;
+            height: 39.99px;
+            border-radius: 50%;
+            border: 2px solid #325033;
+            box-shadow: 0 0 6.66px #006603;
+        }
+
+        .linked-list-node {
+            top: 175.96px;
+            left: 79.98px;
+        }
+
+        .stack-node {
+            top: 119.97px;
+            left: 269.26px;
+        }
+
+        .queue-node {
+            top: 39.99px;
+            left: 186.62px;
+        }
+
+        .deque-node {
+            top: 39.99px;
+            left: 79.98px;
+        }
+
+        .heap-node {
+            top: 45.33px;
+            left: 45.33px;
+
+            border: 2px solid #488028;
+            box-shadow: 0 0 6.66px rgb(32, 121, 35);
+        }
+
+        .bubbleSort-node,
+        .selectionSort-node,
+        .insertionSort-node,
+        .binarySearch-node,
+        .DFS-node,
+        .BFS-node,
+        .dijkstra-node,
+        .bellmanFord-node,
+        .floydWarshall-node,
+        .convexHull-node {
+            position: absolute;
+            width: 39.99px;
+            height: 39.99px;
+            border-radius: 35%;
+            transform: rotate(45deg);
+            border: 2px solid #6256bc;
+            box-shadow: 0 0 13.33px #392ba1;
+        }
+
+        .bubbleSort-node {
+            top: 241.87px;
+            left: 613.18px;
+        }
+
+        .selectionSort-node {
+            top: 146.63px;
+            left: 613.18px;
+        }
+
+        .insertionSort-node {
+            top: 53.32px;
+            left: 613.18px;
+        }
+
+        .binarySearch-node {
+            top: 93.31px;
+            left: 489.61px;
+        }
+
+        .DFS-node {
+            top: 199.95px;
+            left: 359.91px;
+        }
+
+        .BFS-node {
+            top: 93.31px;
+            left: 359.91px;
+        }
+
+        .dijkstra-node {
+            top: 53.32px;
+            left: 213.28px;
+        }
+
+        .bellmanFord-node {
+            top: 146.63px;
+            left: 213.28px;
+        }
+
+        .floydWarshall-node {
+            top: 241.87px;
+            left: 213.28px;
+        }
+
+        .convexHull-node {
+            top: 146.63px;
+            left: 79.98px;
+            border-radius: 15%;
+        }
+
+        .data-title {
+            position: absolute;
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #4caf50;
+
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+
+            left: -35px;
+            top: 10px;
+        }
+
+        .heap-title {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: #70af4c;
+
+            left: 5px;
+            top: -35px;
+        }
+
+        .Algorithm-title {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: 400;
+            color: #8473ff;
+
+            left: 5px;
+            top: 340px;
+        }
+
+        .ShowRoadMap-Info {
+            position: absolute;
+            top: 475px;
+            left: 100px;
+            width: 300px;
+            height: 175px;
+            border-radius: 10px 10px 0px 0px;
+        }
+
+        .RoadMap-Info-DataStruct,
+        .RoadMap-Info-DataStructTree,
+        .RoadMap-Info-Algorithm
+        {
+            white-space: pre-wrap;
+            font-family: monospace;
+            padding: 5px 10px 10px 10px;
+            font-size: 1rem;
+            border-radius: 8px;
+        }
+
+        .node-label-dataStruct {
+            top: 50px; 
+            left: 50%;
+        }
+
+        .node-label-algorithm {
+            top: 30px; 
+            left: 50%;
+        }
+
+        /*플로이드 워셜 개별 수정*/
+        .node-label-algorithm_1 {
+            position: absolute;
+            top: 10px; 
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            rotate: -45deg;
+            background-color: rgba(98, 0, 255, 0.3);
+            color: #8473ff;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #8473ff;
+            border-radius: 4px;
+            padding: 4px 6px;
+            opacity: 0;
+            animation: radarFadeIn 0.3s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        /* 볼록껍질 개별 수정*/
+        .node-label-algorithm_2 {
+            position: absolute;
+            top: 40px; 
+            left: 10%;
+            transform: translateX(-50%) scale(0.8);
+            rotate: -45deg;
+            background-color: rgba(98, 0, 255, 0.3);
+            color: #8473ff;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #8473ff;
+            border-radius: 4px;
+            padding: 4px 6px;
+            opacity: 0;
+            animation: radarFadeIn 0.3s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        /* 다익스트라 개별 수정*/
+        .node-label-algorithm_3 {
+            position: absolute;
+            top: 40px; 
+            left: -40%;
+            transform: translateX(-50%) scale(0.8);
+            rotate: -45deg;
+            background-color: rgba(98, 0, 255, 0.3);
+            color: #8473ff;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #8473ff;
+            border-radius: 4px;
+            padding: 4px 6px;
+            opacity: 0;
+            animation: radarFadeIn 0.3s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        /* BFS DFS 개별 수정*/
+        .node-label-algorithm_4 {
+            position: absolute;
+            top: 40px; 
+            left: -10%;
+            transform: translateX(-50%) scale(0.8);
+            rotate: -45deg;
+            background-color: rgba(98, 0, 255, 0.3);
+            color: #8473ff;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #8473ff;
+            border-radius: 4px;
+            padding: 4px 6px;
+            opacity: 0;
+            animation: radarFadeIn 0.3s ease-out forwards;
+            white-space: nowrap;
+        }
+
+    }
+
 
     @media screen and (min-width: 2560px) {
         .main-container {
