@@ -13,3 +13,17 @@ export const incrementAnimationCount = async (algorithm) => {
         });
     }
 }
+
+// 일일목표 검증하는 함수
+export const verifyGoal = async (algorithm) => {
+    if (isLogin) {
+        await fetch('/mypage/verify-daily-goal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ algorithm }),
+        });
+    }
+};

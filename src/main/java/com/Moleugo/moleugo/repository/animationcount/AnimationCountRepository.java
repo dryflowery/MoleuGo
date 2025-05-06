@@ -1,5 +1,7 @@
 package com.Moleugo.moleugo.repository.animationcount;
 
+import com.Moleugo.moleugo.entity.AnimationCount;
+
 import java.util.Map;
 
 public interface AnimationCountRepository {
@@ -9,4 +11,7 @@ public interface AnimationCountRepository {
 
     // algorithm의 카운트를 1 증가시킴
     void incrementCountsByEmail(String email, String algorithm);
+
+    // 회원가입시 DB에 정보주입
+    void insert(AnimationCount animationCount);
 }

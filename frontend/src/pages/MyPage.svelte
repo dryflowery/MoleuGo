@@ -3,6 +3,7 @@
     import Header from "../component/Header.svelte";
     import Toast from '../component/Toast.svelte';
     import TypewriterText from '../component/TypewriterText.svelte';
+    import DailyGoalTypewriter from '../component/DailyGoalTypewriter.svelte';
 
     import { BAD_REQUEST, CONFLICT, FORBIDDEN, OK, UNAUTHORIZED } from "../lib/httpStatusStore.js";
     import { isListVisible } from "../lib/store"
@@ -170,6 +171,12 @@
         floydWarshall: undefined,
         convexHull: undefined,
     };
+
+    // 일일목표 저장할 배열
+    let todayGoals = [];
+
+    // 일일목표 달성 여부 배열
+    let isTodayGoals = [];
     
 
     const socialIcons = {
@@ -526,6 +533,32 @@
         }
     };
 
+    // DB에 일일목표 생성
+    const fetchTodayGoals = async () => {
+        const res = await fetch('/mypage/today-goal', { credentials: 'include' });
+
+        if (res.ok) {
+            const data = await res.json();
+            todayGoals = data;
+        } else {
+            console.error("오늘의 목표를 불러오는 데 실패했습니다.");
+        }
+    };
+
+    // 일일목표 달성여부 확인
+    const fetchGoalStatus = async () => {
+        const res = await fetch('/mypage/today-goal-status', {
+            credentials: 'include',
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            isTodayGoals = data;
+        } else {
+            console.error("오늘의 목표 상태를 불러오지 못했습니다.");
+        }
+    };
+
     // 마이페이지 요소 초기화
     const initMypageInfo = async () => {
         getMonthStartWeek();
@@ -534,6 +567,8 @@
         await fetchAccountType();
         await fetchDailyGoal();
         await fetchAnimationCnt();
+        await fetchTodayGoals();
+        await fetchGoalStatus();
     }
 
     // 페이지 로드될 때 초기화
@@ -622,6 +657,7 @@
         dailyGoalYear = selectedYear;
         fetchDailyGoal();
     }
+
 </script>
 
 <main>
@@ -929,7 +965,15 @@
 
                 <div id="left-under-container">
                     <div id="left-under-box" style="height: {currentHeight_U}px; transition: height 0.3s ease;">
-                        <span id='under-title' style="color: #4C905E;">컬렉션</span>
+
+                        <span id='under-title' style="color: #d1d1d1;">일일목표</span>
+
+                        <div class="dailyGoal-box">
+                            {#if isTodayGoals.length > 0 }
+                                <DailyGoalTypewriter goals={isTodayGoals} charSpeed={30} lineDelay={350} />
+                            {/if}
+                        </div>
+
                     </div>
                 </div>
 
@@ -1294,7 +1338,7 @@
 
     #activity-box {
         display: grid;
-        grid-template-rows: 20px 1fr 1fr;
+        grid-template-rows: 15px 1fr 1fr;
         width: 1050px;
         height: 700px;
         background-color: #151b23;
@@ -1307,17 +1351,22 @@
 
     #left-under-box {
         display: grid;
-        grid-template-rows: 270px 1fr;
+        grid-template-rows: 35px 1fr;
         margin: 20px 0px 0px 0px;
         padding: 20px 0px 0px 20px;
         width: 400px;
         height: 224px;
-        background-color: #15231c;
-        border: 1px solid #4a7744;
+        background-color: #131313;
+        border: 1px solid #777e86;
         border-radius: 8px;
         box-sizing: border-box;
         overflow: hidden; /* 높이를 초과하는 내용을 숨김 */
 
+    }
+
+    .dailyGoal-box {
+        margin: 3px 0px 0px 10px;
+        font-size: 0.9rem;
     }
 
     #left-under-container {
@@ -3320,6 +3369,16 @@
             margin: 0px 0px 0px 0px;
 
         }
+
+        #left-under-box {
+            grid-template-rows: 40px 1fr;
+        }
+
+        .dailyGoal-box {
+            margin: 3px 0px 0px 10px;
+            font-size: 1rem;
+        }
+
 
     }
 

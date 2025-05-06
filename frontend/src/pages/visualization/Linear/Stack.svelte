@@ -4,7 +4,7 @@
     import StackNavigation from "../../../component/navigation/Linear/StackNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
-    import {incrementAnimationCount} from "../../../lib/mypage/animationCount.js";
+    import {incrementAnimationCount, verifyGoal} from "../../../lib/mypage/animationCount.js";
 
     let canvasWidth = window.innerWidth * 0.73;
     let canvasHeight = window.innerHeight * 0.78;
@@ -235,6 +235,7 @@
         $isPaused = false;
 
         incrementAnimationCount("stack");
+        verifyGoal("stack");
         executeStackPeekQueries($asyncCnt++);
     };
 
@@ -370,6 +371,7 @@
         $isPaused = false;
 
         incrementAnimationCount("stack");
+        verifyGoal("stack");
         executeStackPopQueries($asyncCnt++);
     };
 
@@ -648,6 +650,7 @@
         $isPaused = false;
 
         incrementAnimationCount("stack");
+        verifyGoal("stack");
         executeStackPushQueries($asyncCnt++);
     };
 
