@@ -356,7 +356,7 @@ main {
   border-radius: 50%;
   background-color: #333;
   color: #fff;
-  font-size: 1rem;
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -368,3 +368,36 @@ main {
   background-color: #444;
 }
 /* guide-button css */
+
+/* algo-guide css */
+.sheet {
+  display: grid;
+  background: #fff; color: black;
+  grid-template-rows: 1fr 15fr 1fr;
+  padding: 1.3rem;
+  height: 95%;
+}
+
+.page-title {
+  display: flex; justify-content: center; align-items: center;
+  font-size: 1.2rem;
+  border-bottom: 1px solid gray; /* 삭제? */
+}
+
+.page-content {
+  border-bottom: 1px solid gray; /* 삭제? */
+  padding: 1rem;
+}
+
+.page-num {
+  display: flex; justify-content: center; align-items: center;
+  font-size: 1.2rem;
+}
+
+/* QHD 미디어 쿼리 */
+@media screen and (min-width: 2560px) {
+  .page-title, .page-num {
+    font-size: 1.6rem;
+  }
+}
+/* algo-guide css */

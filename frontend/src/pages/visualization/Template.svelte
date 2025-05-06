@@ -5,7 +5,7 @@
     import {isListVisible, isAlgoGuideVisible} from "../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../lib/visualizationStore";
-    import BubbleSortGuide from "../../component/guide/BubbleSortGuide.svelte";
+    import BubbleSortGuide from "../../component/guide/bubblesort/BubbleSortGuide.svelte";
 
     // 페이지 바뀌면 애니메이션 종료
     onDestroy(() => {
