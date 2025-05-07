@@ -74,7 +74,7 @@
     let isQueue = false;
     let isDeque = false;
     let isHeap = false;
-    let isBubblSort = false;
+    let isBubbleSort = false;
     let isSelectionSort = false;
     let isInsertionSort = false;
     let isBinarySearchSort = false;
@@ -119,7 +119,7 @@
     };
 
     $: algorithmStructStatus = {
-        "버블정렬": isBubblSort,
+        "버블정렬": isBubbleSort,
         "선택정렬": isSelectionSort,
         "삽입정렬": isInsertionSort,
         "이분탐색": isBinarySearchSort,
@@ -1087,23 +1087,14 @@
                             </div>
                         </div>
 
-                        <div id="activity-top-information-container">
-                            <!--                            <span id='informaition-txt'>최근 공부한 알고리즘: bubble-sort </span>-->
-                            <!--                            <span id='informaition-txt'>연속 출석일수: 3일 </span>-->
-                            <!--                            <span id='informaition-txt' style="color:#83b06d ">모은 commit: 162 </span>-->
-                        </div>
+                        <div id="blank_contariner"> </div> <!-- 그냥 공백 -->
                     </div>
 
                     <div id="activity-bottom-container">
-                        <!--                        <div id="wrote-container">-->
-                        <!--                            <span id='wrote-title'>내가 쓴 글</span>-->
-                        <!--                            <div id="wrote-box"></div>-->
-                        <!--                        </div>-->
+                        <div class="chart-title">
+                            <span>알고리즘 실행 횟수</span>
+                        </div>
 
-                        <!--                        <div id="comment-container" style="padding-left:10px;">-->
-                        <!--                            <span id='comment-title'>내가 쓴 댓글</span>-->
-                        <!--                            <div id="comment-box"></div>-->
-                        <!--                        </div>-->
 
                     </div>
                 </div> <!--activity-box 끝-->
@@ -1202,9 +1193,9 @@
 
                             <div class="Algorithm-title"> Algorithm-area </div>
 
-                            <div class="bubbleSort-node" class:active-node-algo={isBubblSort}>
+                            <div class="bubbleSort-node" class:active-node-algo={isBubbleSort}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm">버블정렬{#if isBubblSort }*{/if}</div>
+                                    <div class="node-label-algorithm">버블정렬{#if isBubbleSort }*{/if}</div>
                                 {/if}
                             </div>
 
@@ -1350,7 +1341,7 @@
 
     #activity-box {
         display: grid;
-        grid-template-rows: 15px 1fr 1fr;
+        grid-template-rows: 15px 0.76fr 1fr;
         width: 1050px;
         height: 700px;
         background-color: #151b23;
@@ -1928,7 +1919,7 @@
         align-items: center;
     }
 
-    #activity-top-information-container {
+    #blank_contariner {
         padding: 28px 28px 0px 4px;
         display: flex;
         flex-direction: column;
@@ -1936,24 +1927,19 @@
         color: #dddddd;
     }
 
+    /*알고리즘 실행 횟수 컨테이너 전체*/
     #activity-bottom-container {
         display: grid;
-        padding: 28px 28px 0px 4px;
-        grid-template-columns:1fr 1fr;
+        padding: 10px 28px 0px 0px;
+        grid-template-rows: 25px 1fr;
     }
 
-    #wrote-title, #comment-container {
-        font-size: large;
-        color: #c9c9c9;
+    /*알고리즘 실행 횟수 컨테이너 CSS 모음*/
+    .chart-title {
         font-weight: bold;
-    }
-
-    #wrote-box, #comment-box {
-        width: 360px;
-        height: 200px;
-        border: 2px solid #3d444d;
-        border-radius: 5px;
-        margin-top: 5px;
+        font-size: 1.25rem;
+        color: #d1d1d1;
+        padding-left: 6px;
     }
 
     #goToRoadMap {
@@ -3329,7 +3315,7 @@
             margin-left: 28px;
         }
 
-        #activity-top-information-container {
+        #blank_contariner {
             margin-left: 28px;
         }
 
