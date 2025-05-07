@@ -34,4 +34,9 @@ public class JpaAnimationCountRepository implements AnimationCountRepository {
 
         em.createQuery(query).setParameter("email", email).executeUpdate();
     }
+
+    @Override
+    public void insert(AnimationCount animationCount) {
+        em.persist(animationCount);
+    }
 }
