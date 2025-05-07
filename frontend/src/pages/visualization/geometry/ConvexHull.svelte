@@ -5,7 +5,7 @@
     import {isListVisible} from "../../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
-    import { incrementAnimationCount } from "../../../lib/mypage/animationCount.js";
+    import { incrementAnimationCount, verifyGoal } from "../../../lib/mypage/animationCount.js";
 
     let pointElements;
     let pointsInfo = [];
@@ -192,6 +192,7 @@
         $isPaused = false;
 
         incrementAnimationCount("convexHull");
+        verifyGoal("convexHull");
         executeConvexHullQueries($asyncCnt++);
     };
 
