@@ -26,6 +26,7 @@ main {
 
 .header-container {
   z-index: 1;
+  height: 70px;
   top: 0;
 }
 
@@ -34,17 +35,6 @@ main {
   bottom: 0;
 }
 
-.index-list-visible {
-  transform: scale(0.79) translateX(250px);
-  transform-origin: center; 
-  transition: transform 0.5s ease;
-}
-
-.index-list-invisible {
-  transform: scale(1.0) translateX(0px);
-  transform-origin: center; 
-  transition: transform 0.5s ease; 
-}
 
 .main-list-visible {
   transform: translateX(220px); 
@@ -80,6 +70,8 @@ main {
   color: #FFFFFF;
   font-size: 1.25rem;
   font-weight: bold;
+  display: flex;
+  align-items: center;
 }
 
 .canvas {
@@ -355,3 +347,57 @@ main {
   background-color: #CCCCCC;
 }
 /* navigation css */
+
+/* guide-button css */
+.guide-button {
+  margin-left: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #333;
+  color: #fff;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+.guide-button:hover {
+  background-color: #444;
+}
+/* guide-button css */
+
+/* algo-guide css */
+.sheet {
+  display: grid;
+  background: #fff; color: black;
+  grid-template-rows: 1fr 15fr 1fr;
+  padding: 1.3rem;
+  height: 95%;
+}
+
+.page-title {
+  display: flex; justify-content: center; align-items: center;
+  font-size: 1.2rem;
+  border-bottom: 1px solid gray; /* 삭제? */
+}
+
+.page-content {
+  border-bottom: 1px solid gray; /* 삭제? */
+  padding: 1rem;
+}
+
+.page-num {
+  display: flex; justify-content: center; align-items: center;
+  font-size: 1.2rem;
+}
+
+/* QHD 미디어 쿼리 */
+@media screen and (min-width: 2560px) {
+  .page-title, .page-num {
+    font-size: 1.6rem;
+  }
+}
+/* algo-guide css */

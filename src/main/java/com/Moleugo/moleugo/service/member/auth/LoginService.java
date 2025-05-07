@@ -26,6 +26,7 @@ public class LoginService {
 
         LoginResponse loginResponse = ac.getBean(LoginResponse.class);
         loginResponse.setCookie(new Cookie("user_session", uuid));
+
     }
 
     public HttpStatus login(Member member) {
