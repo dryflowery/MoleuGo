@@ -5,11 +5,18 @@ import com.Moleugo.moleugo.repository.member.MemberRepository;
 import com.Moleugo.moleugo.service.member.mail.MailService;
 import com.Moleugo.moleugo.validator.SignUpValidator;
 import com.Moleugo.moleugo.util.NicknameGenerator;
+import com.Moleugo.moleugo.repository.animationcount.AnimationCountRepository;
+import com.Moleugo.moleugo.repository.dailygoal.DailyGoalRepository;
+import com.Moleugo.moleugo.entity.AnimationCount;
+import com.Moleugo.moleugo.entity.DailyGoal;
+import com.Moleugo.moleugo.entity.Id.DailyGoalId;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +27,8 @@ public class SignupService {
     private final MemberRepository memberRepository;
     private final AuthService authService;
     private final NicknameGenerator nicknameGenerator;
+    private final AnimationCountRepository animationCountRepository;
+    private final DailyGoalRepository dailyGoalRepository;
 
     public HttpStatus isValidForm(Member member) {
         SignUpValidator signUpValidator = ac.getBean(SignUpValidator.class);
@@ -56,6 +65,7 @@ public class SignupService {
             member.setNickname(nicknameGenerator.generate());
 
             memberRepository.registerMember(member);
+            registerDb(member.getEmail()); // 회원가입 후 DB 초기화
             return HttpStatus.CREATED;
         }
         else {
@@ -73,8 +83,18 @@ public class SignupService {
         else {
             String nickname = nicknameGenerator.generate();
             memberRepository.registerMember(new Member(email, null, "google", null, nickname));
-
+            registerDb(email); // 구글 회원가입 후 DB 초기화 호출
             return HttpStatus.CREATED;
         }
     }
+
+    // 회원가입 시 DB 기본 값 삽입
+    private void registerDb(String email) {
+
+        // AnimationCount insert
+        AnimationCount animationCount = new AnimationCount();
+        animationCount.setEmail(email); // 기본값으로 0 설정
+        animationCountRepository.insert(animationCount);
+    }
+
 }

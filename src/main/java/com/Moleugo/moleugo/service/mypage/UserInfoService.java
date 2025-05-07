@@ -2,8 +2,10 @@ package com.Moleugo.moleugo.service.mypage;
 
 import com.Moleugo.moleugo.entity.DailyGoal;
 import com.Moleugo.moleugo.entity.Member;
+import com.Moleugo.moleugo.repository.animationcount.AnimationCountRepository;
 import com.Moleugo.moleugo.repository.dailygoal.DailyGoalRepository;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -22,9 +25,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserInfoService {
     private final HttpSession session;
     private final DailyGoalRepository dailyGoalRepository;
+    private final AnimationCountRepository animationCountRepository;
 
     private Member getMember(String userSession) {
         return (Member) session.getAttribute(userSession);
@@ -108,6 +113,27 @@ public class UserInfoService {
             }
 
             return ResponseEntity.ok(result);
+        }
+    }
+
+    // { algorithm type, animation count } 형식의 애니메이션 실행 횟수 반환
+    public ResponseEntity<Map<String, Integer>> getAnimationCount(String userSession) {
+        Member member = getMember(userSession);
+
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        else {
+            return ResponseEntity.ok(animationCountRepository.findAllCountsByEmail(member.getEmail()));
+        }
+    }
+
+    // 애니메이션 실행 횟수 설정(갱신)
+    public void incrementAnimationCount(String userSession, String algorithm) {
+        Member member = getMember(userSession);
+
+        if (member != null) {
+           animationCountRepository.incrementCountsByEmail(member.getEmail(), algorithm);
         }
     }
 }

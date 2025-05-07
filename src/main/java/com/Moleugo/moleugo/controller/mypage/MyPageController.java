@@ -1,6 +1,7 @@
 package com.Moleugo.moleugo.controller.mypage;
 
 
+import com.Moleugo.moleugo.dto.IncrementAnimationCountRequest;
 import com.Moleugo.moleugo.service.mypage.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -17,27 +20,39 @@ public class MyPageController {
     private final UserInfoService userInfoService;
     
     // 사용자 이메일 반환
-    @GetMapping("/email")
+    @GetMapping("/get-email")
     public ResponseEntity<String> getUserEmail(@CookieValue(value = "user_session", required = false) String userSession) {
         return userInfoService.getUserEmail(userSession);
     }
 
     // 사용자 닉네임 반환
-    @GetMapping("/nickname")
+    @GetMapping("/get-nickname")
     public ResponseEntity<String> getUserNickname(@CookieValue(value = "user_session", required = false) String userSession) {
         return userInfoService.getUserNickname(userSession);
     }
 
     // 사용자 계정 타입 반환
-    @GetMapping("/account-type")
+    @GetMapping("/get-account-type")
     public ResponseEntity<String> getUserAccountType(@CookieValue(value = "user_session", required = false) String userSession) {
         return userInfoService.getUserAccountType(userSession);
     }
 
     // dailyGoalYear 기준으로 해당 년도의 일일목표 히스토리 반환
-    @PostMapping("/daily-goal")
+    @PostMapping("/get-daily-goal")
     public ResponseEntity<List<Integer>> getDailyGoal(@CookieValue(value = "user_session", required = false) String userSession,
                                                       @RequestBody(required = false) Integer dailyGoalYear) {
         return userInfoService.getDailyGoal(userSession, dailyGoalYear);
+    }
+    
+    // 애니메이션 실행 횟수 반환
+    @GetMapping("/get-animation-count")
+    public ResponseEntity<Map<String, Integer>> getAnimationCount(@CookieValue(value = "user_session", required = false) String userSession) {
+        return userInfoService.getAnimationCount(userSession);
+    }
+
+    @PostMapping("/increment-animation-count")
+    public void incrementAnimationCount(@CookieValue(value = "user_session", required = false) String userSession,
+                                        @RequestBody IncrementAnimationCountRequest req) {
+        userInfoService.incrementAnimationCount(userSession, req.getAlgorithm());
     }
 }

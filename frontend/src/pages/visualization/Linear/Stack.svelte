@@ -4,6 +4,7 @@
     import StackNavigation from "../../../component/navigation/Linear/StackNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
+    import {incrementAnimationCount, verifyGoal} from "../../../lib/mypage/animationCount.js";
 
     let canvasWidth = window.innerWidth * 0.73;
     let canvasHeight = window.innerHeight * 0.78;
@@ -233,8 +234,9 @@
         $pausedIcon = false;
         $isPaused = false;
 
+        incrementAnimationCount("stack");
+        verifyGoal("stack");
         executeStackPeekQueries($asyncCnt++);
-
     };
 
     const pushStackPeekAnimationQuery = (tmpExplanation, tmpFlagAnimation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor,tmpCode) => {
@@ -368,8 +370,9 @@
         $pausedIcon = false;
         $isPaused = false;
 
+        incrementAnimationCount("stack");
+        verifyGoal("stack");
         executeStackPopQueries($asyncCnt++);
-        
     };
 
     const pushStackPopAnimationQuery = (tmpArr, tmpArrowArr, tmpNodePositions, tmpArrowPositions, tmpNodePopAnimations, tmpArrowPopAnimations, tmpExplanation, tmpNodeBgColor, tmpNodeBorderColor, tmpNodeTextColor, tmpArrowColor,tmpCode) => {
@@ -646,9 +649,9 @@
         $pausedIcon = false;
         $isPaused = false;
 
+        incrementAnimationCount("stack");
+        verifyGoal("stack");
         executeStackPushQueries($asyncCnt++);
-        
-
     };
 
     // 애니메이션(Push) 쿼리 저장

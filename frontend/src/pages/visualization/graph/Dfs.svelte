@@ -5,6 +5,7 @@
     import {isListVisible} from "../../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
+    import {incrementAnimationCount, verifyGoal} from "../../../lib/mypage/animationCount.js";
 
     let svgElement, svgRect, nodeElement, nodeRect;
     let startX, startY, startNodeNum, endNodeNum;
@@ -331,6 +332,8 @@
         $pausedIcon = false;
         $isPaused = false;
 
+        incrementAnimationCount("dfs");
+        verifyGoal("dfs");
         executeDfsQueries($asyncCnt++);
     };
 
