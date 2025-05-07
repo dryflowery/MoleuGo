@@ -4,7 +4,7 @@
     import DequeNavigation from "../../../component/navigation/Linear/DequeNavigation.svelte";
     import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
-    import {incrementAnimationCount} from "../../../lib/mypage/animationCount.js";
+    import {incrementAnimationCount,verifyGoal} from "../../../lib/mypage/animationCount.js";
 
 
     let canvasWidth = window.innerWidth * 0.73;
@@ -372,6 +372,7 @@
         activePeek = true;
 
         incrementAnimationCount("deque");
+        verifyGoal("deque");
         executeQueuePeekQueries($asyncCnt++);
         
     };
@@ -523,6 +524,7 @@
         $isPaused = false;
 
         incrementAnimationCount("deque");
+        verifyGoal("deque");
         executeDequeueQueries($asyncCnt++);
         
     };
@@ -1108,6 +1110,7 @@
         $isPaused = false;
 
         incrementAnimationCount("deque");
+        verifyGoal("deque");
         executeEnqueueQueries($asyncCnt++);
     };
 
