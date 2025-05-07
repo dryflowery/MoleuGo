@@ -421,7 +421,13 @@
             monthMargin = 13.25
         }
         else {
-            currentHeight = 525 * scaleFactor; // 고정 높이
+
+            if (currentSetting === "password") {
+                currentHeight = 600 * scaleFactor;
+            } else {
+                currentHeight = 525 * scaleFactor; // 고정 높이
+            }
+
             monthMargin = 18.2;
         }
     }
@@ -445,7 +451,13 @@
             monthMargin = 13.25
         }
         else {
-            currentHeight_U = 224 * scaleFactor; // 고정 높이
+
+            if (currentSetting === "password") {
+                currentHeight_U = 149 * scaleFactor;
+            } else {
+                currentHeight_U = 224 * scaleFactor; // 고정 높이
+            }
+
             monthMargin = 18.2;
         }
     }
@@ -3184,30 +3196,40 @@
         }
 
         #profile-box {
+            grid-template-rows: 345px 1fr;
             width: 533px; /* 400px x 1.333 */
             height: 700px; /* 525px x 1.333 */
         }
 
+        #profile-image {
+            position: absolute;
+            width: 225px;
+            height: 225px;
+            border-radius: 15%;
+        }
+
+        #profile-title {
+            font-weight: bold;
+            font-size: 20px;
+            color: #d1d1d1;
+            margin-left: 20px;
+        }
+
+        #profile-edit-Btn {
+            margin: 175px 0px 0px 175px;
+        }
+
+
         #profile-image-container {
-            width: 175px;
-            height: 175px;
+            width: 225px;
+            height: 225px;
             border: 1px solid #949494;
             background-color: rgb(88, 88, 88);
-            margin: 10px 0px 0px 175px;
+            margin: 20px 0px 0px 150px;
         }
 
         #nickName {
-            font-weight: bold;
-            font-size: large;
-            color: #c4c4c4;
-
-            margin: 15px 0px 0px 0px;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            flex-wrap: wrap;
+            font-size: 1.2rem;
         }
 
         #email-setting, #nickname-setting, #password-setting {
@@ -3300,7 +3322,7 @@
         }
 
         #lawn-info {
-            padding-left: 1000px;
+            padding-left: 950px;
         }
 
         #activity-bottom-container {
