@@ -86,11 +86,11 @@
             {/if}
 
             {#if type === "fail"}
-                <img src="assets/fail.png" width="120px" alt=""><br>
+                <img src="assets/email/fail.png" width="120px" alt=""><br>
                 <br><br>
                 <p style="color: white; padding-top: 7.5px;">세션이 만료되었거나, 잘못된 접근입니다.</p>
             {:else if type === "find-password-success"}
-                <img src="assets/success.png" width="120px" alt="">
+                <img src="assets/email/success.png" width="120px" alt="">
                 <br><br>
                 <p>발급된 임시 비밀번호는
                     <span style="color:#00a000; cursor: pointer;"
@@ -102,7 +102,7 @@
                     입니다.</p>
                 <p>로그인 후 비밀번호를 변경해주세요.</p>
             {:else}
-                <img src="assets/success.png" width="120px" alt="">
+                <img src="assets/email/success.png" width="120px" alt="">
                 <br><br>
                 <p style="color: white; padding-top: 7.5px;">메인 화면으로 이동 후 로그인하시면,</p>
                 <p style="color: white; padding-top: 7.5px;">모르고의 다양한 서비스를 마음껏 이용하실 수 있습니다.</p>
