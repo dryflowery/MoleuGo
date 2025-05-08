@@ -49,7 +49,7 @@
     
     <span id="header-left-container">
         <div id="menu-circle" on:click={setAlgorithmListVisible}>
-            <img src="assets/menu.png" alt="" id="menu-toggle-icon">
+            <img src="assets/header/menu.png" alt="" id="menu-toggle-icon">
         </div>
 
         <div id="site-icon"></div>

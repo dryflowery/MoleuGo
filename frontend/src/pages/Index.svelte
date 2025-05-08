@@ -108,14 +108,14 @@
     // 자료구조 컨텐츠 박스 스크롤 별 설명 구역  => 스택과 큐에 대한 예시 gif 삽입 예정
     const datastruct_sections = [
         {
-            title: '자료구조 스택을 애니메이션으로',
+            title: '스택 자료구조를 애니메이션으로',
             desc: '스택에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/image1.png',
+            image: '../assets/index/image1.png',
         },
         {
             title: '자료구조 큐를 애니메이션으로',
             desc: '큐에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/image2.png',
+            image: '../assets/index/image2.png',
         },
     ];
 
@@ -147,12 +147,12 @@
         {
             title: '버블정렬을 애니메이션으로',
             desc: '버블정렬에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/image1.png',
+            image: '../assets/index/image1.png',
         },
         {
             title: 'DFS를 애니메이션으로',
             desc: 'DFS에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/image2.png',
+            image: '../assets/index/image2.png',
         },
     ];
 
@@ -184,22 +184,22 @@
         {
             title: '모듈 설명 1',
             desc: '모듈에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/image1.png',
+            image: '../assets/index/image1.png',
         },
         {
             title: '모듈 설명 2',
             desc: '모듈에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/image2.png',
+            image: '../assets/index/image2.png',
         },
         {
             title: '모듈 설명 3',
             desc: '모듈에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/image3.png',
+            image: '../assets/index/image3.png',
         },
         {
             title: '모듈 설명 4',
             desc: '모듈에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/image4.png',
+            image: '../assets/index/image4.png',
         },
     ];
 

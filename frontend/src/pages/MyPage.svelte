@@ -155,6 +155,21 @@
         }, speed);
     }
 
+    // 애니메이션 실행 총 횟수
+    let totalCount = 0;
+
+    // 일일목표 저장할 배열
+    let todayGoals = [];
+
+    // 일일목표 달성 여부 배열
+    let isTodayGoals = [];
+
+    // 차트 객체 변수
+    let canvasRef;
+    let chart;
+
+    // 알고리즘 횟수 테이블 정렬 변수
+    let sortOrder = 'default';
 
     // 애니메이션 실행 횟수
     let animationCnt = {
@@ -175,48 +190,7 @@
         convexHull: undefined,
     };
 
-    // 애니메이션 실행 총 횟수
-    let totalCount = 0;
-
-    // 일일목표 저장할 배열
-    let todayGoals = [];
-
-    // 일일목표 달성 여부 배열
-    let isTodayGoals = [];
-
-    // 차트 객체 변수
-    let canvasRef;
-    let chart;
-
-    // 차트 색상들 (순서대로 연결리스트, 스텍, 큐 ... )
-    const colors = [
-        // 자료구조 - 그린
-        '#4caf50',
-        '#43a047',
-        '#388e3c',
-        '#2e7d32',
-        '#1b5e20',
-
-        // 이진탐색 - 블루그린
-        '#00acc1',
-
-        // 정렬 - 오렌지
-        '#ffb74d',
-        '#ffa726',
-        '#fb8c00',
-
-        // 그래프 - 블루퍼플
-        '#7986cb',
-        '#5c6bc0',
-        '#3f51b5',
-        '#303f9f',
-        '#1a237e',
-
-        // 기하 - 퍼플핑크
-        '#ba68c8'
-    ];
-
-    // 알고리즘 차트 라벨 한글 매핑
+    // 알고리즘 한글 매핑
     const labelMap = {
         linkedList: '연결리스트',
         stack: '스택',
@@ -241,14 +215,78 @@
         return ((value ?? 0) / totalCount * 100).toFixed(1) + '%';
     };
 
+    const toggleSortOrder = () => {
+        if (sortOrder === 'default') sortOrder = 'asc';
+        else if (sortOrder === 'asc') sortOrder = 'desc';
+        else sortOrder = 'default';
+    }
+
+    $: sortedEntries = (() => {
+        const entries = Object.entries(animationCnt);
+
+        if (sortOrder === 'asc') {
+            return [...entries].sort((a, b) => (a[1] ?? 0) - (b[1] ?? 0));
+        } else if (sortOrder === 'desc') {
+            return [...entries].sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
+        } else {
+            // 기본 순서는 labelMap에 정의된 순서로 유지
+            const defaultOrder = Object.keys(labelMap);
+            return defaultOrder.map(key => [key, animationCnt[key]]);
+        }
+    })();
+
 
     // 차트 생성 함수
     const drawAnimationChart = () => {
         const ctx = canvasRef.getContext('2d');
 
-        // 한글 라벨 + 데이터 추출
-        const labels = Object.keys(animationCnt).map(key => labelMap[key]);
-        const data = Object.values(animationCnt);
+        // 차트 색상들 (순서대로 연결리스트, 스텍, 큐 ... )
+        const colorMap = {
+            // 자료구조 - 그린
+            linkedList: '#4caf50',
+            stack: '#43a047',
+            queue: '#388e3c',
+            deque: '#2e7d32',
+            heap: '#1b5e20',
+
+            // 이진탐색 - 블루그린
+            binarySearch: '#00acc1',
+
+            // 정렬 - 오렌지
+            bubbleSort: '#ffb74d',
+            selectionSort: '#ffa726',
+            insertionSort: '#fb8c00',
+
+            // 그래프 - 블루퍼플
+            dfs: '#7986cb',
+            bfs: '#5c6bc0',
+            dijkstra: '#3f51b5',
+            bellmanFord: '#303f9f',
+            floydWarshall: '#1a237e',
+
+            // 기하 - 퍼플핑크
+            convexHull: '#ba68c8'
+        };
+
+        let labels = [];
+        let data = [];
+        let colors = [];
+
+        for (const [key, value] of Object.entries(animationCnt)) {
+            if (value > 0) {
+                labels.push(labelMap[key]);
+                data.push(value);
+                colors.push(colorMap[key]);
+            }
+        }
+
+        let total = data.reduce((a, b) => a + b, 0);
+
+        if (total === 0) {
+            labels = ['데이터 없음'];
+            data = [1];
+            colors = ['#4e4e4e'];
+        }
 
         if (chart) chart.destroy(); // 기존 차트 있으면 제거
 
@@ -274,7 +312,7 @@
                         font: { weight: 'bold', size: 10 },
                         formatter: (value, context) => {
                             const label = context.chart.data.labels[context.dataIndex];
-                            return value > 0 ? `${label}\n(${value})` : '';
+                            return value > 0 ? `${label}` : '';
                         }
                     },
                     legend: { display: false },
@@ -302,10 +340,9 @@
         });
     }
 
-
     const socialIcons = {
         google: {
-            src: 'assets/google.png',
+            src: 'assets/mypage/google.png',
             alt: '구글 계정'
         }
     };
@@ -824,7 +861,7 @@
 
                         <div id="profile-image-container">
                             <!--나중에 수정-->
-                            <img id="profile-image" src={ $isLogin ? 'assets/profile_1.png' : 'assets/profile_guest.png' } alt="">
+                            <img id="profile-image" src={ $isLogin ? 'assets/mypage/profile/profile_basic.png' : 'assets/mypage/profile/profile_guest.png' }>
                             <button id="profile-edit-Btn"> 설정</button>
                         </div>
 
@@ -1156,7 +1193,7 @@
 
                                 {#if !$isLogin}
                                     <div id="overlay-blocker">
-                                        <img id='overlay-image' style="width: 5%" src="assets/lock.png" />
+                                        <img id='overlay-image' style="width: 5%" src="assets/mypage/lock.png" />
                                     </div>
                                 {/if}
 
@@ -1188,7 +1225,6 @@
                                         <div class="lawn-month" style="margin-left: {(weeksByMonth[10] - weeksByMonth[9]) * monthMargin}px">Oct</div>
                                         <div class="lawn-month" style="margin-left: {(weeksByMonth[11] - weeksByMonth[10]) * monthMargin}px">Nov</div>
                                         <div class="lawn-month" style="margin-left: {(weeksByMonth[12] - weeksByMonth[11]) * monthMargin}px">Dec</div>
-
                                     </div>
 
                                     <div class="grid-container">
@@ -1230,102 +1266,28 @@
                                     <thead>
                                         <tr>
                                             <th>알고리즘</th>
-                                            <th>횟수</th>
+
+                                            <th>
+                                                횟수
+                                                <button class="sort-btn" on:click={toggleSortOrder}>
+                                                  <span class="material-icons">
+                                                    {sortOrder === 'default' ? 'drag_handle' : sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward'}
+                                                  </span>
+                                                </button>
+                                            </th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
-
-                                        <tr>
-                                            <td>연결리스트</td>
-                                            <td><strong>{animationCnt.linkedList ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.linkedList)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>스택</td>
-                                            <td><strong>{animationCnt.stack ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.stack)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>큐</td>
-                                            <td><strong>{animationCnt.queue ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.queue)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>덱</td>
-                                            <td><strong>{animationCnt.deque ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.deque)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>힙</td>
-                                            <td><strong>{animationCnt.heap ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.heap)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>버블 정렬</td>
-                                            <td><strong>{animationCnt.bubbleSort ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.bubbleSort)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>선택 정렬</td>
-                                            <td><strong>{animationCnt.selectionSort ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.selectionSort)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>삽입 정렬</td>
-                                            <td><strong>{animationCnt.insertionSort ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.insertionSort)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>이분 탐색</td>
-                                            <td><strong>{animationCnt.binarySearch ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.binarySearch)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>DFS</td>
-                                            <td><strong>{animationCnt.dfs ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.dfs)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>BFS</td>
-                                            <td><strong>{animationCnt.bfs ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.bfs)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>다익스트라</td>
-                                            <td><strong>{animationCnt.dijkstra ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.dijkstra)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>벨만포드</td>
-                                            <td><strong>{animationCnt.bellmanFord ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.bellmanFord)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>플로이드 워셜</td>
-                                            <td><strong>{animationCnt.floydWarshall ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.floydWarshall)}</span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>볼록 껍질</td>
-                                            <td><strong>{animationCnt.convexHull ?? 0}</strong></td>
-                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.convexHull)}</span></td>
-                                        </tr>
-
+                                        {#each sortedEntries as [key, value]}
+                                            <tr>
+                                                <td>{labelMap[key]}</td>
+                                                <td><strong>{value ?? 0}</strong></td>
+                                                <td style="text-align: right;">
+                                                    <span style="color: gray;">{percent(value)}</span>
+                                                </td>
+                                            </tr>
+                                        {/each}
                                     </tbody>
 
                                 </table>
@@ -1357,7 +1319,7 @@
                     <div class="roadMap-content">
 
                         <div class="space-ship">
-                            <img class="sapce-ship-img"src="../assets/starship.png"> <!--사용자 현재 위치 표시-->
+                            <img class="sapce-ship-img"src="../assets/mypage/starship.png"> <!--사용자 현재 위치 표시-->
                         </div>
 
                         <div class="start-to-linkedlist" class:active-line={isStart_to_LikedList}></div>
@@ -2239,6 +2201,27 @@
 
     .chart-info thead {
         border-bottom: 1px solid #6d6d6d;
+    }
+
+    .sort-btn {
+        padding: 2px 6px;
+        font-size: 0.9em;
+        border: 1px solid #151b23;
+        background-color: #151b23;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        width: 32px;
+    }
+
+    .sort-btn:hover {
+        background-color: #2c2c2c;
+    }
+
+    .material-icons {
+        font-size: 18px;
+        vertical-align: middle;
     }
 
     canvas {
