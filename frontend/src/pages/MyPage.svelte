@@ -5,6 +5,9 @@
     import TypewriterText from '../component/TypewriterText.svelte';
     import DailyGoalTypewriter from '../component/DailyGoalTypewriter.svelte';
 
+    import Chart from 'chart.js/auto';
+    import ChartDataLabels from 'chartjs-plugin-datalabels';
+
     import { BAD_REQUEST, CONFLICT, FORBIDDEN, OK, UNAUTHORIZED } from "../lib/httpStatusStore.js";
     import { isListVisible } from "../lib/store"
     import { isLogin } from "../lib/store"
@@ -172,12 +175,133 @@
         convexHull: undefined,
     };
 
+    // 애니메이션 실행 총 횟수
+    let totalCount = 0;
+
     // 일일목표 저장할 배열
     let todayGoals = [];
 
     // 일일목표 달성 여부 배열
     let isTodayGoals = [];
-    
+
+    // 차트 객체 변수
+    let canvasRef;
+    let chart;
+
+    // 차트 색상들 (순서대로 연결리스트, 스텍, 큐 ... )
+    const colors = [
+        // 자료구조 - 그린
+        '#4caf50',
+        '#43a047',
+        '#388e3c',
+        '#2e7d32',
+        '#1b5e20',
+
+        // 이진탐색 - 블루그린
+        '#00acc1',
+
+        // 정렬 - 오렌지
+        '#ffb74d',
+        '#ffa726',
+        '#fb8c00',
+
+        // 그래프 - 블루퍼플
+        '#7986cb',
+        '#5c6bc0',
+        '#3f51b5',
+        '#303f9f',
+        '#1a237e',
+
+        // 기하 - 퍼플핑크
+        '#ba68c8'
+    ];
+
+    // 알고리즘 차트 라벨 한글 매핑
+    const labelMap = {
+        linkedList: '연결리스트',
+        stack: '스택',
+        queue: '큐',
+        deque: '덱',
+        heap: '힙',
+        binarySearch: '이분탐색',
+        bubbleSort: '버블정렬',
+        selectionSort: '선택정렬',
+        insertionSort: '삽입정렬',
+        dfs: 'DFS',
+        bfs: 'BFS',
+        dijkstra: '다익스트라',
+        bellmanFord: '벨만포드',
+        floydWarshall: '플로이드-워셜',
+        convexHull: '볼록 껍질'
+    };
+
+    // 횟수 퍼센테이지 함수
+    const percent = (value) => {
+        if (!totalCount) return '0.0%';
+        return ((value ?? 0) / totalCount * 100).toFixed(1) + '%';
+    };
+
+
+    // 차트 생성 함수
+    const drawAnimationChart = () => {
+        const ctx = canvasRef.getContext('2d');
+
+        // 한글 라벨 + 데이터 추출
+        const labels = Object.keys(animationCnt).map(key => labelMap[key]);
+        const data = Object.values(animationCnt);
+
+        if (chart) chart.destroy(); // 기존 차트 있으면 제거
+
+        chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data,
+                    backgroundColor: colors,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                animation: { duration: 2000 },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                plugins: {
+                    datalabels: {
+                        color: '#fff',
+                        font: { weight: 'bold', size: 10 },
+                        formatter: (value, context) => {
+                            const label = context.chart.data.labels[context.dataIndex];
+                            return value > 0 ? `${label}\n(${value})` : '';
+                        }
+                    },
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                },
+                cutout: '30%'
+            },
+            plugins: [ChartDataLabels,
+                {
+                    id: 'centerText',
+                    beforeDraw(chart) {
+                        const { width, height, ctx } = chart;
+                        const total = Object.values(animationCnt).reduce((sum, v) => sum + v, 0);
+
+                        ctx.save();
+                        ctx.font = 'bold 15px sans-serif';
+                        ctx.fillStyle = '#ffffff';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(`총합: ${total}`, width / 2, height / 2);
+                        ctx.restore();
+                    }
+                }
+            ]
+        });
+    }
+
 
     const socialIcons = {
         google: {
@@ -542,6 +666,10 @@
         if (animationCntRes.ok) {
             const data = await animationCntRes.json();
             animationCnt = { ...animationCnt, ...data };
+
+            totalCount = Object.values(animationCnt)
+            .map(v => v ?? 0)
+            .reduce((a, b) => a + b, 0);
         }
     };
 
@@ -581,6 +709,7 @@
         await fetchAnimationCnt();
         await fetchTodayGoals();
         await fetchGoalStatus();
+        await drawAnimationChart();
     }
 
     // 페이지 로드될 때 초기화
@@ -1086,15 +1215,128 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div id="blank_contariner"> </div> <!-- 그냥 공백 -->
                     </div>
 
                     <div id="activity-bottom-container">
                         <div class="chart-title">
-                            <span>알고리즘 실행 횟수</span>
+                            <span>알고리즘 차트</span>
                         </div>
 
+                        <div class="chart-box">
+
+                            <div class="chart-info">
+                                <table>
+
+                                    <thead>
+                                        <tr>
+                                            <th>알고리즘</th>
+                                            <th>횟수</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        <tr>
+                                            <td>연결리스트</td>
+                                            <td><strong>{animationCnt.linkedList ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.linkedList)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>스택</td>
+                                            <td><strong>{animationCnt.stack ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.stack)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>큐</td>
+                                            <td><strong>{animationCnt.queue ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.queue)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>덱</td>
+                                            <td><strong>{animationCnt.deque ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.deque)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>힙</td>
+                                            <td><strong>{animationCnt.heap ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.heap)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>버블 정렬</td>
+                                            <td><strong>{animationCnt.bubbleSort ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.bubbleSort)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>선택 정렬</td>
+                                            <td><strong>{animationCnt.selectionSort ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.selectionSort)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>삽입 정렬</td>
+                                            <td><strong>{animationCnt.insertionSort ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.insertionSort)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>이분 탐색</td>
+                                            <td><strong>{animationCnt.binarySearch ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.binarySearch)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>DFS</td>
+                                            <td><strong>{animationCnt.dfs ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.dfs)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>BFS</td>
+                                            <td><strong>{animationCnt.bfs ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.bfs)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>다익스트라</td>
+                                            <td><strong>{animationCnt.dijkstra ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.dijkstra)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>벨만포드</td>
+                                            <td><strong>{animationCnt.bellmanFord ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.bellmanFord)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>플로이드 워셜</td>
+                                            <td><strong>{animationCnt.floydWarshall ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.floydWarshall)}</span></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>볼록 껍질</td>
+                                            <td><strong>{animationCnt.convexHull ?? 0}</strong></td>
+                                            <td style="text-align: right;"><span style="color: gray;">{percent(animationCnt.convexHull)}</span></td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                            <div class="chart-img">
+                                <!--알고리즘 횟수 차트-->
+                                <canvas bind:this={canvasRef}></canvas>
+                            </div>
+
+                        </div>
 
                     </div>
                 </div> <!--activity-box 끝-->
@@ -1313,13 +1555,6 @@
         grid-template-columns: 1fr 2.5fr;
     }
 
-    .left-container {
-
-    }
-
-    #right-container {
-
-    }
 
     /* -------------------큰 틀------------------ */
     #profile-box {
@@ -1337,19 +1572,6 @@
         overflow: hidden;
 
 
-    }
-
-    #activity-box {
-        display: grid;
-        grid-template-rows: 15px 0.76fr 1fr;
-        width: 1050px;
-        height: 700px;
-        background-color: #151b23;
-        border: 1px solid #3d444d;
-        border-radius: 8px;
-        box-sizing: border-box;
-        padding: 0 0 0 20px;
-        overflow: hidden;
     }
 
     #left-under-box {
@@ -1435,7 +1657,6 @@
         align-items: center;
         text-align: center;
         flex-wrap: wrap;
-
     }
 
 
@@ -1919,29 +2140,153 @@
         align-items: center;
     }
 
-    #blank_contariner {
-        padding: 28px 28px 0px 4px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        color: #dddddd;
+    /* 차트 칸 */
+    #activity-box {
+        display: grid;
+        grid-template-rows: 15px 0.67fr 1fr;
+        width: 1050px;
+        height: 700px;
+        background-color: #151b23;
+        border: 1px solid #3d444d;
+        border-radius: 8px;
+        box-sizing: border-box;
+        padding: 0 0 0 20px;
+        overflow: hidden;
     }
 
-    /*알고리즘 실행 횟수 컨테이너 전체*/
+    /* 알고리즘 실행 횟수 컨테이너 전체 */
     #activity-bottom-container {
         display: grid;
-        padding: 10px 28px 0px 0px;
-        grid-template-rows: 25px 1fr;
+        padding: 15px 28px 0px 0px;
+        grid-template-rows: 35px 1fr;
     }
 
-    /*알고리즘 실행 횟수 컨테이너 CSS 모음*/
+    /* 알고리즘 실행 횟수 컨테이너 CSS 모음 */
     .chart-title {
         font-weight: bold;
         font-size: 1.25rem;
         color: #d1d1d1;
         padding-left: 6px;
     }
+    
+    /* 차트 CSS */
+    .chart-box {
+        position: relative;
 
+        height: 300px;
+        width: 1000px;
+        background-color: #151b23;
+        border: 2px solid #3d444d;
+        border-radius: 5px;
+        margin-left: 4px;
+        box-sizing: border-box;
+        padding: 15px 10px 10px 40px;
+
+        display: grid;
+        grid-template-columns: 1fr 0.6fr;
+
+    }
+
+    .chart-img {
+        width: 250px;
+        height: 250px;
+        margin: auto;
+        position: relative;
+    }
+
+    .chart-info {
+        max-height: 400px;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        scrollbar-gutter: stable;
+    }
+
+    /* 스크롤 관련 CSS */
+    .chart-info:hover {
+        overflow-y: auto;
+    }
+
+    .chart-info::-webkit-scrollbar {
+        width: 6px;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .chart-info:hover::-webkit-scrollbar {
+        opacity: 1;
+    }
+
+    .chart-info::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 4px;
+    }
+
+    .chart-info::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    /* 차트 테이블 */
+    .chart-info table {
+        width:85%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+    }
+
+    .chart-info th, .chart-info td {
+        text-align: left;
+        padding: 8px 12px;
+    }
+
+    .chart-info thead {
+        border-bottom: 1px solid #6d6d6d;
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* 차트 미디어 쿼리 */
+    @media screen and (min-width: 2560px) {
+
+        /* 차트 칸 QHD */
+        #activity-box {
+            width: 1400px;
+            height: 933px;
+            grid-template-rows: 30px 0.64fr 1fr;
+        }
+        .chart-title {
+            font-size: 1.5rem;
+        }
+
+        /* 차트 */
+        .chart-box {
+            height: 400px;
+            width: 1340px;
+            margin-left: 4px;
+            padding: 30px 10px 10px 52px;
+
+            display: grid;
+            grid-template-columns: 1fr 0.6fr;
+
+        }
+
+        .chart-img {
+            width: 340px;
+            height: 340px;
+            margin: auto;
+            position: relative;
+        }
+
+        .chart-info table {
+            font-size: 1.2rem;
+        }
+
+    }
+
+
+
+    /* 로드맵 버튼 */
     #goToRoadMap {
         margin: 0 auto;
     }
@@ -3254,12 +3599,6 @@
             text-align: left; /* 텍스트 정렬 */
         }
 
-        #activity-box {
-            width: 1400px; /* 800px x 1.333 */
-            height: 933px; /* 700px x 1.333 */
-            grid-template-rows: 30px 1fr 1fr;
-        }
-
         #activity-title {
             margin-left: 8px;
         }
@@ -3312,11 +3651,7 @@
         }
 
         #activity-bottom-container {
-            margin-left: 28px;
-        }
-
-        #blank_contariner {
-            margin-left: 28px;
+            margin-left: 0px;
         }
 
         .grid-container {
