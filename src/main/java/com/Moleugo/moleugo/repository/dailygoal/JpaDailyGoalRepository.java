@@ -42,4 +42,10 @@ public class JpaDailyGoalRepository implements DailyGoalRepository {
     public void updateAchievedCount(DailyGoal dailyGoal) {
         em.merge(dailyGoal);
     }
+
+    @Override
+    public void delete(DailyGoal dailyGoal) {
+        em.remove(em.contains(dailyGoal) ? dailyGoal : em.merge(dailyGoal));
+    }
+
 }

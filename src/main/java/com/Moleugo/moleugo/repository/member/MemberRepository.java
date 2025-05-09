@@ -31,6 +31,9 @@ public interface MemberRepository {
     // 멤버 객체 갱신
     void updateMember(Member updatedMember);
 
+    // 삭제
+    void delete(Member member);
+
     // 멤버 객체 모두찾기
     List<Member> findAll();
 }
