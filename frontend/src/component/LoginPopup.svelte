@@ -112,7 +112,8 @@
 
     const googleLogin = () => {
         const client_id = "548082459277-meajirn1br2a1g2916ottstii0d54sc2.apps.googleusercontent.com";
-        const redirect_uri = import.meta.env.BASE_URL + "/login" || "http://localhost:8080/login";
+        const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:8080";
+        const redirect_uri = `${baseUrl}/login`;
         const response_type = "code";
         const scope = "email profile";
         let base_url = "https://accounts.google.com/o/oauth2/v2/auth";
