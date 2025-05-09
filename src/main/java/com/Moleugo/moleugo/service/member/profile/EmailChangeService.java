@@ -7,6 +7,7 @@ import com.Moleugo.moleugo.service.member.mail.MailService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,8 @@ public class EmailChangeService {
     private final MemberRepository memberRepository;
     private final MailService mailService;
     private final AuthService authService;
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     /**
      * 현재 로그인한 사용자로부터 이메일 변경 요청을 받아 새 이메일로 인증 메일 전송
@@ -38,7 +41,7 @@ public class EmailChangeService {
         String uuid = authService.createSession(newMember, 1800);
         session.setAttribute("old_email_" + uuid, currentMember.getEmail()); // 기존 이메일 저장
 
-        String verificationLink = "http://localhost:8080/user/change-email/" + uuid;
+        String verificationLink = baseUrl + "/user/change-email/" + uuid;
         String content = """
             이메일 변경 요청이 접수되었습니다.<br/>
             아래 링크를 클릭하여 새 이메일을 인증해주세요.<br/><br/>
