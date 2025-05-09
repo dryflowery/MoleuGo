@@ -12,6 +12,7 @@ import com.Moleugo.moleugo.entity.DailyGoal;
 import com.Moleugo.moleugo.entity.Id.DailyGoalId;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ public class SignupService {
     private final NicknameGenerator nicknameGenerator;
     private final AnimationCountRepository animationCountRepository;
     private final DailyGoalRepository dailyGoalRepository;
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     public HttpStatus isValidForm(Member member) {
         SignUpValidator signUpValidator = ac.getBean(SignUpValidator.class);
@@ -36,7 +39,7 @@ public class SignupService {
     }
 
     public void sendVerificationEmail(Member member) {
-        String verificationLink = "http://localhost:8080/signup/" + authService.createSession(member, 1800);
+        String verificationLink = baseUrl + "/signup/" + authService.createSession(member, 1800);
         String to = member.getEmail();
         String title = "[moleugo] 회원가입을 완료하려면 이메일을 확인하세요!";
         String content = """
@@ -74,7 +77,7 @@ public class SignupService {
     }
 
     public HttpStatus googleSignUp(String code) {
-        String accessToken = authService.getGoogleAccessToken(code, "http://localhost:8080/signup");
+        String accessToken = authService.getGoogleAccessToken(code, baseUrl + "/signup");
         String email = authService.getGoogleEmail(accessToken);
 
         if(memberRepository.isRegisteredEmail(email)) {
