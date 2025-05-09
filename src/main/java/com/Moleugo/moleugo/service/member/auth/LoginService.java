@@ -7,6 +7,7 @@ import com.Moleugo.moleugo.validator.LoginValidator;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ public class LoginService {
     private final HttpSession session;
     private final AuthService authService;
     private final MemberRepository memberRepository;
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     // create login info(session, cookie)
     public void createLoginInfo(Member member) {
@@ -41,7 +44,7 @@ public class LoginService {
     }
 
     public HttpStatus googleLogin(String code) {
-        String accessToken = authService.getGoogleAccessToken(code, "http://localhost:8080/login");
+        String accessToken = authService.getGoogleAccessToken(code, baseUrl + "/login");
         String email = authService.getGoogleEmail(accessToken);
 
         if(memberRepository.isRegisteredEmail(email) && memberRepository.isGoogleMember(email)) {
