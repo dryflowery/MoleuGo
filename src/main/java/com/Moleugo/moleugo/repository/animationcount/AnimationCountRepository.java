@@ -14,4 +14,11 @@ public interface AnimationCountRepository {
 
     // 회원가입시 DB에 정보주입
     void insert(AnimationCount animationCount);
+
+    //기존 이메일 삭제
+    void deleteByEmail(String email);
+
+    AnimationCount findByEmail(String email);
+
+
 }

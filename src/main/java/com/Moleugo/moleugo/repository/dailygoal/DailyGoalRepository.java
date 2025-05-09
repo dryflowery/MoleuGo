@@ -18,4 +18,6 @@ public interface DailyGoalRepository {
 
     // achieve_count 업데이트
     void updateAchievedCount(DailyGoal dailyGoal);
+
+    void delete(DailyGoal dailyGoal);
 }

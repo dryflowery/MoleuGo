@@ -39,4 +39,16 @@ public class JpaAnimationCountRepository implements AnimationCountRepository {
     public void insert(AnimationCount animationCount) {
         em.persist(animationCount);
     }
+
+    @Override
+    public void deleteByEmail(String email) {
+        AnimationCount count = em.find(AnimationCount.class, email);
+        if (count != null) em.remove(count);
+    }
+
+    @Override
+    public AnimationCount findByEmail(String email) {
+        return em.find(AnimationCount.class, email); // ✅ 추가
+    }
+
 }

@@ -63,6 +63,12 @@ public class JpaMemberRepository implements MemberRepository {
         em.merge(member);
     }
 
+    // 멤버 삭제
+    @Override
+    public void delete(Member member) {
+        em.remove(em.contains(member) ? member : em.merge(member));
+    }
+
     @Override
     public List<Member> findAll() {
         return em.createQuery("SELECT m FROM Member m", Member.class).getResultList();
