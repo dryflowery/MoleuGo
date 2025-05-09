@@ -22,17 +22,17 @@
 
 	let changeToVerifyEmailPage = false; // true면 이메일 인증 페이지로 넘어감
 
-	  // 이메일 유효성 검사
+	// 이메일 유효성 검사
 	function validateEmail(email) {
 
-    	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 		if (!emailRegex.test(email)) {
 			emailErrorMessage = "이메일 형식이 올바르지 않습니다.";
 		} else {
 			emailErrorMessage = "";
 		}
-  	}
+	}
 
 	function validateNewPassword(password) {
 
@@ -44,22 +44,22 @@
 			return;
 		}
 
-    // 1. 영문/숫자/특수문자 중 2가지 이상 포함
-    condition1Met = [
-      /[a-zA-Z]/.test(password), // 영문
-      /[0-9]/.test(password), // 숫자
-      /[^a-zA-Z0-9\s]/.test(password), // 특수문자
-    ].filter(Boolean).length >= 2;
+		// 1. 영문/숫자/특수문자 중 2가지 이상 포함
+		condition1Met = [
+			/[a-zA-Z]/.test(password), // 영문
+			/[0-9]/.test(password), // 숫자
+			/[^a-zA-Z0-9\s]/.test(password), // 특수문자
+		].filter(Boolean).length >= 2;
 
-    // 2. 8자 이상 32자 이하 입력 (공백 제외)
-    condition2Met = password.replace(/\s/g, "").length >= 8 && password.length <= 32;
+		// 2. 8자 이상 32자 이하 입력 (공백 제외)
+		condition2Met = password.replace(/\s/g, "").length >= 8 && password.length <= 32;
 
-    // 3. 연속 3자 이상 동일한 문자/숫자 제외
-    condition3Met = !/(.)\1\1/.test(password);
+		// 3. 연속 3자 이상 동일한 문자/숫자 제외
+		condition3Met = !/(.)\1\1/.test(password);
 	}
 
-  	// 비밀번호 확인 일치 여부 검사
-  	$: {
+	// 비밀번호 확인 일치 여부 검사
+	$: {
 		if (inputVerifyPassword === "") {
 			verifyPasswordMessage = "";
 			verifyPasswordMessageStyle = ""; // 기본 스타일
@@ -70,7 +70,7 @@
 			verifyPasswordMessage = "비밀번호가 일치하지 않습니다";
 			verifyPasswordMessageStyle = "color: rgb(173, 44, 44);"; // 빨간색
 		}
-  	}
+	}
 
 	// 비밀번호 보이기 버튼 토글
 	function toggleNewPasswordVisibility() {
@@ -88,18 +88,18 @@
 		}
 
 		sendCheckFormRequest()
-			.then(noArgs => {
-				if (signUpHttpStatusCode === OK) {
-					changeToVerifyEmailPage = true;
-					sendVerifyEmailRequest();
-				}
-				else if (signUpHttpStatusCode === BAD_REQUEST) {
-					alert("올바르지 않은 형식의 입력입니다.\n이메일 혹은 비밀번호를 다시 입력해주세요.");
-				}
-				else if (signUpHttpStatusCode === CONFLICT) {
-					alert("이미 등록된 이메일입니다.\n다른 이메일을 사용해주세요.");
-				}
-			});
+				.then(noArgs => {
+					if (signUpHttpStatusCode === OK) {
+						changeToVerifyEmailPage = true;
+						sendVerifyEmailRequest();
+					}
+					else if (signUpHttpStatusCode === BAD_REQUEST) {
+						alert("올바르지 않은 형식의 입력입니다.\n이메일 혹은 비밀번호를 다시 입력해주세요.");
+					}
+					else if (signUpHttpStatusCode === CONFLICT) {
+						alert("이미 등록된 이메일입니다.\n다른 이메일을 사용해주세요.");
+					}
+				});
 	};
 
 	// 전체 폼 유효성 검사
@@ -132,9 +132,9 @@
 				verifyPassword: inputVerifyPassword
 			})
 		})
-		.then(response => {
-			signUpHttpStatusCode = response.status;
-		});
+				.then(response => {
+					signUpHttpStatusCode = response.status;
+				});
 	}
 
 	const sendVerifyEmailRequest = () => {
@@ -150,18 +150,14 @@
 				verifyPassword: inputVerifyPassword
 			})
 		})
-		.then(response => {
-			signUpHttpStatusCode = response.status;
-		});
+				.then(response => {
+					signUpHttpStatusCode = response.status;
+				});
 	}
 
 	const googleSignup = () => {
 		const client_id = "548082459277-meajirn1br2a1g2916ottstii0d54sc2.apps.googleusercontent.com";
-		// const baseUrl = import.meta.env.VITE_BASE_URL || "https://moleugo.koyeb.app";
-		console.log("prev")
-		console.log("log = " + import.meta.env.VITE_BASE_URL);
-		console.log("nxt")
-		const baseUrl = "https://moleugo.koyeb.app";
+		const baseUrl = import.meta.env.VITE_BASE_URL || "https://moleugo.koyeb.app";
 		const redirect_uri = `${baseUrl}/signup`;
 		const response_type = "code";
 		const scope = "email profile";
@@ -331,7 +327,7 @@
 		padding: 20px;
 		box-sizing: border-box;
 	}
-  
+
 	/* 헤더 스타일 */
 	.header {
 		margin-bottom: 20px;
@@ -339,7 +335,7 @@
 	.logo {
 		text-align: center;
 	}
-  
+
 	/* 폼 컨테이너 스타일 */
 	.form-container {
 		width: 100%;
@@ -347,19 +343,19 @@
 		max-width: 400px;
 		text-align: center;
 	}
-  
+
 	h1 {
 		margin-bottom: 8px;
 		font-size: 1.5rem;
 		color: #ffffff;
 	}
-  
+
 	p {
 		margin: 0;
 		font-size: 1rem;
 		color: #8d8d8d;
 	}
-  
+
 	form {
 		align-items: center;
 		display: flex;
@@ -368,7 +364,7 @@
 		margin: 50px 0px;
 		margin-bottom: 10px;
 	}
-  
+
 	.input-field {
 		display: flex;
 		flex-direction: column;
@@ -380,14 +376,14 @@
 		position: relative; /* 부모 요소를 기준으로 자식 위치 지정 */
 	}
 
-	
-  
+
+
 	label {
 		text-align: left;
 		font-size: 1rem;
 		color: #ffffff;
 	}
-  
+
 	input {
 		background-color: #414141;
 		padding: 10px;
@@ -398,19 +394,19 @@
 		height: 20px;
 		color: #ffffff;
 	}
-  
+
 	input:focus {
 		outline: none;
 		border-color: #ffffff;
 	}
-  
+
 	.hint {
 		font-size: 0.8rem;
 		color: #888;
 		text-align: left;
 		margin-top: 4px;
 	}
-  
+
 	.submit-button {
 		padding: 12px;
 		background-color: #00a000;
@@ -423,7 +419,7 @@
 		width: 322px;
 		margin-top: 15px;
 	}
-  
+
 	.submit-button:hover {
 		background-color: #007d00;
 	}
@@ -451,43 +447,43 @@
 		line-height: 1.4;
 	}
 
-    .divider {
-        margin: 25px 0;
-        border-top: 1px solid #444;
-        position: relative;
-        color: #9e9e9e;
-    }
+	.divider {
+		margin: 25px 0;
+		border-top: 1px solid #444;
+		position: relative;
+		color: #9e9e9e;
+	}
 
-    .divider:before {
-        content: "간편 회원가입";
-        position: absolute;
-        top: -13px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #151515;
-        padding: 0 10px;
-    }
+	.divider:before {
+		content: "간편 회원가입";
+		position: absolute;
+		top: -13px;
+		left: 50%;
+		transform: translateX(-50%);
+		background-color: #151515;
+		padding: 0 10px;
+	}
 
 	#google-login {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 50px;
-        height: 50px;
-        margin: 0 auto;
-        border-radius: 5px;
-        background-color: #FFFFFF;
-        cursor: pointer;
-    }
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 50px;
+		height: 50px;
+		margin: 0 auto;
+		border-radius: 5px;
+		background-color: #FFFFFF;
+		cursor: pointer;
+	}
 
-    #google-login:hover {
-        background-color: #E0E0E0;
-    }
+	#google-login:hover {
+		background-color: #E0E0E0;
+	}
 
 	#google-login img {
-        width: 24px;
-        height: 24px;
-    }
+		width: 24px;
+		height: 24px;
+	}
 
 	.requirements {
 		margin-top: 10px;
@@ -517,15 +513,15 @@
 		color: #bbbbbb;
 	}
 
-  .toggle-password-btn:hover,   
-  .toggle-password-btn2:hover {
-	  color: #9c9c9c;
-  }
+	.toggle-password-btn:hover,
+	.toggle-password-btn2:hover {
+		color: #9c9c9c;
+	}
 
-  @media (min-width: 2560px) {
-	  .header {
-		  margin-bottom: 20px;
-		  margin-top: 130px;
-	  }
-  }
+	@media (min-width: 2560px) {
+		.header {
+			margin-bottom: 20px;
+			margin-top: 130px;
+		}
+	}
 </style>
