@@ -157,7 +157,11 @@
 
 	const googleSignup = () => {
 		const client_id = "548082459277-meajirn1br2a1g2916ottstii0d54sc2.apps.googleusercontent.com";
-		const baseUrl = import.meta.env.VITE_BASE_URL || "https://moleugo.koyeb.app";
+		// const baseUrl = import.meta.env.VITE_BASE_URL || "https://moleugo.koyeb.app";
+		console.log("prev")
+		console.log("log = " + import.meta.env.VITE_BASE_URL);
+		console.log("nxt")
+		const baseUrl = "https://moleugo.koyeb.app";
 		const redirect_uri = `${baseUrl}/signup`;
 		const response_type = "code";
 		const scope = "email profile";
