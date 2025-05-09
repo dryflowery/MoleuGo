@@ -158,8 +158,6 @@
 	const googleSignup = () => {
 		const client_id = "548082459277-meajirn1br2a1g2916ottstii0d54sc2.apps.googleusercontent.com";
 		const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:8080";
-		console.log("VITE_BASE_URL: " + import.meta.env.VITE_BASE_URL);
-		console.log("baseUrl: " + baseUrl);
 		const redirect_uri = `${baseUrl}/signup`;
 		const response_type = "code";
 		const scope = "email profile";
