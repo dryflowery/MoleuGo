@@ -71,38 +71,28 @@
     let weeksByMonth = []; // 각 달의 시작일이 몇 주차인지
     let monthMargin = 13.25;
 
-    // 로드맵 노드, 간선 활성화 유무 변수들
-    let isLinkedList = false;
-    let isStack = false;
-    let isQueue = false;
-    let isDeque = false;
-    let isHeap = false;
-    let isBubbleSort = false;
-    let isSelectionSort = false;
-    let isInsertionSort = false;
-    let isBinarySearchSort = false;
-    let isDFS = false;
-    let isBFS = false;
-    let isDijkstra = false;
-    let isBellmanFord = false;
-    let isFloydWarshall = false;
-    let isConvexHull = false;
+    // 애니메이션 실행 횟수
+    let animationCnt = {
+        linkedList: undefined,
+        stack: undefined,
+        queue: undefined,
+        deque: undefined,
+        heap: undefined,
+        bubbleSort: undefined,
+        selectionSort: undefined,
+        insertionSort: undefined,
+        binarySearch: undefined,
+        dfs: undefined,
+        bfs: undefined,
+        dijkstra: undefined,
+        bellmanFord: undefined,
+        floydWarshall: undefined,
+        convexHull: undefined,
+    };
 
-    let isStart_to_LikedList = false;
-    let isLinkedList_to_Stack = false;
-    let isStack_to_Queue = false;
-    let isQueue_to_Deque = false;
-    let isDeque_to_Heap = false;
-    let isHeap_to_BubbleSort = false;
-    let isBubbleSort_to_SelectionSort = false;
-    let isSelectionSort_to_InsertionSort = false;
-    let isInsertionSort_to_BinarySearch = false;
-    let isBinarySearch_to_DFS = false;
-    let isDFS_to_BFS = false;
-    let isBFS_to_Dijkstra = false;
-    let isDijkstra_to_BellmanFord = false;
-    let isBellmanFord_to_FloydWarshall = false;
-    let isFloydWarshall_to_ConvexHull = false;
+    // 로드맵 노드, 간선 활성화 유무 변수들. 순서는 animationCnt와 같음
+    let isActiveNode = Array(Object.keys(animationCnt).length).fill(false);
+    let isActiveEdge = Array(Object.keys(animationCnt).length).fill(false);
 
     // 로드맵 설명 칸 변수
     let isvisible_datastruct = false;
@@ -111,27 +101,27 @@
 
     // 반응형: 로드맵 정보 호출
     $: dataStructStatus = {
-        "연결리스트": isLinkedList,
-        "스택": isStack,
-        "큐": isQueue,
-        "덱": isDeque
+        "연결리스트": isActiveNode[0],
+        "스택": isActiveNode[1],
+        "큐": isActiveNode[2],
+        "덱": isActiveNode[3]
     };
 
     $: treeDataStructStatus = {
-        "힙": isHeap
+        "힙": isActiveNode[4]
     };
 
     $: algorithmStructStatus = {
-        "버블정렬": isBubbleSort,
-        "선택정렬": isSelectionSort,
-        "삽입정렬": isInsertionSort,
-        "이분탐색": isBinarySearchSort,
-        "DFS": isDFS,
-        "BFS": isBFS,
-        "다익스트라": isDijkstra,
-        "벨만포드": isBellmanFord,
-        "플로이드워셜": isFloydWarshall,
-        "볼록 껍질": isConvexHull
+        "버블정렬": isActiveNode[5],
+        "선택정렬": isActiveNode[6],
+        "삽입정렬": isActiveNode[7],
+        "이분탐색": isActiveNode[8],
+        "DFS": isActiveNode[9],
+        "BFS": isActiveNode[10],
+        "다익스트라": isActiveNode[11],
+        "벨만포드": isActiveNode[12],
+        "플로이드워셜": isActiveNode[13],
+        "볼록 껍질": isActiveNode[14]
     };
 
     // 반응형: 로드맵 정보 호출 - 애니메이션 정보 작성
@@ -170,25 +160,6 @@
 
     // 알고리즘 횟수 테이블 정렬 변수
     let sortOrder = 'default';
-
-    // 애니메이션 실행 횟수
-    let animationCnt = {
-        linkedList: undefined,
-        stack: undefined,
-        queue: undefined,
-        deque: undefined,
-        heap: undefined,
-        binarySearch: undefined,
-        bubbleSort: undefined,
-        selectionSort: undefined,
-        insertionSort: undefined,
-        dfs: undefined,
-        bfs: undefined,
-        dijkstra: undefined,
-        bellmanFord: undefined,
-        floydWarshall: undefined,
-        convexHull: undefined,
-    };
 
     // 알고리즘 한글 매핑
     const labelMap = {
@@ -681,7 +652,7 @@
         }
     };
 
-    // 일일 목표를 가져와요
+    // 일일 목표 가져오기
     const fetchDailyGoal = async () => {
         const dailyGoalRes = await fetch('/mypage/get-daily-goal', {
             method: 'POST',
@@ -736,6 +707,19 @@
         }
     };
 
+    // 로드맵 진행 정도 계산
+    const calcRoadMapProgress = () => {
+        const values = Object.values(animationCnt);
+
+        for (let i = 0; i < values.length; i++) {
+            if(values[i] === 0) {
+                break;
+            }
+
+            isActiveNode[i] = isActiveEdge[i] = true;
+        }
+    };
+
     // 마이페이지 요소 초기화
     const initMypageInfo = async () => {
         getMonthStartWeek();
@@ -747,6 +731,7 @@
         await fetchTodayGoals();
         await fetchGoalStatus();
         await drawAnimationChart();
+        calcRoadMapProgress();
     }
 
     // 페이지 로드될 때 초기화
@@ -1322,21 +1307,21 @@
                             <img class="sapce-ship-img"src="../assets/mypage/starship.png"> <!--사용자 현재 위치 표시-->
                         </div>
 
-                        <div class="start-to-linkedlist" class:active-line={isStart_to_LikedList}></div>
-                        <div class="linkedlist-to-stack" class:active-line={isLinkedList_to_Stack}></div>
-                        <div class="stack-to-queue" class:active-line={isStack_to_Queue}></div>
-                        <div class="queue-to-deque" class:active-line={isQueue_to_Deque}></div>
-                        <div class="deque-to-heap" class:active-line={isDeque_to_Heap}></div>
-                        <div class="heap-to-bubbleSort" class:active-line={isHeap_to_BubbleSort}></div>
-                        <div class="bubbleSort-to-selectionSort" class:active-line={isBubbleSort_to_SelectionSort}></div>
-                        <div class="selectionSort-to-insertionSort" class:active-line={isSelectionSort_to_InsertionSort}></div>
-                        <div class="insertionSort-to-binarySearch" class:active-line={isInsertionSort_to_BinarySearch}></div>
-                        <div class="binarySearch-to-DFS" class:active-line={isBinarySearch_to_DFS}></div>
-                        <div class="DFS-to-BFS" class:active-line={isDFS_to_BFS}></div>
-                        <div class="BFS-to-dijkstra" class:active-line={isBFS_to_Dijkstra}></div>
-                        <div class="dijkstra-to-bellmanFord" class:active-line={isDijkstra_to_BellmanFord}></div>
-                        <div class="bellmanFord-to-floydWarshall" class:active-line={isBellmanFord_to_FloydWarshall}></div>
-                        <div class="floydWarshall-to-convexHull" class:active-line={isFloydWarshall_to_ConvexHull}></div>
+                        <div class="start-to-linkedlist" class:active-line={isActiveEdge[0]}></div>
+                        <div class="linkedlist-to-stack" class:active-line={isActiveEdge[1]}></div>
+                        <div class="stack-to-queue" class:active-line={isActiveEdge[2]}></div>
+                        <div class="queue-to-deque" class:active-line={isActiveEdge[3]}></div>
+                        <div class="deque-to-heap" class:active-line={isActiveEdge[4]}></div>
+                        <div class="heap-to-bubbleSort" class:active-line={isActiveEdge[5]}></div>
+                        <div class="bubbleSort-to-selectionSort" class:active-line={isActiveEdge[6]}></div>
+                        <div class="selectionSort-to-insertionSort" class:active-line={isActiveEdge[7]}></div>
+                        <div class="insertionSort-to-binarySearch" class:active-line={isActiveEdge[8]}></div>
+                        <div class="binarySearch-to-DFS" class:active-line={isActiveEdge[9]}></div>
+                        <div class="DFS-to-BFS" class:active-line={isActiveEdge[10]}></div>
+                        <div class="BFS-to-dijkstra" class:active-line={isActiveEdge[11]}></div>
+                        <div class="dijkstra-to-bellmanFord" class:active-line={isActiveEdge[12]}></div>
+                        <div class="bellmanFord-to-floydWarshall" class:active-line={isActiveEdge[13]}></div>
+                        <div class="floydWarshall-to-convexHull" class:active-line={isActiveEdge[14]}></div>
 
 
                         <!-- 자료구조 구역 -->
@@ -1347,27 +1332,27 @@
 
                             <div class="data-title"> Data-area </div>
 
-                            <div class="linked-list-node" class:active-node-data={isLinkedList}>
+                            <div class="linked-list-node" class:active-node-data={isActiveNode[0]}>
                                 {#if isvisible_datastruct}
-                                    <div class="node-label-dataStruct">연결리스트{#if isLinkedList }*{/if}</div>
+                                    <div class="node-label-dataStruct">연결리스트{#if isActiveNode[0] }*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="stack-node" class:active-node-data={isStack}>
+                            <div class="stack-node" class:active-node-data={isActiveNode[1]}>
                                 {#if isvisible_datastruct}
-                                    <div class="node-label-dataStruct">스택{#if isStack }*{/if} </div>
+                                    <div class="node-label-dataStruct">스택{#if isActiveNode[1] }*{/if} </div>
                                 {/if}
                             </div>
                         
-                            <div class="queue-node" class:active-node-data={isQueue}>
+                            <div class="queue-node" class:active-node-data={isActiveNode[2]}>
                                 {#if isvisible_datastruct}
-                                    <div class="node-label-dataStruct">큐{#if isQueue }*{/if} </div>
+                                    <div class="node-label-dataStruct">큐{#if isActiveNode[2] }*{/if} </div>
                                 {/if}
                             </div>
                         
-                            <div class="deque-node" class:active-node-data={isDeque}>
+                            <div class="deque-node" class:active-node-data={isActiveNode[3]}>
                                 {#if isvisible_datastruct}
-                                    <div class="node-label-dataStruct">덱{#if isDeque }*{/if} </div>
+                                    <div class="node-label-dataStruct">덱{#if isActiveNode[3] }*{/if} </div>
                                 {/if}
                             </div>
                             
@@ -1381,9 +1366,9 @@
 
                             <div class="heap-title"> Tree-area </div>
 
-                            <div class="heap-node" class:active-node-heap={isHeap} >
+                            <div class="heap-node" class:active-node-heap={isActiveNode[4]} >
                                 {#if isvisible_datastructTree}
-                                    <div class="node-label-dataStructTree">힙{#if isHeap }*{/if} </div>
+                                    <div class="node-label-dataStructTree">힙{#if isActiveNode[4] }*{/if} </div>
                                 {/if}
                             </div>
                               
@@ -1397,63 +1382,63 @@
 
                             <div class="Algorithm-title"> Algorithm-area </div>
 
-                            <div class="bubbleSort-node" class:active-node-algo={isBubbleSort}>
+                            <div class="bubbleSort-node" class:active-node-algo={isActiveNode[5]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm">버블정렬{#if isBubbleSort }*{/if}</div>
+                                    <div class="node-label-algorithm">버블정렬{#if isActiveNode[5] }*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="selectionSort-node" class:active-node-algo={isSelectionSort}>
+                            <div class="selectionSort-node" class:active-node-algo={isActiveNode[6]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm">선택정렬{#if isSelectionSort }*{/if}</div>
+                                    <div class="node-label-algorithm">선택정렬{#if isActiveNode[6] }*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="insertionSort-node" class:active-node-algo={isInsertionSort}>
+                            <div class="insertionSort-node" class:active-node-algo={isActiveNode[7]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm">삽입정렬{#if isInsertionSort }*{/if}</div>
+                                    <div class="node-label-algorithm">삽입정렬{#if isActiveNode[7] }*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="binarySearch-node" class:active-node-algo={isBinarySearchSort}>
+                            <div class="binarySearch-node" class:active-node-algo={isActiveNode[8]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm">이분탐색{#if isBinarySearchSort}*{/if}</div>
+                                    <div class="node-label-algorithm">이분탐색{#if isActiveNode[8]}*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="DFS-node" class:active-node-algo={isDFS}>
+                            <div class="DFS-node" class:active-node-algo={isActiveNode[9]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm_4">D F S{#if isDFS}*{/if}</div>
+                                    <div class="node-label-algorithm_4">D F S{#if isActiveNode[9]}*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="BFS-node" class:active-node-algo={isBFS}>
+                            <div class="BFS-node" class:active-node-algo={isActiveNode[10]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm_4">B F S{#if isBFS}*{/if}</div>
+                                    <div class="node-label-algorithm_4">B F S{#if isActiveNode[10]}*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="dijkstra-node" class:active-node-algo={isDijkstra}>
+                            <div class="dijkstra-node" class:active-node-algo={isActiveNode[11]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm_3">다익스트라{#if isDijkstra}*{/if}</div>
+                                    <div class="node-label-algorithm_3">다익스트라{#if isActiveNode[11]}*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="bellmanFord-node" class:active-node-algo={isBellmanFord}>
+                            <div class="bellmanFord-node" class:active-node-algo={isActiveNode[12]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm">벨만포드{#if isBellmanFord}*{/if}</div>
+                                    <div class="node-label-algorithm">벨만포드{#if isActiveNode[12]}*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="floydWarshall-node" class:active-node-algo={isFloydWarshall}>
+                            <div class="floydWarshall-node" class:active-node-algo={isActiveNode[13]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm_1">플로이드 워셜{#if isFloydWarshall}*{/if}</div>
+                                    <div class="node-label-algorithm_1">플로이드 워셜{#if isActiveNode[13]}*{/if}</div>
                                 {/if}
                             </div>
 
-                            <div class="convexHull-node" class:active-node-final={isConvexHull}>
+                            <div class="convexHull-node" class:active-node-final={isActiveNode[14]}>
                                 {#if isvisible_algorithm}
-                                    <div class="node-label-algorithm_2">볼록껍질{#if isConvexHull}*{/if}</div>
+                                    <div class="node-label-algorithm_2">볼록껍질{#if isActiveNode[14]}*{/if}</div>
                                 {/if}
                             </div>
 
