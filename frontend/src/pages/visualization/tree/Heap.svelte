@@ -6,7 +6,7 @@
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
     import { fly } from "svelte/transition";
-    import {incrementAnimationCount, verifyGoal} from "../../../lib/mypage/animationCount.js";
+    import {incrementAnimationCount, verifyGoal} from "../../../lib/updateMypageInfo.js";
 
     let elementCnt = 0, nodeVw = 0, nodeVh = 0;
     let heap = [];
