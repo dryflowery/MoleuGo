@@ -847,7 +847,7 @@
                         <div id="profile-image-container">
                             <!--나중에 수정-->
                             <img id="profile-image" src={ $isLogin ? 'assets/mypage/profile/profile_basic.png' : 'assets/mypage/profile/profile_guest.png' }>
-                            <button id="profile-edit-Btn"> 설정</button>
+                            
                         </div>
 
                         <div id='nickName'>닉네임: {savedUserName}
