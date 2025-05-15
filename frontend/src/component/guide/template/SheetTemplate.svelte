@@ -5,7 +5,13 @@
     <header class="page-title"></header>
 
     <!-- 페이지 본문-->
-    <section class="page-content"></section>
+    <section class="page-content">
+        <div class="page-content-img">
+            <img src="assets/guide/algorithm/file_name">
+        </div>
+
+        <div class="page-content-txt"></div>
+    </section>
 
     <!-- 페이지 번호-->
     <footer class="page-num"></footer>

@@ -572,6 +572,8 @@ main {
 .page-content {
   border-bottom: 1px solid gray; /* 삭제? */
   padding: 1rem;
+  display: grid;
+  grid-template-rows: 2fr 1fr;
 }
 
 .page-num {
@@ -579,10 +581,25 @@ main {
   font-size: 1.2rem;
 }
 
+.page-content-img {
+  border-bottom: 1px solid gray; /* 삭제? */
+  display: flex; justify-content: center; align-items: center;
+}
+
+.page-content-txt {
+  padding-top: 10px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
 /* QHD 미디어 쿼리 */
 @media screen and (min-width: 2560px) {
   .page-title, .page-num {
     font-size: 1.6rem;
+  }
+
+  .page-content-txt {
+    font-size: 1.4rem;
   }
 }
 /* algo-guide css */
