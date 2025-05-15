@@ -109,12 +109,12 @@
     const datastruct_sections = [
         {
             title: '스택 자료구조를 애니메이션으로',
-            desc: '스택에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/index/image1.png',
+            desc: '스택은 데이터를 나중에 넣은 것이 먼저 나오는 LIFO(후입선출) 방식의 자료구조입니다. 애니메이션을 통해 push와 pop 동작을 직관적으로 확인할 수 있습니다.',
+            image: '../assets/index/stack.png',
         },
         {
             title: '자료구조 큐를 애니메이션으로',
-            desc: '큐에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
+            desc: '큐는 먼저 넣은 데이터가 먼저 나오는 FIFO(선입선출) 방식의 자료구조입니다. 애니메이션으로 enqueue와 dequeue 과정을 쉽게 이해할 수 있습니다.',
             image: '../assets/index/image2.png',
         },
     ];
@@ -555,8 +555,8 @@
     }
 
     .datastruct-left-section {
-        margin: 20px 0px 0px 0px;
-        min-height: 300px;
+        margin: 70px 0px 0px 0px;
+        min-height: 250px;
         padding: 3rem;
         color: white;
         display: flex;
@@ -584,12 +584,12 @@
 
     .datastruct-sticky-image {
         position: sticky;
-        top: 5vh;
+        top: 10vh;
         padding: 2rem;
     }
 
     .datastruct-sticky-image img {
-        width: 100%;
+        width: 718px;
         border-radius: 15px;
     }
 

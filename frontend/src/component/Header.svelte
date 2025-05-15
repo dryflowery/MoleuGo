@@ -47,15 +47,17 @@
         <LoginPopup/>
     {/if}
     
-    <span id="header-left-container">
+    <div id="header-left-container">
+
         <div id="menu-circle" on:click={setAlgorithmListVisible}>
             <img src="assets/header/menu.png" alt="" id="menu-toggle-icon">
         </div>
 
-        <div id="site-icon"></div>
+        <div id="site-name" on:click={() => push('/')}>
+            MoleuGo
+        </div>
 
-        <div id="site-name" style="padding-left: 10px;" on:click={() => push('/')}>MoleuGo</div>
-    </span>
+    </div>
 
     <div id="header-right-container">
         {#if $isLogin === false}
@@ -118,20 +120,21 @@
         left: 0; 
     }
 
-    #site-icon {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        border: 5px solid #3d444d;
-        background-color: #8d8d8d;
-        cursor: pointer;
-    }
-
     #site-name {
         color: #FFFFFF;
-        font-size: 1rem;
+        font-size: 1.1rem;
         cursor: pointer;
         font-weight: bold;
+
+        border-radius: 6px;
+        cursor: pointer;
+
+        padding-left: 10px;
+        padding: 8px 12px;
+    }
+
+    #site-name:hover {
+        background-color: rgba(255, 255, 255, 0.1); /* 예: 어두운 배경에서 약간 밝게 */
     }
 
     .sign-btn {
