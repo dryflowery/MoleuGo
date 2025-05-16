@@ -109,7 +109,7 @@
     const datastruct_sections = [
         {
             title: '스택 자료구조를 애니메이션으로',
-            desc: '스택은 데이터를 나중에 넣은 것이 먼저 나오는 LIFO(후입선출) 방식의 자료구조입니다. 애니메이션을 통해 push와 pop 동작을 직관적으로 확인할 수 있습니다.',
+            desc: '스택은 나중에 넣은 데이터가 먼저 나오는 LIFO(후입선출) 방식의 자료구조입니다. 애니메이션을 통해 push와 pop 동작을 직관적으로 확인할 수 있습니다.',
             image: '../assets/index/stack.png',
         },
         {
