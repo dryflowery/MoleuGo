@@ -108,14 +108,14 @@
     // 자료구조 컨텐츠 박스 스크롤 별 설명 구역  => 스택과 큐에 대한 예시 gif 삽입 예정
     const datastruct_sections = [
         {
-            title: '스택 자료구조를 애니메이션으로',
+            title: '스택을 애니메이션으로',
             desc: '스택은 나중에 넣은 데이터가 먼저 나오는 LIFO(후입선출) 방식의 자료구조입니다. 애니메이션을 통해 push와 pop 동작을 직관적으로 확인할 수 있습니다.',
-            image: '../assets/index/stack.png',
+            image: '../assets/index/dataStruct/stackGIF.gif',
         },
         {
-            title: '자료구조 큐를 애니메이션으로',
+            title: '큐를 애니메이션으로',
             desc: '큐는 먼저 넣은 데이터가 먼저 나오는 FIFO(선입선출) 방식의 자료구조입니다. 애니메이션으로 enqueue와 dequeue 과정을 쉽게 이해할 수 있습니다.',
-            image: '../assets/index/image2.png',
+            image: '../assets/index/dataStruct/queueGIF.gif',
         },
     ];
 
@@ -146,13 +146,13 @@
     const algo_sections = [
         {
             title: '버블정렬을 애니메이션으로',
-            desc: '버블정렬에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/index/image1.png',
+            desc: '버블 정렬은 인접한 두 값을 비교해 큰 값을 뒤로 보내는 방식으로, 반복할수록 큰 값이 차례대로 정렬됩니다. 애니메이션을 통해 값들이 어떻게 이동하며 정렬되는지 시각적으로 확인할 수 있습니다.',
+            image: '../assets/index/algorithm/bubbleGIF.gif',
         },
         {
             title: 'DFS를 애니메이션으로',
-            desc: 'DFS에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/index/image2.png',
+            desc: 'DFS는 한 정점에서 출발해 갈 수 있는 만큼 깊이 들어가며 탐색하는 방식입니다. 스택 구조를 활용해 분기마다 가장 깊은 경로를 우선으로 탐색하는 특징이 있으며, 애니메이션을 통해 탐색 경로를 단계별로 확인할 수 있습니다.',
+            image: '../assets/index/algorithm/DFSGIF.gif',
         },
     ];
 
@@ -299,7 +299,7 @@
                             <div id="box-content-datastruct-right" > 
 
                                 <div class="datastruct-sticky-image">
-                                    <img src={datastruct_sections[datastruct_currentIndex].image} alt="image" />
+                                    <img src={datastruct_sections[datastruct_currentIndex].image} alt="image" class="hover-zoom" />
                                 </div>
 
                             </div>
@@ -327,7 +327,7 @@
                             <div id="box-content-algo-right" > 
 
                                 <div class="algo-sticky-image">
-                                    <img src={algo_sections[algo_currentIndex].image} alt="image" />
+                                    <img src={algo_sections[algo_currentIndex].image} alt="image" class="hover-zoom" />
                                 </div>
 
                             </div>
@@ -353,7 +353,7 @@
                             <div id="box-content-content-right" > 
 
                                 <div class="content-sticky-image">
-                                    <img src={content_sections[content_currentIndex].image} alt="image" />
+                                    <img src={content_sections[content_currentIndex].image} alt="image" class="hover-zoom" />
                                 </div>
                             </div>
                         </div>
@@ -539,7 +539,7 @@
         grid-template-columns: 0.35fr 0.75fr;
 
         padding: 10px 10px 10px 10px;
-        width: 100%;
+        width: 1180px;
         height: 100%;
 
         overflow-y: scroll;
@@ -595,16 +595,13 @@
 
     /* box-content-algorithm 과 관련된 모든 CSS*/
     .box-content-algorithm {
-        width: 100%;
-        height: 100%;
-
         box-sizing: border-box;
         
         display: grid;
         grid-template-columns: 0.35fr 0.75fr;
 
         padding: 10px 10px 10px 10px;
-        width: 100%;
+        width: 1180px;
         height: 100%;
 
         overflow-y: scroll;
@@ -619,8 +616,8 @@
     }
 
     .algo-left-section {
-        margin: 20px 0px 0px 0px;
-        min-height: 300px;
+        margin: 70px 0px 0px 0px;
+        min-height: 250px;
         padding: 3rem;
         color: white;
         display: flex;
@@ -636,27 +633,24 @@
 
     .algo-sticky-image {
         position: sticky;
-        top: 5vh;
+        top: 10vh;
         padding: 2rem;
     }
 
     .algo-sticky-image img {
-        width: 100%;
+        width: 718px;
         border-radius: 15px;
     }
 
     /* box-content-content 과 관련된 모든 CSS*/
     .box-content-content {
-        width: 100%;
-        height: 100%;
-
         box-sizing: border-box;
         
         display: grid;
         grid-template-columns: 0.35fr 0.75fr;
 
         padding: 10px 10px 10px 10px;
-        width: 100%;
+        width: 1180px;
         height: 100%;
 
         overflow-y: scroll;
@@ -671,8 +665,8 @@
     }
 
     .content-left-section {
-        margin: 20px 0px 0px 0px;
-        min-height: 300px;
+        margin: 70px 0px 0px 0px;
+        min-height: 250px;
         padding: 3rem;
         color: white;
         display: flex;
@@ -688,13 +682,22 @@
 
     .content-sticky-image {
         position: sticky;
-        top: 5vh;
+        top: 10vh;
         padding: 2rem;
     }
 
     .content-sticky-image img {
-        width: 100%;
+        width: 718px;
         border-radius: 15px;
+    }
+
+    .hover-zoom {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hover-zoom:hover {
+        transform: scale(1.05); /* 약간 커지게 */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
     }
 
     /*FHD(1920x1080) 환경 미디어 쿼리*/
@@ -741,7 +744,7 @@
             position: relative;
             margin: 50px 0px 0px 0px;
             box-sizing: border-box;
-            width: 1000px; /*FHD 한정 고정 길이*/
+            width: 1075px; /*FHD 한정 고정 길이*/
             height: 550px; /*고정 길이 해야 안늘어남*/
             background-color: #0c0c0c;
             border: 1px solid #3d444d;
@@ -848,9 +851,9 @@
         }
 
         .datastruct-left-section {
-            margin: 20px 0px 0px 0px;
-            min-height: 300px;
-            padding: 3rem;
+            margin: 40px 0px 0px 0px;
+            min-height: 200px;
+            padding: 2rem;
             color: white;
             display: flex;
             flex-direction: column;
@@ -871,14 +874,14 @@
         }
 
         #box-content-datastruct-right {
-            height: 1000px;
+            height: 750px;
             position: relative;
         }
 
         .datastruct-sticky-image {
             position: sticky;
-            top: 1.5vh;
-            padding: 2rem;
+            top: 4vh;
+            padding: 1.5rem;
         }
 
         .datastruct-sticky-image img {
@@ -888,9 +891,6 @@
 
         /* box-content-algorithm 과 관련된 모든 CSS*/
         .box-content-algorithm {
-            width: 100%;
-            height: 100%;
-
             box-sizing: border-box;
             
             display: grid;
@@ -912,9 +912,9 @@
         }
 
         .algo-left-section {
-            margin: 20px 0px 0px 0px;
-            min-height: 300px;
-            padding: 3rem;
+            margin: 40px 0px 0px 0px;
+            min-height: 200px;
+            padding: 2rem;
             color: white;
             display: flex;
             flex-direction: column;
@@ -923,14 +923,14 @@
         }
 
         #box-content-algo-right {
-            height: 1000px;
+            height: 750px;
             position: relative;
         }
 
         .algo-sticky-image {
             position: sticky;
-            top: 1.5vh;
-            padding: 2rem;
+            top: 4vh;
+            padding: 1.5rem;
         }
 
         .algo-sticky-image img {

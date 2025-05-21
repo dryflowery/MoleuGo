@@ -1127,9 +1127,15 @@
                 </div> <!--profile-box 끝-->
 
                 <div id="left-under-container">
+
                     <div id="left-under-box" style="height: {currentHeight_U}px; transition: height 0.3s ease;">
 
-                        <span id='under-title' style="color: #d1d1d1;">일일목표</span>
+                        <span id='under-title' style="color: #d1d1d1;">
+                            일일목표
+                            {#if !$isLogin }
+                                <img id='overlay-image' style="width: 5%" src="assets/mypage/lock.png" />
+                            {/if}
+                        </span>
 
                         <div class="dailyGoal-box">
                             {#if isTodayGoals.length > 0 }
@@ -1245,6 +1251,12 @@
 
                         <div class="chart-box">
 
+                            {#if !$isLogin}
+                                <div id="overlay-blocker">
+                                    <img id='overlay-image' style="width: 5%" src="assets/mypage/lock.png" />
+                                </div>
+                            {/if}
+
                             <div class="chart-info">
                                 <table>
 
@@ -1302,6 +1314,12 @@
 
                     <!--로드맵 캔버스-->
                     <div class="roadMap-content">
+
+                        {#if !$isLogin}
+                            <div id="overlay-blocker">
+                                <img id='overlay-image' style="width: 5%" src="assets/mypage/lock.png" />
+                            </div>
+                        {/if}
 
                         <div class="space-ship">
                             <img class="sapce-ship-img"src="../assets/mypage/starship.png"> <!--사용자 현재 위치 표시-->
