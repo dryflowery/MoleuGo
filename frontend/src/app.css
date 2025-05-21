@@ -570,7 +570,7 @@ main {
 }
 
 .page-content {
-  border-bottom: 1px solid gray; /* 삭제? */
+  border-bottom: 1px solid gray;
   padding: 1rem;
   display: grid;
   grid-template-rows: 2fr 1fr;
@@ -582,13 +582,13 @@ main {
 }
 
 .page-content-img {
-  border-bottom: 1px solid gray; /* 삭제? */
+  border-bottom: 1px solid gray;
   display: flex; justify-content: center; align-items: center;
 }
 
 .page-content-txt {
   padding-top: 10px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
 }
 

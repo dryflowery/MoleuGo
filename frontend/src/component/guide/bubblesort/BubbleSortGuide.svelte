@@ -1,25 +1,21 @@
 <script>
-    import { isAlgoGuideVisible, algoGuideDelay } from "../../../lib/store.js";
+    import  { isAlgoGuideVisible, algoGuideDelay } from "../../../lib/store.js";
     import { fade } from 'svelte/transition';
 
     import BubbleSortSheet1 from "./sheet/BubbleSortSheet1.svelte";
     import BubbleSortSheet2 from "./sheet/BubbleSortSheet2.svelte";
-    import BubbleSortSheet3 from "./sheet/BubbleSortSheet3.svelte";
-    import BubbleSortSheet4 from "./sheet/BubbleSortSheet4.svelte";
 
     // 왼쪽 페이지의 앞면(해당 페이지를 보고 있을 때 보이는 면)과 뒷면
     const leftSheets = {
         1: { forward: BubbleSortSheet1, backward: undefined },
-        3: { forward: BubbleSortSheet3, backward: BubbleSortSheet2 },
     };
 
     // 오른쪽 페이지의 앞면(해당 페이지를 보고 있을 때 보이는 면)과 뒷면
     const rightSheets = {
-        1: { forward: BubbleSortSheet2, backward: BubbleSortSheet3 },
-        3: { forward: BubbleSortSheet4, backward: undefined },
+        1: { forward: BubbleSortSheet2, backward: undefined },
     };
 
-    let curPage = 1, minPage = 1, maxPage = 3; // 왼쪽 페이지 기준
+    let curPage = 1, minPage = 1, maxPage = 1; // 왼쪽 페이지 기준
 
     // nxt1, prev1은 0도 ~ 90도, nxt2, prev2는 90도 ~ 180도
     let flipNxt1 = false, flipNxt2 = false;
