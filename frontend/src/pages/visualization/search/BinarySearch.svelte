@@ -3,10 +3,11 @@
     import Header from "../../../component/Header.svelte";
     import Navigation from "../../../component/navigation/search/BinarySearchNavigation.svelte";
     import { fade } from 'svelte/transition';
-    import {isListVisible} from "../../../lib/store";
+    import {isListVisible, isAlgoGuideVisible} from "../../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep,
         asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
     import {incrementAnimationCount, verifyGoal} from "../../../lib/updateMypageInfo.js";
+    import BinarySearchGuide from "../../../component/guide/binarysearch/BinarySearchGuide.svelte";
 
     let arr = [];
     let arrLeft, low, mid, high, lowArrowLeft, midArrowLeft, highArrowLeft;
@@ -409,7 +410,7 @@
 </script>
 
 <main>
-    <div class="navigation-container">
+    <div class="navigation-container" style="display: {$isAlgoGuideVisible ? 'none' : 'block'};">
         <Navigation on:createRandomElement={createRandomElement}
                     on:createInputtedElement={createInputtedElement}
                     on:startBinarySearch={startBinarySearch}
@@ -428,6 +429,14 @@
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 이분 탐색(Binary Search)
+
+                <!-- 알고리즘 가이드 -->
+                <button class="guide-button" on:click={() => $isAlgoGuideVisible = true}>?</button>
+
+                {#if $isAlgoGuideVisible}
+                    <!-- 각 알고리즘에 맞는 가이드 넣기 -->
+                    <BinarySearchGuide/>
+                {/if}
             </div>
 
             <div class="canvas">
