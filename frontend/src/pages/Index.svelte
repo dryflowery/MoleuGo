@@ -182,25 +182,20 @@
     // 컨텐츠 컨텐츠 박스 스크롤 별 설명 구역  => 모듈에 대한 예시 gif 삽입 예정
     const content_sections = [
         {
-            title: '모듈 설명 1',
-            desc: '모듈에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/index/image1.png',
+            title: '이 알고리즘은?',
+            desc: '상단의 물음표 버튼을 클릭하면, 책 모양의 시각 요소가 나타나 현재 알고리즘에 대한 설명을 제공합니다. 핵심 개념과 작동 방식을 정리해 배경지식을 보완하고, 알고리즘 학습을 효과적으로 지원합니다.',
+            image: '../assets/index/content/module_1.gif',
         },
         {
-            title: '모듈 설명 2',
-            desc: '모듈에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/index/image2.png',
+            title: '내 학습 현황',
+            desc: '마이페이지는 사용자 맞춤형 기능을 제공하는 공간으로, 계정 정보 관리부터 학습 이력 확인까지 다양한 서비스를 지원합니다. 도넛 차트와 잔디밭 시각화를 통해 알고리즘 학습 현황을 확인할 수 있으며 학습 흐름과 목표 설정도 가능합니다.',
+            image: '../assets/index/content/module_2.gif',
         },
         {
-            title: '모듈 설명 3',
-            desc: '모듈에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/index/image3.png',
-        },
-        {
-            title: '모듈 설명 4',
-            desc: '모듈에 대한 설명입니다다다다다다다ㅏ다다다다다다다다다다다다.',
-            image: '../assets/index/image4.png',
-        },
+            title: '나의 알고리즘 여정',
+            desc: '로드맵은 알고리즘 학습의 흐름과 순서를 시각적으로 안내하는 기능입니다. 기초 자료구조부터 고급 알고리즘까지의 경로를 따라가며, 사용자는 현재 위치를 확인하고 다음 학습 단계를 계획할 수 있습니다.',
+            image: '../assets/index/content/module_3.gif',
+        }
     ];
 
     // content 현재 위치 
@@ -665,7 +660,7 @@
     }
 
     .content-left-section {
-        margin: 70px 0px 0px 0px;
+        margin: 80px 0px 0px 0px;
         min-height: 250px;
         padding: 3rem;
         color: white;
@@ -676,7 +671,7 @@
     }
 
     #box-content-content-right {
-        height: 1850px;
+        height: 1460px;
         position: relative;
     }
 
@@ -940,9 +935,6 @@
 
         /* box-content-content 과 관련된 모든 CSS*/
         .box-content-content {
-            width: 100%;
-            height: 100%;
-
             box-sizing: border-box;
             
             display: grid;
@@ -964,9 +956,9 @@
         }
 
         .content-left-section {
-            margin: 20px 0px 0px 0px;
-            min-height: 300px;
-            padding: 3rem;
+            margin: 50px 0px 0px 0px;
+            min-height: 200px;
+            padding: 2rem;
             color: white;
             display: flex;
             flex-direction: column;
@@ -975,14 +967,14 @@
         }
 
         #box-content-content-right {
-            height: 1850px;
+            height: 1080px;
             position: relative;
         }
 
         .content-sticky-image {
             position: sticky;
-            top: 1.5vh;
-            padding: 2rem;
+            top: 4vh;
+            padding: 1.5rem;
         }
 
         .content-sticky-image img {
