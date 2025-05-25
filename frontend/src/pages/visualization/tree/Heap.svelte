@@ -2,11 +2,11 @@
     import { onDestroy, onMount, tick } from "svelte";
     import Header from "../../../component/Header.svelte";
     import Navigation from "../../../component/navigation/tree/HeapNavigation.svelte";
-    import {isListVisible} from "../../../lib/store";
+    import {isListVisible, isAlgoGuideVisible} from "../../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
-    import { fly } from "svelte/transition";
     import {incrementAnimationCount, verifyGoal} from "../../../lib/updateMypageInfo.js";
+    import HeapGuide from "../../../component/guide/heap/HeapGuide.svelte";
 
     let elementCnt = 0, nodeVw = 0, nodeVh = 0;
     let heap = [];
@@ -531,7 +531,7 @@
 </script>
 
 <main>
-    <div class="navigation-container">
+    <div class="navigation-container" style="display: {$isAlgoGuideVisible ? 'none' : 'block'};">
         <Navigation 
             on:createRandomElement={createRandomElement} 
             on:createInputtedElement={createInputtedElement} 
@@ -552,6 +552,14 @@
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 최대 힙(Max Heap)
+
+                <!-- 알고리즘 가이드 -->
+                <button class="guide-button" on:click={() => $isAlgoGuideVisible = true}>?</button>
+
+                {#if $isAlgoGuideVisible}
+                    <!-- 각 알고리즘에 맞는 가이드 넣기 -->
+                    <HeapGuide/>
+                {/if}
             </div>
 
             <div class="canvas">
