@@ -536,19 +536,20 @@
                     <!-- 코드의 class="code"로 설정 -->
                     <!-- 들여쓰기는 padding-left:35px -->
                     <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">low = 0</div>
-                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">high = arr.length() - 1</div>
+                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">high = len(arr) - 1</div>
                     <br>
-                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">while(low + 1 &lt high)</div>
-                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">mid = (low + high) / 2</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">while low + 1 &lt high:</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">mid = (low + high) // 2</div>
                     <br>
-                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {1 * $indentSize + 10}px">if(arr[mid] &lt key)</div>
+                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {1 * $indentSize + 10}px">if arr[mid] &lt key:</div>
                     <div class="code" style="background-color: {$codeColor[2]}; padding-left: {2 * $indentSize + 10}px">low = mid</div>
 
-                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {1 * $indentSize + 10}px">else if(arr[mid] &gt key)</div>
+                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {1 * $indentSize + 10}px">elif arr[mid] &gt key:</div>
                     <div class="code" style="background-color: {$codeColor[3]}; padding-left: {2 * $indentSize + 10}px">high = mid</div>
 
-                    <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">else</div>
+                    <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">else:</div>
                     <div class="code" style="background-color: {$codeColor[4]}; padding-left: {2 * $indentSize + 10}px">return mid</div>
+
                 </div>
             </div>
         </div>

@@ -663,24 +663,25 @@
                 <div class="code-title">의사코드</div>
 
                 <div class="code-area">
-                    {#if createAnimation} 
-                        <div class="code" style="background-color: {$codeColor[5]}; padding-left: {0 * $indentSize + 10}px">for i = 0 to A.length</div>
-                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {1 * $indentSize + 10}px">Heap[Heap.length] = num</div>
-                        <div class="code" style="background-color: {$codeColor[3]}; padding-left: {1 * $indentSize + 10}px">while Heap[current] &gt; Heap[parent node]</div>
-                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {2 * $indentSize + 10}px">Swap(Heap[current], Heap[parent node])</div>
-                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {2 * $indentSize + 10}px">current = parent node</div>
+                    {#if createAnimation}
+                        <div class="code" style="background-color: {$codeColor[5]}; padding-left: {0 * $indentSize + 10}px">for i in range(len(A)):</div>
+                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {1 * $indentSize + 10}px">Heap.append(num)</div>
+                        <div class="code" style="background-color: {$codeColor[3]}; padding-left: {1 * $indentSize + 10}px">while Heap[current] &gt; Heap[parent]:</div>
+                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {2 * $indentSize + 10}px">Swap(Heap[current], Heap[parent])</div>
+                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {2 * $indentSize + 10}px">current = parent</div>
                     {:else if extractAnimation}
-                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">Extract root(MAX_VALUE)</div>
-                        <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">Delete(Heap[1])</div>
-                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">Heap[1] = Heap[Heap.length - 1]</div><br/>
-                        <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">while Heap[larger child node] &gt; Heap[current]</div>
-                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">Swap(Heap[current], Heap[larger child node])</div>
-                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">current = larger child node</div>
+                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">extract = Heap[0]</div>
+                        <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">del Heap[0]</div>
+                        <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">Heap[0] = Heap.pop()</div><br/>
+                        <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">while Heap[larger_child] &gt; Heap[current]:</div>
+                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">Swap(Heap[current], Heap[larger_child])</div>
+                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">current = larger_child</div>
+
                     {:else if insertAnimation}
-                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">Heap[Heap.length] = num</div><br/>
-                        <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">while Heap[current] &gt; Heap[parent node]</div>
-                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">Swap(Heap[current], Heap[parent node])</div>
-                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">current = parent node</div>
+                        <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">Heap.append(num)</div><br/>
+                        <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">while Heap[current] &gt; Heap[parent]:</div>
+                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">Swap(Heap[current], Heap[parent])</div>
+                        <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">current = parent</div>
                     {/if}
                 </div>
             </div>

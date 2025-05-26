@@ -596,10 +596,11 @@
                 <div class="code-title">의사코드</div>
 
                 <div class="code-area">
-                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">visited[current] = true</div>
-                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">for(int next : graph[current])</div>
-                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">if(visited[next] == false)</div>
+                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">visited[current] = True</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">for next in graph[current]:</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">if not visited[next]:</div>
                     <div class="code" style="background-color: {$codeColor[1]}; padding-left: {2 * $indentSize + 10}px">dfs(next)</div>
+
                 </div>
             </div>
         </div>

@@ -628,16 +628,16 @@
                 <div class="code-title">의사코드</div>
 
                 <div class="code-area">
-                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">current = startNodeNum</div>
-                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">visited[current] = true</div>
-                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">queue.push(current)</div><br>
-                    <div class="code" style="background-color: {$codeColor[4]}; padding-left: {0 * $indentSize + 10}px">while(!queue.empty())</div>
-                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">for(int next : graph[current])</div>
-                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {2 * $indentSize + 10}px">if(visited[next] == false)</div>
-                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {3 * $indentSize + 10}px">visited[next] = true</div>
-                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {3 * $indentSize + 10}px">queue.push(next)</div>
-                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {1 * $indentSize + 10}px">current = queue.top()</div>
-                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {1 * $indentSize + 10}px">queue.pop()</div>
+                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">current = start_node</div>
+                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">visited[current] = True</div>
+                    <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">queue.append(current)</div><br>
+                    <div class="code" style="background-color: {$codeColor[4]}; padding-left: {0 * $indentSize + 10}px">while queue:</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {1 * $indentSize + 10}px">for next in graph[current]:</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {2 * $indentSize + 10}px">if not visited[next]:</div>
+                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {3 * $indentSize + 10}px">visited[next] = True</div>
+                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {3 * $indentSize + 10}px">queue.append(next)</div>
+                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {1 * $indentSize + 10}px">current = queue[0]</div>
+                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {1 * $indentSize + 10}px">queue.pop(0)</div>
                 </div>
             </div>
         </div>
