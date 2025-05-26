@@ -1283,10 +1283,6 @@
                         <!-- Peek 연산 의사코드 -->
                         <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">if head == null then return null</div>
                         <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">return head.value</div>
-
-                    {:else}
-                        <!-- Default case -->
-                        <div class="code" style="background-color: rgba(255, 255, 255, 0); padding-left: {0 * $indentSize + 10}px">연산이 선택되지 않았습니다.</div>
                     {/if}
                     
                 </div>

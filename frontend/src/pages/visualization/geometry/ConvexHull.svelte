@@ -1042,13 +1042,13 @@
                 <div class="code-area">
                     <!-- 코드의 class="code"로 설정 -->
                     <div class="code" style="background-color: {$codeColor[0]}; padding-left: {0 * $indentSize + 10}px">set points[0]</div>
-                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">sort in counter-clockwise order</div><br>
-                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">stack.push(points[0])</div>
-                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">stack.push(points[1])</div><br>
-                    <div class="code" style="background-color: {$codeColor[4]}; padding-left: {0 * $indentSize + 10}px">for i = 2 to points.length - 1</div>
-                    <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">while stack.size() &ge; 2 and CCW() &le; 0</div>
+                    <div class="code" style="background-color: {$codeColor[1]}; padding-left: {0 * $indentSize + 10}px">sort points in counter-clockwise order</div><br>
+                    <div class="code" style="background-color: {$codeColor[2]}; padding-left: {0 * $indentSize + 10}px">stack.append(points[0])</div>
+                    <div class="code" style="background-color: {$codeColor[3]}; padding-left: {0 * $indentSize + 10}px">stack.append(points[1])</div><br>
+                    <div class="code" style="background-color: {$codeColor[4]}; padding-left: {0 * $indentSize + 10}px">for i in range(2, len(points)):</div>
+                    <div class="code" style="background-color: {$codeColor[4]}; padding-left: {1 * $indentSize + 10}px">while len(stack) &ge; 2 and CCW() &le; 0:</div>
                     <div class="code" style="background-color: {$codeColor[5]}; padding-left: {2 * $indentSize + 10}px">stack.pop()</div>
-                    <div class="code" style="background-color: {$codeColor[6]}; padding-left: {1 * $indentSize + 10}px">stack.push(points[i])</div>
+                    <div class="code" style="background-color: {$codeColor[6]}; padding-left: {1 * $indentSize + 10}px">stack.append(points[i])</div>
                 </div>
             </div>
         </div>
