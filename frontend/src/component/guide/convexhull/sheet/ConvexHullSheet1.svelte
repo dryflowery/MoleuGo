@@ -3,7 +3,7 @@
 
     <section class="page-content">
         <div class="page-content-img">
-            <img src="assets/guide/convexhull/1.png" style="width: 450px; height: 350px; object-fit: contain;">
+            <img src="assets/guide/convexhull/1.PNG" style="width: 450px; height: 350px; object-fit: contain;">
         </div>
 
         <div class="page-content-txt">

@@ -2,9 +2,10 @@
     import { onDestroy, onMount, tick   } from "svelte";
     import Header from "../../../component/Header.svelte";
     import QueueNavigation from "../../../component/navigation/Linear/QueueNavigation.svelte";
-    import {isListVisible} from "../../../lib/store.js";
+    import {isListVisible, isAlgoGuideVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
     import {incrementAnimationCount, verifyGoal} from "../../../lib/updateMypageInfo.js";
+    import QueueGuide from "../../../component/guide/queue/QueueGuide.svelte";
 
     let canvasWidth = window.innerWidth * 0.73;
     let canvasHeight = window.innerHeight * 0.78;
@@ -1118,7 +1119,7 @@
 </script>
 
 <main>
-    <div class="navigation-container">
+    <div class="navigation-container" style="display: {$isAlgoGuideVisible ? 'none' : 'block'};">
         <QueueNavigation {numArr}
         on:createRandomArr={createRandomArr} 
         on:createInputtedArr={createInputtedArr} 
@@ -1140,6 +1141,14 @@
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 큐(Queue)
+
+                <!-- 알고리즘 가이드 -->
+                <button class="guide-button" on:click={() => $isAlgoGuideVisible = true}>?</button>
+
+                {#if $isAlgoGuideVisible}
+                    <!-- 각 알고리즘에 맞는 가이드 넣기 -->
+                    <QueueGuide/>
+                {/if}
             </div>
 
             <div class="canvas">
