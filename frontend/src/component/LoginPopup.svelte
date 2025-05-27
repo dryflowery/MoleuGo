@@ -1,6 +1,6 @@
 <script>
     import '../component/Toast.svelte'
-    import {isLoginVisible, isLogin, checkLoginStatus} from "../lib/store";
+    import {isLoginVisible, checkLoginStatus} from "../lib/store";
     import {OK, UNAUTHORIZED} from "../lib/httpStatusStore.js";
     import { push } from "svelte-spa-router";
     import Toast from "./Toast.svelte";
@@ -24,7 +24,6 @@
             showToast = false;
         }, 2000); // 2초 후 자동 숨김
     }
-
 
     const closeLoginPopup = (event) => {
         const popupContent = document.getElementById("popup-content");
