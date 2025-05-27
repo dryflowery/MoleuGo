@@ -2,7 +2,7 @@
     import AlgorithmList from "./AlgorithmList.svelte";
     import LoginPopup from "./LoginPopup.svelte";
     import { push } from "svelte-spa-router";
-    import {isListVisible, isLoginVisible, isLogin, isAlgoGuideVisible, checkLoginStatus} from "../lib/store";
+    import {isListVisible, isLoginVisible, isLogin, isAlgoGuideVisible, isAboutVisible, isTeamsVisible, checkLoginStatus} from "../lib/store";
     import {OK} from "../lib/httpStatusStore.js";
 
     const setAlgorithmListVisible = () => {
@@ -10,6 +10,7 @@
     };
 
     const openLoginPopup = () => {
+        $isAboutVisible = $isTeamsVisible = false;
         $isLoginVisible = true;
     };
 

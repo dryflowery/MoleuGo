@@ -1,5 +1,17 @@
 <script>
+    import { isTeamsVisible, isAboutVisible, isLoginVisible } from "../lib/store.js";
+    import Teams from "./footer/Teams.svelte";
+    import About from "./footer/About.svelte";
+    
+    const openTeamsPopup = () => {
+        $isAboutVisible = $isLoginVisible = false;
+        $isTeamsVisible = true;
+    }
 
+    const openAboutPopup = () => {
+        $isTeamsVisible = $isLoginVisible = false;
+        $isAboutVisible = true;
+    }
 </script>
 
 <main>
@@ -7,8 +19,17 @@
         <div id="footer-github">
             <ion-icon name="logo-github" style="font-size: 1.5rem" class="footer-element"></ion-icon>
         </div>
-        <div id="footer-teams" class="footer-element">Teams</div>
-        <div id="footer-about" class="footer-element">About</div>
+
+        <div id="footer-teams" class="footer-element" on:click={openTeamsPopup}>Teams</div>
+        <div id="footer-about" class="footer-element" on:click={openAboutPopup}>About</div>
+    </div>
+
+    <div>
+        {#if $isTeamsVisible === true}
+            <Teams/>
+        {:else if $isAboutVisible === true}
+            <About/>
+        {/if}
     </div>
 </main>
 
@@ -23,6 +44,10 @@
     }
 
     #footer-container {
+        -webkit-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select:none;
         display: flex;
         gap: 10px;
         align-items: center;
