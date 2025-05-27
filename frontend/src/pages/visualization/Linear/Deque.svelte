@@ -2,10 +2,10 @@
     import { onDestroy, onMount, tick   } from "svelte";
     import Header from "../../../component/Header.svelte";
     import DequeNavigation from "../../../component/navigation/Linear/DequeNavigation.svelte";
-    import {isListVisible} from "../../../lib/store.js";
+    import {isListVisible, isAlgoGuideVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
     import {incrementAnimationCount,verifyGoal} from "../../../lib/updateMypageInfo.js";
-
+    import DequeGuide from "../../../component/guide/deque/DequeGuide.svelte";
 
     let canvasWidth = window.innerWidth * 0.73;
     let canvasHeight = window.innerHeight * 0.78;
@@ -1584,7 +1584,7 @@
 </script>
 
 <main>
-    <div class="navigation-container">
+    <div class="navigation-container" style="display: {$isAlgoGuideVisible ? 'none' : 'block'};">
         <DequeNavigation {numArr}
         on:createRandomArr={createRandomArr} 
         on:createInputtedArr={createInputtedArr} 
@@ -1606,6 +1606,14 @@
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 데크(Deque)
+
+                <!-- 알고리즘 가이드 -->
+                <button class="guide-button" on:click={() => $isAlgoGuideVisible = true}>?</button>
+
+                {#if $isAlgoGuideVisible}
+                    <!-- 각 알고리즘에 맞는 가이드 넣기 -->
+                    <DequeGuide/>
+                {/if}
             </div>
 
             <div class="canvas">
