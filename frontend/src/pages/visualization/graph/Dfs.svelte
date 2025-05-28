@@ -2,10 +2,11 @@
     import { onDestroy, onMount } from "svelte";
     import Header from "../../../component/Header.svelte";
     import Navigation from "../../../component/navigation/graph/DfsNavigation.svelte";
-    import {isListVisible} from "../../../lib/store";
+    import {isListVisible, isAlgoGuideVisible} from "../../../lib/store";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep,
         asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
     import {incrementAnimationCount, verifyGoal} from "../../../lib/updateMypageInfo.js";
+    import DfsGuide from "../../../component/guide/dfs/DfsGuide.svelte";
 
     let svgElement, svgRect, nodeElement, nodeRect;
     let startX, startY, startNodeNum, endNodeNum;
@@ -488,86 +489,84 @@
         $explanation = $animationQuery[queryNum].curExplanation;
         changeCodeColor($animationQuery[queryNum].curCode);
 
-        if(queryNum !== 0) {
-            const edgeElements = document.querySelectorAll('path');
+        const edgeElements = document.querySelectorAll('path');
 
-            for (let idx = 0; idx < edgeElements.length; idx++) {
-                const element = edgeElements[idx];
+        for (let idx = 0; idx < edgeElements.length; idx++) {
+            const element = edgeElements[idx];
 
-                if (element.getAttribute("stroke") === null || element.getAttribute("stroke") === undefined) {
-                    continue;
-                }
-
-                const newStroke = `${$animationQuery[queryNum].curEdgeColor[idx - 1]}`;
-
-                if (element.getAttribute("stroke") !== newStroke) {
-
-                    if (!($fromBtn || $isReplay)) {
-                        const newEdge = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                        newEdge.setAttribute("stroke", newStroke);
-                        newEdge.setAttribute("stroke-width", "3.25");
-                        newEdge.setAttribute("fill", "none");
-
-                        const d = element.getAttribute("d");
-                        const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                        tempPath.setAttribute("d", d);
-
-                        const markerWidth = parseFloat(document.getElementById("arrow").getAttribute("markerWidth")) + 5.0;
-                        const totalLength = tempPath.getTotalLength();
-                        const newLength = totalLength - markerWidth;
-
-                        const startPoint = tempPath.getPointAtLength(0);
-                        const endPoint = tempPath.getPointAtLength(newLength);
-                        const newD = `M${startPoint.x},${startPoint.y} L${endPoint.x},${endPoint.y}`;
-
-                        newEdge.setAttribute("d", newD);
-                        svgElement.appendChild(newEdge);
-
-                        newEdge.style.strokeDasharray = newLength;
-                        newEdge.style.strokeDashoffset = newLength;
-
-                        newEdge.animate(
-                            [
-                                {strokeDashoffset: newLength},
-                                {strokeDashoffset: 0}
-                            ],
-                            {
-                                duration: 2000 * (1 / $animationSpeed),
-                                easing: "ease-in-out",
-                                iterations: 1
-                            }
-                        );
-
-                        newEdge.style.strokeDashoffset = 0;
-
-                        await delay(2000 * (1 / $animationSpeed));
-
-                        element.setAttribute("stroke", newStroke);
-                        newEdge.remove();
-                    }
-                    else {
-                        element.setAttribute("stroke", newStroke);
-                    }
-                }
+            if (element.getAttribute("stroke") === null || element.getAttribute("stroke") === undefined) {
+                continue;
             }
 
-            const nodeElements = document.querySelectorAll('.node');
-            for (let idx = 0; idx < nodeElements.length; idx++) {
-                const element = nodeElements[idx];
-                const newColor = $animationQuery[queryNum].curNodeColor[idx];
+            const newStroke = `${$animationQuery[queryNum].curEdgeColor[idx - 1]}`;
 
-                if (rgbToHex(element.style.color) !== newColor) {
-                    if (!($fromBtn || $isReplay)) {
-                        element.style.transition = `color ${800 * (1 / $animationSpeed)}ms, border ${800 * (1 / $animationSpeed)}ms`;
-                    }
+            if (element.getAttribute("stroke") !== newStroke) {
 
-                    const color = $animationQuery[queryNum].curNodeColor[idx];
-                    element.style.color = color;
-                    element.style.border = `5px solid ${color}`;
+                if (!($fromBtn || $isReplay)) {
+                    const newEdge = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    newEdge.setAttribute("stroke", newStroke);
+                    newEdge.setAttribute("stroke-width", "3.25");
+                    newEdge.setAttribute("fill", "none");
 
-                    if (!($fromBtn || $isReplay)) {
-                        await delay(800 * (1 / $animationSpeed));
-                    }
+                    const d = element.getAttribute("d");
+                    const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    tempPath.setAttribute("d", d);
+
+                    const markerWidth = parseFloat(document.getElementById("arrow").getAttribute("markerWidth")) + 5.0;
+                    const totalLength = tempPath.getTotalLength();
+                    const newLength = totalLength - markerWidth;
+
+                    const startPoint = tempPath.getPointAtLength(0);
+                    const endPoint = tempPath.getPointAtLength(newLength);
+                    const newD = `M${startPoint.x},${startPoint.y} L${endPoint.x},${endPoint.y}`;
+
+                    newEdge.setAttribute("d", newD);
+                    svgElement.appendChild(newEdge);
+
+                    newEdge.style.strokeDasharray = newLength;
+                    newEdge.style.strokeDashoffset = newLength;
+
+                    newEdge.animate(
+                        [
+                            {strokeDashoffset: newLength},
+                            {strokeDashoffset: 0}
+                        ],
+                        {
+                            duration: 2000 * (1 / $animationSpeed),
+                            easing: "ease-in-out",
+                            iterations: 1
+                        }
+                    );
+
+                    newEdge.style.strokeDashoffset = 0;
+
+                    await delay(2000 * (1 / $animationSpeed));
+
+                    element.setAttribute("stroke", newStroke);
+                    newEdge.remove();
+                }
+                else {
+                    element.setAttribute("stroke", newStroke);
+                }
+            }
+        }
+
+        const nodeElements = document.querySelectorAll('.node');
+        for (let idx = 0; idx < nodeElements.length; idx++) {
+            const element = nodeElements[idx];
+            const newColor = $animationQuery[queryNum].curNodeColor[idx];
+
+            if (rgbToHex(element.style.color) !== newColor) {
+                if (!($fromBtn || $isReplay)) {
+                    element.style.transition = `color ${800 * (1 / $animationSpeed)}ms, border ${800 * (1 / $animationSpeed)}ms`;
+                }
+
+                const color = $animationQuery[queryNum].curNodeColor[idx];
+                element.style.color = color;
+                element.style.border = `5px solid ${color}`;
+
+                if (!($fromBtn || $isReplay)) {
+                    await delay(800 * (1 / $animationSpeed));
                 }
             }
         }
@@ -590,7 +589,7 @@
 </script>
 
 <main>
-    <div class="navigation-container">
+    <div class="navigation-container" style="display: {$isAlgoGuideVisible ? 'none' : 'block'};">
         <Navigation on:startDfs={startDfs}/>
     </div>
 
@@ -606,6 +605,14 @@
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
                 깊이 우선 탐색(Depth First Search)
+
+                <!-- 알고리즘 가이드 -->
+                <button class="guide-button" on:click={() => $isAlgoGuideVisible = true}>?</button>
+
+                {#if $isAlgoGuideVisible}
+                    <!-- 각 알고리즘에 맞는 가이드 넣기 -->
+                    <DfsGuide/>
+                {/if}
             </div>
 
             <div class="canvas" on:click={createNode}>
