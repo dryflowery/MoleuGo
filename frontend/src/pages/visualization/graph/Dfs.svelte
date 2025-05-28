@@ -3,14 +3,14 @@
     import Header from "../../../component/Header.svelte";
     import Navigation from "../../../component/navigation/graph/DfsNavigation.svelte";
     import {isListVisible} from "../../../lib/store";
-    import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
-             asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
+    import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep,
+        asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
     import {incrementAnimationCount, verifyGoal} from "../../../lib/updateMypageInfo.js";
 
     let svgElement, svgRect, nodeElement, nodeRect;
     let startX, startY, startNodeNum, endNodeNum;
     let isDragging = false;
-    let edgeElement = null; 
+    let edgeElement = null;
     let nodeCnt = 0;
     let edgeCnt = 0;
     let edgeIdx = {};
@@ -20,23 +20,23 @@
         $animationSpeed = 1;
         InitAnimation();
     });
-    
+
     // 슬라이더의 위치에 따른 $animationSpeed 관리
     // 50%까지는 [1, 10], 51%부터는 [11, 500]
     const updateSpeed = (e) => {
         const sliderValue = e.target.value;
-        
+
         if (sliderValue <= 50) {
-            $animationSpeed = Math.round(sliderValue / 5); 
-            
+            $animationSpeed = Math.round(sliderValue / 5);
+
             if($animationSpeed == 0) {
                 $animationSpeed = 1;
             }
-        } 
-        else {
-            $animationSpeed = Math.min($maxSpeed, Math.round(10 + (sliderValue - 50) * 20));  
         }
-        
+        else {
+            $animationSpeed = Math.min($maxSpeed, Math.round(10 + (sliderValue - 50) * 20));
+        }
+
     };
 
     // 슬라이더 색깔관리
@@ -53,16 +53,16 @@
             const checkPause = () => {
                 if ($isPaused === false) {
                     setTimeout(resolve, 0);
-                } 
+                }
                 else {
                     setTimeout(() => {
                         if ($isPaused === true) {
-                            checkPause(); 
-                        } 
+                            checkPause();
+                        }
                         else {
                             resolve();
                         }
-                    }, 50); 
+                    }, 50);
                 }
             };
 
@@ -79,16 +79,16 @@
         $explanation = ``;
         $animationQuery = [];
         $codeColor = Array(3).fill();
-        $animationStep = [0, 0]; 
+        $animationStep = [0, 0];
         $asyncCnt = 0;
 
         isDragging = false;
-        edgeElement = null; 
+        edgeElement = null;
         nodeCnt = 0;
         edgeCnt = 0;
         edgeIdx = {};
 
-        const nodeElements = document.querySelectorAll('.node'); 
+        const nodeElements = document.querySelectorAll('.node');
         nodeElements.forEach(element => {
             element.remove();
         });
@@ -141,8 +141,8 @@
         node.id = `node_${nodeCnt}`;
         node.className = 'node';
         node.style.position = 'absolute';
-        node.style.left = `${centerW}vw `; 
-        node.style.top = `${centerH}vh`; 
+        node.style.left = `${centerW}vw `;
+        node.style.top = `${centerH}vh`;
         node.style.display = 'flex';
         node.style.alignItems = 'center';
         node.style.justifyContent = 'center';
@@ -170,8 +170,8 @@
     };
 
     const startDrag = (e) => {
-        if (e.button != 0) { 
-            return; 
+        if (e.button != 0) {
+            return;
         }
 
         isDragging = true;
@@ -179,8 +179,8 @@
 
         svgElement = document.getElementById("svg");
         svgRect = svgElement.getBoundingClientRect();
-        
-        nodeElement = e.target.closest(".node"); 
+
+        nodeElement = e.target.closest(".node");
         nodeRect = nodeElement.getBoundingClientRect();
 
         // 노드의 중간 지점에서 간선 시작
@@ -251,16 +251,16 @@
             return;
         }
 
-        nodeElement = e.target.closest(".node"); 
+        nodeElement = e.target.closest(".node");
         nodeRect = nodeElement.getBoundingClientRect();
         endNodeNum = nodeElement.id.substring(5);
 
-         // self loop, 중복 간선 생성 방지
+        // self loop, 중복 간선 생성 방지
         if(startNodeNum == endNodeNum || document.querySelector(`#edge_${startNodeNum}_${endNodeNum}`) != null) {
             edgeElement.remove();
             return;
         }
-        
+
         // 목표 노드와 간선의 교점 좌표 구하기
         const S = {x: startX, y: startY};
         const E = {x: nodeRect.left - svgRect.left + 30, y: nodeRect.top - svgRect.top + 30};
@@ -272,18 +272,18 @@
         // 경로 완성
         edgeElement.setAttribute("d", `M${startX},${startY} L${endX},${endY}`);
         edgeElement.setAttribute("id", `edge_${startNodeNum}_${endNodeNum}`)
-        
+
         // pointermove, pointerup 이벤트 리스너 제거
         document.removeEventListener("pointermove", onDrag);
         document.removeEventListener("pointerup", stopDrag);
     };
 
     const deleteNode = (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
 
-        const delNode = e.target; 
+        const delNode = e.target;
         const delNodeNum = parseInt(delNode.id.substring(5), 10);
-        delNode.remove(); 
+        delNode.remove();
         nodeCnt--;
 
         // 연결된 간선 삭제
@@ -296,19 +296,18 @@
 
             const edgeNum = element.id.split('_');
             startNodeNum = parseInt(edgeNum[1], 10);
-            endNodeNum = parseInt(edgeNum[2], 10);  
+            endNodeNum = parseInt(edgeNum[2], 10);
 
             if(delNodeNum == startNodeNum || delNodeNum == endNodeNum) {
                 element.remove();
             }
             else { // 간선 번호 하나씩 당기기
-                element.setAttribute("id", `edge_${startNodeNum > delNodeNum ? startNodeNum - 1 : startNodeNum}_
-                                                 ${endNodeNum > delNodeNum ? endNodeNum - 1 : endNodeNum}`);
+                element.setAttribute("id", `edge_${startNodeNum > delNodeNum ? startNodeNum - 1 : startNodeNum}_${endNodeNum > delNodeNum ? endNodeNum - 1 : endNodeNum}`);
             }
         });
 
         // 정점 번호 하나씩 당기기
-        const nodeElements = document.querySelectorAll('.node'); 
+        const nodeElements = document.querySelectorAll('.node');
 
         nodeElements.forEach(element => {
             const nodeNum = parseInt(element.id.substring(5), 10);
@@ -338,7 +337,7 @@
     };
 
     const pushAnimationQuery = (tmpExplanation, tmpCode, tmpNodeColor, tmpEdgeColor) => {
-            $animationQuery.push({
+        $animationQuery.push({
             curExplanation: tmpExplanation,
             curCode: tmpCode,
             curNodeColor: tmpNodeColor,
@@ -357,11 +356,11 @@
 
                 const edgeNum = element.id.split('_');
                 startNodeNum = parseInt(edgeNum[1], 10);
-                endNodeNum = parseInt(edgeNum[2], 10); 
+                endNodeNum = parseInt(edgeNum[2], 10);
 
                 edgeIdx[element.id] = index - 1; // arrow-path 제외
                 edgeCnt++;
-                
+
                 addEdge(graph, startNodeNum, endNodeNum);
             });
         };
@@ -370,13 +369,13 @@
             if(!graph[u]) {
                 graph[u] = [];
             }
-            
+
             graph[u].push(v);
         };
 
         const sortGraph = (graph) => {
             const sortedGraph = Object.keys(graph)
-                .sort((a, b) => a - b) 
+                .sort((a, b) => a - b)
                 .reduce((acc, key) => {
                     acc[key] = graph[key].sort((a, b) => a - b);
                     return acc;
@@ -417,11 +416,11 @@
                     tmpCode = 1;
                     tmpExplanation = `${nxt}번 노드를 방문하지 않았다면 방문하고, 아니면 다른 노드를 탐색합니다`
                     tmpNodeColor[nxt] = tmpNodeColor[nxt] == "#000000" ? "#e97714" : "#50ad49";
-                    tmpEdgeColor[edgeIdx[`edge_${cur}_${nxt}`]] = "#e97714"; 
+                    tmpEdgeColor[edgeIdx[`edge_${cur}_${nxt}`]] = "#e97714";
                     pushAnimationQuery(tmpExplanation, tmpCode, [...tmpNodeColor], [...tmpEdgeColor]);
 
                     tmpNodeColor[nxt] = "#50ad49";
-                    tmpEdgeColor[edgeIdx[`edge_${cur}_${nxt}`]] = "#50ad49"; 
+                    tmpEdgeColor[edgeIdx[`edge_${cur}_${nxt}`]] = "#50ad49";
 
                     if(!visited[nxt]) {
                         dfs(nxt);
@@ -470,27 +469,110 @@
         }
     };
 
+    const rgbToHex = (rgb) => {
+        const result = rgb.match(/\d+/g);
+        if (!result || result.length < 3) {
+            return null;
+        }
+
+        return (
+            '#' +
+            result
+                .slice(0, 3)
+                .map((n) => parseInt(n).toString(16).padStart(2, '0'))
+                .join('')
+        );
+    };
+
     const drawDfsAnimation = async (queryNum) => {
-        $explanation = $animationQuery[queryNum].curExplanation; 
-        changeCodeColor($animationQuery[queryNum].curCode); 
+        $explanation = $animationQuery[queryNum].curExplanation;
+        changeCodeColor($animationQuery[queryNum].curCode);
 
-        const nodeElements = document.querySelectorAll('.node'); 
-        nodeElements.forEach((element, idx) => {
-            element.style.transition = 'color 0s';
-            element.style.color = $animationQuery[queryNum].curNodeColor[idx];
-            element.style.border = `5px solid ${$animationQuery[queryNum].curNodeColor[idx]}`;
-        });
+        if(queryNum !== 0) {
+            const edgeElements = document.querySelectorAll('path');
 
-        const edgeElements = document.querySelectorAll('path');
-        edgeElements.forEach((element, idx) => {
-            if(element.id == 'arrow-path') {
-                return;
+            for (let idx = 0; idx < edgeElements.length; idx++) {
+                const element = edgeElements[idx];
+
+                if (element.getAttribute("stroke") === null || element.getAttribute("stroke") === undefined) {
+                    continue;
+                }
+
+                const newStroke = `${$animationQuery[queryNum].curEdgeColor[idx - 1]}`;
+
+                if (element.getAttribute("stroke") !== newStroke) {
+
+                    if (!($fromBtn || $isReplay)) {
+                        const newEdge = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        newEdge.setAttribute("stroke", newStroke);
+                        newEdge.setAttribute("stroke-width", "3.25");
+                        newEdge.setAttribute("fill", "none");
+
+                        const d = element.getAttribute("d");
+                        const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        tempPath.setAttribute("d", d);
+
+                        const markerWidth = parseFloat(document.getElementById("arrow").getAttribute("markerWidth")) + 5.0;
+                        const totalLength = tempPath.getTotalLength();
+                        const newLength = totalLength - markerWidth;
+
+                        const startPoint = tempPath.getPointAtLength(0);
+                        const endPoint = tempPath.getPointAtLength(newLength);
+                        const newD = `M${startPoint.x},${startPoint.y} L${endPoint.x},${endPoint.y}`;
+
+                        newEdge.setAttribute("d", newD);
+                        svgElement.appendChild(newEdge);
+
+                        newEdge.style.strokeDasharray = newLength;
+                        newEdge.style.strokeDashoffset = newLength;
+
+                        newEdge.animate(
+                            [
+                                {strokeDashoffset: newLength},
+                                {strokeDashoffset: 0}
+                            ],
+                            {
+                                duration: 2000 * (1 / $animationSpeed),
+                                easing: "ease-in-out",
+                                iterations: 1
+                            }
+                        );
+
+                        newEdge.style.strokeDashoffset = 0;
+
+                        await delay(2000 * (1 / $animationSpeed));
+
+                        element.setAttribute("stroke", newStroke);
+                        newEdge.remove();
+                    }
+                    else {
+                        element.setAttribute("stroke", newStroke);
+                    }
+                }
             }
 
-            element.setAttribute("stroke", `${$animationQuery[queryNum].curEdgeColor[idx - 1]}`)
-        });
+            const nodeElements = document.querySelectorAll('.node');
+            for (let idx = 0; idx < nodeElements.length; idx++) {
+                const element = nodeElements[idx];
+                const newColor = $animationQuery[queryNum].curNodeColor[idx];
 
-        if(!($fromBtn || $isReplay)) {            
+                if (rgbToHex(element.style.color) !== newColor) {
+                    if (!($fromBtn || $isReplay)) {
+                        element.style.transition = `color ${800 * (1 / $animationSpeed)}ms, border ${800 * (1 / $animationSpeed)}ms`;
+                    }
+
+                    const color = $animationQuery[queryNum].curNodeColor[idx];
+                    element.style.color = color;
+                    element.style.border = `5px solid ${color}`;
+
+                    if (!($fromBtn || $isReplay)) {
+                        await delay(800 * (1 / $animationSpeed));
+                    }
+                }
+            }
+        }
+
+        if(!($fromBtn || $isReplay)) {
             await delay(2000 * (1 / $animationSpeed));
         }
         else {
@@ -528,13 +610,13 @@
 
             <div class="canvas" on:click={createNode}>
                 <svg id="svg" style="position: absolute; left: 0; top: 0; overflow: hidden">
-                    <marker 
-                        id='arrow' 
-                        orient="auto" 
-                        markerWidth='6'
-                        markerHeight='6' 
-                        refX='3' 
-                        refY='3'> 
+                    <marker
+                            id='arrow'
+                            orient="auto"
+                            markerWidth='6'
+                            markerHeight='6'
+                            refX='3'
+                            refY='3'>
                         <path d='M0,0 L6,3 L0,6 L0,0 Z' fill="black" />
                     </marker>
                 </svg>
@@ -544,20 +626,20 @@
                 <ion-icon name="play-back" class="animation-control-btn" on:click={() => {if($animationWorking) {$fromBtn = true; $isPaused = false; $pausedIcon = true; $animationStep[0] = 0;}}}></ion-icon>
                 <ion-icon name="caret-back" class="animation-control-btn" on:click={() => {if($animationWorking) {$fromBtn = true; $isPaused = false; $pausedIcon = true; $animationStep[0] = Math.max($animationStep[0] - 1, 0);}}}></ion-icon>
 
-                {#if $isPaused || $pausedIcon} 
-                    <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" 
-                        on:click={() => {
+                {#if $isPaused || $pausedIcon}
+                    <ion-icon name="play-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;"
+                              on:click={() => {
                             if($animationWorking) {
                                 if ($animationStep[0] === $animationStep[1]) {
                                     $isReplay = true; $animationStep[0] = -1;
-                                } 
+                                }
 
-                                $isPaused = false; 
+                                $isPaused = false;
                                 $pausedIcon = false;
                             }
                         }}>
                     </ion-icon>
-            
+
                 {:else}
                     <ion-icon name="pause-outline" class="animation-control-btn" style="font-size: 2.5rem; color: #d9d9d9;" on:click={() => {if($animationWorking) {$isPaused = true; $pausedIcon = true;}}}></ion-icon>
                 {/if}
@@ -566,24 +648,24 @@
                 <ion-icon name="play-forward" class="animation-control-btn" on:click={() => {if($animationWorking) {$fromBtn = true; $isPaused = false; $pausedIcon = true; $animationStep[0] = $animationStep[1];}}}></ion-icon>
 
                 <input class="animation-slider"
-                    type="range"
-                    style="background: {sliderStyle};"
-                    min=0
-                    max={$animationStep[1]}
-                    bind:value={$animationStep[0]}
-                    on:input={() => {if($animationWorking) {$isPaused = false; $pausedIcon = true; $fromBtn = true;}}}
+                       type="range"
+                       style="background: {sliderStyle};"
+                       min=0
+                       max={$animationStep[1]}
+                       bind:value={$animationStep[0]}
+                       on:input={() => {if($animationWorking) {$isPaused = false; $pausedIcon = true; $fromBtn = true;}}}
                 />
 
                 <input class="speed-slider"
-                    type="range" 
-                    min="0" 
-                    max="100" 
-                    step="1" 
-                    value="0"
-                    on:input={updateSpeed}
+                       type="range"
+                       min="0"
+                       max="100"
+                       step="1"
+                       value="0"
+                       on:input={updateSpeed}
                 />
                 <span class="speed-label">x {$animationSpeed}</span>
-            </div>      
+            </div>
         </div>
 
         <div class="main-right-container">
@@ -607,11 +689,11 @@
     </div>
 </main>
 
-<style>    
+<style>
     main {
         height: 100vh;
         display: grid;
-        grid-template-rows: 70px 1fr;   
+        grid-template-rows: 70px 1fr;
         user-select: none;
         -ms-use-select: none;
         -moz-user-select: none;
