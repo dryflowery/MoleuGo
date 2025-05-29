@@ -1605,7 +1605,7 @@
 
             <div class="algorithm-title-container">
                 <!-- 알고리즘 이름 추가. ex) 버블 정렬(Bubble Sort) -->
-                데크(Deque)
+                덱(Deque)
 
                 <!-- 알고리즘 가이드 -->
                 <button class="guide-button" on:click={() => $isAlgoGuideVisible = true}>?</button>
