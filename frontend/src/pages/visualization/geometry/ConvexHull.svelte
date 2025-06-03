@@ -164,7 +164,7 @@
 
         visibleCells = Array(54).fill(false);
 
-        if(e.detail.pointCnt === 7) {
+        if(e.detail.pointCnt === 8) {
             visibleCells[3] = visibleCells[6] = visibleCells[14] = visibleCells[18] =
             visibleCells[25] = visibleCells[29] = visibleCells[41] = visibleCells[47] = true
         } // 시연 끝나면 삭제
