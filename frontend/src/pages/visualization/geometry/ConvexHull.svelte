@@ -163,15 +163,22 @@
         InitAnimation();
 
         visibleCells = Array(54).fill(false);
-        for (let i = 0; i < e.detail.pointCnt; i++) {
-            let r = Math.floor(Math.random() * 54); 
 
-            if(!visibleCells[r]) 
-            {
-                visibleCells[r] = true;
-            }
-            else {
-                i--;
+        if(e.detail.pointCnt === 7) {
+            visibleCells[3] = visibleCells[6] = visibleCells[14] = visibleCells[18] =
+            visibleCells[25] = visibleCells[29] = visibleCells[41] = visibleCells[47] = true
+        } // 시연 끝나면 삭제
+        else {
+            for (let i = 0; i < e.detail.pointCnt; i++) {
+                let r = Math.floor(Math.random() * 54);
+
+                if(!visibleCells[r])
+                {
+                    visibleCells[r] = true;
+                }
+                else {
+                    i--;
+                }
             }
         }
     };
