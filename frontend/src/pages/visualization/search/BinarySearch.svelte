@@ -164,7 +164,7 @@
         arr = [];
 
         if(elementCnt === 7) {
-            arr = [-24, -2, 0, 7, 16, 31, 64]
+            arr = [1, 7, 10, 34, 52, 67, 89]
         } // 시연 끝나면 삭제
         else {
             for (let i = 0; i < elementCnt; i++) {
