@@ -5,6 +5,7 @@
     import {isListVisible} from "../../../lib/store.js";
     import { isPaused, pausedIcon, fromBtn, isReplay, explanation, animationSpeed, animationWorking, animationQuery, codeColor, animationStep, 
              asyncCnt, gradient, indentSize, maxSpeed } from "../../../lib/visualizationStore";
+    import {incrementAnimationCount, verifyGoal} from "../../../lib/updateMypageInfo.js";
 
     let numNode = [15, 10, 20, 30, 7]
     let nodePositions = []; // 노드의 실제 위치 저장
@@ -796,6 +797,9 @@
         $animationWorking = true;
         $pausedIcon = false;
         $isPaused = false;
+
+        incrementAnimationCount("linkedList");
+        verifyGoal("linkedList");
         
         executeLinkedListSearchAnimation($asyncCnt++);
     };
