@@ -261,6 +261,7 @@
     }
 
     const startLinkedListInsert = () => { // 삽입
+
         if(!isActive || $animationWorking) {
             return;
         }
@@ -268,6 +269,9 @@
         if (!validateInsertInputs()) {
             return;
         }
+
+        alert('삽입은 현재 오류로 인해 수정중 입니다. 검색을 이용해주세요');
+            return;
 
         toggle = Array(9).fill(false);
         isActive = false;
@@ -282,6 +286,9 @@
         if(!validateDeleteInputs()) {
             return;
         }
+
+        alert('삭제는 현재 오류로 인해 수정중 입니다. 검색을 이용해주세요');
+        return;
 
         toggle = Array(9).fill(false);
         isActive = false;

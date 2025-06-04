@@ -18,7 +18,7 @@
 
     const searchAlgorithm = () => {
         const checkAlgorithmString = inputAlgorithm.replace(/\s+/g, '').toUpperCase();
-        const elements = document.querySelectorAll('.algo-list-index-text, .algo-list-text-div, .algo-divider');
+        const elements = document.querySelectorAll('.algo-list-index-text, .algo-list-text-div, .algo-divider, .algo-list-text-div-WIP, .algo-list-text-div-REPAIR');
 
         if(checkAlgorithmString === '') {
             elements.forEach(element => {element.style.display = 'block';});
@@ -188,15 +188,15 @@
         <div>
             <p class="algo-list-index-text">7. 최단 경로</p>
 
-            <div class="algo-list-text-div" id="다익스트라">
+            <div class="algo-list-text-div-REPAIR" id="다익스트라" on:click={() => showToastMessage("최단 경로 알고리즘은 현재 오류 수정중입니다.", "info", true)}>
                 <span>다익스트라</span>
             </div>
 
-            <div class="algo-list-text-div" id="벨만포드">
+            <div class="algo-list-text-div-REPAIR" id="벨만포드" on:click={() => showToastMessage("최단 경로 알고리즘은 현재 오류 수정중입니다.", "info", true)}>
                 <span>벨만-포드</span>
             </div>
 
-            <div class="algo-list-text-div" id="플로이드워셜">
+            <div class="algo-list-text-div-REPAIR" id="플로이드워셜" on:click={() => showToastMessage("최단 경로 알고리즘은 현재 오류 수정중입니다.", "info", true)}>
                 <span>플로이드-워셜</span>
             </div>
         </div>
@@ -371,6 +371,26 @@
 
     .algo-list-text-div-WIP:hover {
         background-color: #312323; 
+        color: #BDBDBD; 
+        cursor: pointer; 
+    }
+
+    .algo-list-text-div-REPAIR{
+        width: 300px;
+        height: 35px;
+        padding: 5px 5px 5px 6px;
+        background-color: #181a1e;
+        border-radius: 8px;
+        display: flex; 
+        align-items: center; 
+        color: #BDBDBD; 
+        font-size: 1.1rem; 
+        margin: 0;
+        font-weight: bold;
+    }
+
+    .algo-list-text-div-REPAIR:hover {
+        background-color: #272331; 
         color: #BDBDBD; 
         cursor: pointer; 
     }
