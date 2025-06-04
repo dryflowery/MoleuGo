@@ -22,7 +22,7 @@
     </div>
 
     <div class="pre-main-container" class:visualization-list-visible={$isListVisible} class:visualization-list-invisible={!$isListVisible}>
-        <video bind:this={videoElement} src="assets/pre/convexhull.mp4" loop muted class="pre-video"></video>
+        <video bind:this={videoElement} src="assets/pre/convexhull.mp4" muted class="pre-video"></video>
     </div>
 </main>
 
@@ -45,7 +45,6 @@
     }
 
     .pre-video {
-        cursor: none;
         outline: none;
     }
 </style>
