@@ -163,17 +163,11 @@
         const elementCnt = e.detail.elementCnt;
         arr = [];
 
-        if(elementCnt === 7) {
-            arr = [1, 7, 10, 34, 52, 67, 89]
-        } // 시연 끝나면 삭제
-        else {
-            for (let i = 0; i < elementCnt; i++) {
-                arr.push(Math.floor(Math.random() * 99) + 1);
-            }
-
-            arr.sort((a, b) => a - b);
+        for (let i = 0; i < elementCnt; i++) {
+            arr.push(Math.floor(Math.random() * 99) + 1);
         }
 
+        arr.sort((a, b) => a - b);
 
         low = 0;
         high = arr.length - 1;

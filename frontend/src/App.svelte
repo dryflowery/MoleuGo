@@ -20,7 +20,6 @@
   import Bfs from './routes/visualization/graph/Bfs.svelte';
   import BinarySearch from "./routes/visualization/search/BinarySearch.svelte";
   import ResultPage from "./routes/ResultPage.svelte";
-  import ConvexHullPre from "./pages/visualization/geometry/ConvexHullPre.svelte";
 
   const routes = {
       '/': Index,
@@ -41,7 +40,6 @@
       '/visualization/graph/Bfs': Bfs,
       '/visualization/search/BinarySearch': BinarySearch,
       '/result': ResultPage,
-      '/visualization/geometry/ConvexHullPre': ConvexHullPre
   };
 
   onMount(() => {
