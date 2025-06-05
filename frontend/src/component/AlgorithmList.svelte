@@ -223,10 +223,6 @@
             <div class="algo-list-text-div" id="볼록껍질 컨벡스헐" on:click={() => navigateTo('geometry/ConvexHull')}>
                 <span>볼록 껍질(Convex Hull)</span>
             </div>
-
-            <div class="algo-list-text-div" id="볼록껍질 컨벡스헐" on:click={() => navigateTo('geometry/ConvexHullPre')}>
-                <span>볼록 껍질(발표용)</span>
-            </div>
         </div>
 
         <div class="algo-divider"></div>
