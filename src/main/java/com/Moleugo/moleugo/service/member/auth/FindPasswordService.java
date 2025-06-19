@@ -7,6 +7,7 @@ import com.Moleugo.moleugo.service.member.mail.MailService;
 import com.Moleugo.moleugo.util.PasswordGenerator;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,12 @@ public class FindPasswordService {
     private final PasswordGenerator passwordGenerator;
     private final MemberRepository memberRepository;
     private final HttpSession session;
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     public void sendVerificationEmail(FindPasswordRequest req) {
         Member member = new Member(req.getEmail());
-        String verificationLink = "http://localhost:8080/user/find-password/" + authService.createSession(member, 1800);
+        String verificationLink = baseUrl + "/user/find-password/" + authService.createSession(member, 1800);
         String to = member.getEmail();
         String title = "[moleugo] 비밀번호 변경을 완료하려면 이메일을 확인하세요!";
         String content = """
