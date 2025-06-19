@@ -76,7 +76,7 @@
 				</form>
 			{:else}
 				<h1>인증 메일을 보내드렸어요.</h1><br>
-				<img src="assets/mail.png" width="120px" alt="">
+				<img src="assets/email/mail.png" width="120px" alt="">
 
 				<br><br>
 				<p style="color: white; padding-top: 7.5px;">메일함을 확인해주세요.</p>
